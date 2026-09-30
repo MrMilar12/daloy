@@ -1,0 +1,2975 @@
+{
+    "retrieved_on":  "2026-09-30",
+    "sources":  [
+                    "https://ebeis.deped.gov.ph/beis/reports_info/masterlist",
+                    "https://nid.deped.gov.ph/public-dashboard/region/Region%20III/division/Aurora"
+                ],
+    "scope":  "Aurora division basic education school records, including private schools. Source records may include former school IDs and names; current operating status is not supplied. Identical names and addresses are grouped. Municipalities are assigned only where explicitly present in the source address.",
+    "schools":  [
+                    {
+                        "school_ids":  [
+                                           "104443"
+                                       ],
+                        "name":  "Abuleg ES",
+                        "address":  "Brgy. Abuleg, Dinalungan, Aurora",
+                        "municipality":  "Dinalungan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104451"
+                                       ],
+                        "name":  "Abungan ES",
+                        "address":  "Brgy. Ibona, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104419"
+                                       ],
+                        "name":  "Agues ES",
+                        "address":  "Brgy. Cozo, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104408",
+                                           "1503131",
+                                           "503131"
+                                       ],
+                        "name":  "Anacleto V. Mijares Integrated School",
+                        "address":  "Brgy. Buhangin, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "400566"
+                                       ],
+                        "name":  "Angelcare Science Academy",
+                        "address":  "Brgy. Suklayin, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "417506"
+                                       ],
+                        "name":  "Angelcare Science Academy, Casiguran",
+                        "address":  "Brgy. Tabas, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "417517"
+                                       ],
+                        "name":  "Angelcare Science Academy, Dipaculao",
+                        "address":  "Corner Mahoney St, North Poblacion, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "1400566"
+                                       ],
+                        "name":  "Angelcare Science Academy, Inc.",
+                        "address":  "San Luis Ext.",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "417521"
+                                       ],
+                        "name":  "Asia Pacific Integrated School, Inc.",
+                        "address":  "Quezon Street",
+                        "municipality":  "",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "300672"
+                                       ],
+                        "name":  "Aurora National Science HS",
+                        "address":  "Brgy. Buhangin, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300673"
+                                       ],
+                        "name":  "Aurora NHS",
+                        "address":  "Brgy. Reserva, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "417524"
+                                       ],
+                        "name":  "Aurora Polytechnic College, Inc.",
+                        "address":  "Brgy. Buhangin",
+                        "municipality":  "",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "417503"
+                                       ],
+                        "name":  "Aurora Shekinah New Sprout School",
+                        "address":  "Bukang Liwayway, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "406087",
+                                           "600242"
+                                       ],
+                        "name":  "Aurora State College of Technology",
+                        "address":  "Brgy. Zabali, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104513"
+                                       ],
+                        "name":  "Bacong ES",
+                        "address":  "Brgy. Bacong, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104484"
+                                       ],
+                        "name":  "Bagtu ES",
+                        "address":  "Brgy. Bagtu, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "400565"
+                                       ],
+                        "name":  "Baler Adventist Elementary School, Inc.",
+                        "address":  "Quezon St, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104409"
+                                       ],
+                        "name":  "Baler CS",
+                        "address":  "Brgy. 03, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "417505"
+                                       ],
+                        "name":  "Baler Essential Advent Academy",
+                        "address":  "Brgy. Suklayin, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "417512"
+                                       ],
+                        "name":  "Baler Essential Advent Academy (Annex)",
+                        "address":  "",
+                        "municipality":  "",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "400567"
+                                       ],
+                        "name":  "Baler Immaculate School, Inc.",
+                        "address":  "Bitong Extension, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "417511"
+                                       ],
+                        "name":  "Baler Infant Learning Center, Inc",
+                        "address":  "SITIO KINALAPAN BRGY. PINGIT, BALER, AURORA",
+                        "municipality":  "Baler",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "400568"
+                                       ],
+                        "name":  "Baler Institute",
+                        "address":  "Aurora Street, Baler Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "300677"
+                                       ],
+                        "name":  "Baler NHS",
+                        "address":  "Brgy. Pingit, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "305191"
+                                       ],
+                        "name":  "Baler Stand Alone Senior High School",
+                        "address":  "So. Setan, Brgy. Calabuanan, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104463"
+                                       ],
+                        "name":  "Bayabas ES",
+                        "address":  "Brgy. Bayabas, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300674"
+                                       ],
+                        "name":  "Bayanihan NHS",
+                        "address":  "Brgy. Bayanihan, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104494"
+                                       ],
+                        "name":  "Bernabe R. Dulay Memorial ES",
+                        "address":  "Brgy. Diaman, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104420"
+                                       ],
+                        "name":  "Bianoan ES",
+                        "address":  "A. Gonzales St., Brgy. Bianoan, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "416523"
+                                       ],
+                        "name":  "Bianoan Immaculate School, Inc.",
+                        "address":  "Brgy. Bianoan",
+                        "municipality":  "",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104464"
+                                       ],
+                        "name":  "Borlongan ES",
+                        "address":  "Brgy. Borlongan, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300675"
+                                       ],
+                        "name":  "Borlongan NHS",
+                        "address":  "Brgy. Borlongan, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "157517"
+                                       ],
+                        "name":  "Buenavista PS",
+                        "address":  "Brgy. Buenavista, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "157513"
+                                       ],
+                        "name":  "Butas na Bato ES",
+                        "address":  "Brgy. Butas Na Bato, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "157507"
+                                       ],
+                        "name":  "C. J. Torre ES",
+                        "address":  "Brgy. Tabas, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "157502"
+                                       ],
+                        "name":  "Cabanuangan PS",
+                        "address":  "-",
+                        "municipality":  "",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104488"
+                                       ],
+                        "name":  "Cabituculan East ES",
+                        "address":  "Brgy. Cabituculan East, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104452",
+                                           "1500751",
+                                           "500751"
+                                       ],
+                        "name":  "Cabog IS",
+                        "address":  "Sitio Cabog, Brgy. Matawe, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104421"
+                                       ],
+                        "name":  "Calabgan-Ditinagyan ES",
+                        "address":  "Brgy. Calabgan, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104410"
+                                       ],
+                        "name":  "Calabuanan ES",
+                        "address":  "Brgy. Calabuanan, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300678"
+                                       ],
+                        "name":  "Calabuanan NHS",
+                        "address":  "Purok 2, Brgy. Calabuanan, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104422",
+                                           "1502641",
+                                           "502641"
+                                       ],
+                        "name":  "Calantas Integrated School",
+                        "address":  "Sitio Mucdol, Brgy. Calantas, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104489"
+                                       ],
+                        "name":  "Calao ES",
+                        "address":  "So. Calao, Maria Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104465",
+                                           "1502642",
+                                           "502642"
+                                       ],
+                        "name":  "Calaocan Integrated School",
+                        "address":  "Brgy. Calaocan, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104431"
+                                       ],
+                        "name":  "Camilo Osias ES",
+                        "address":  "Brgy. Esperanza, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300679"
+                                       ],
+                        "name":  "Canili Area NHS",
+                        "address":  "Brgy. San Juan, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104453"
+                                       ],
+                        "name":  "Caragsacan ES",
+                        "address":  "Brgy. Caragsacan, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104411"
+                                       ],
+                        "name":  "Carmen T. Valenzuela ES",
+                        "address":  "Sitio Castillo, Brgy. Sabang, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "1500729",
+                                           "306510"
+                                       ],
+                        "name":  "Carmen T. Valenzuela IS",
+                        "address":  "Brgy. Sabang, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "500729"
+                                       ],
+                        "name":  "Carmen T. Valenzuela IS",
+                        "address":  "Sitio Castillo, Brgy. Sabang, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "400573"
+                                       ],
+                        "name":  "Casiguran Adventist Elementary School, Inc.",
+                        "address":  "Quezon Street",
+                        "municipality":  "",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104423"
+                                       ],
+                        "name":  "Casiguran CS",
+                        "address":  "Mabini St., Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "417522"
+                                       ],
+                        "name":  "Casiguran Immaculate Concepcion, Inc.",
+                        "address":  "Poblacion",
+                        "municipality":  "",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "300680"
+                                       ],
+                        "name":  "Casiguran NHS",
+                        "address":  "Brgy. Esteves, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104490"
+                                       ],
+                        "name":  "Debucao ES",
+                        "address":  "Brgy. Debucao, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104491"
+                                       ],
+                        "name":  "Decoliat ES",
+                        "address":  "Brgy. Decoliat, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104492"
+                                       ],
+                        "name":  "Detailen ES",
+                        "address":  "Brgy. Detailen, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104493"
+                                       ],
+                        "name":  "Diaat ES",
+                        "address":  "Brgy. Diaat, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104432"
+                                       ],
+                        "name":  "Diagyan ES",
+                        "address":  "Brgy. Diagyan, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "306504"
+                                       ],
+                        "name":  "Diagyan NHS",
+                        "address":  "Brgy. Diagyan, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "157516"
+                                       ],
+                        "name":  "Diamanen ES",
+                        "address":  "Brgy. Diamanen, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "157509"
+                                       ],
+                        "name":  "Dianao ES",
+                        "address":  "Sitio Dianao,Barangay Diniog, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "306506"
+                                       ],
+                        "name":  "Dianawan NHS",
+                        "address":  "Brgy. Dianawan",
+                        "municipality":  "",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104466"
+                                       ],
+                        "name":  "Dianed ES",
+                        "address":  "Brgy. Dianed, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104467"
+                                       ],
+                        "name":  "Diarabasin ES",
+                        "address":  "Brgy. Diarabasin, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "306507"
+                                       ],
+                        "name":  "Diarabasin NHS",
+                        "address":  "Brgy. Diarabasin, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104424"
+                                       ],
+                        "name":  "Dibacong ES",
+                        "address":  "Brgy. Dibacong, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "306502"
+                                       ],
+                        "name":  "Dibacong NHS",
+                        "address":  "Brgy. Dibacong, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104444"
+                                       ],
+                        "name":  "Dibaraybay ES",
+                        "address":  "Brgy. Dibaraybay, Dinalungan, Aurora",
+                        "municipality":  "Dinalungan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104514"
+                                       ],
+                        "name":  "Dibayabay ES",
+                        "address":  "Brgy. Dibayabay, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104425"
+                                       ],
+                        "name":  "Dibet ES",
+                        "address":  "Brgy. Dibet, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104515",
+                                           "1502854",
+                                           "1502855",
+                                           "502854",
+                                           "502855"
+                                       ],
+                        "name":  "Dibut Integrated School",
+                        "address":  "Purok l, Brgy. Dibut, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104468"
+                                       ],
+                        "name":  "Dibutunan ES",
+                        "address":  "Brgy. Dibutunan, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104433"
+                                       ],
+                        "name":  "Dicabasan ES",
+                        "address":  "Purok 5A, Brgy ,Dicabasan, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104412"
+                                       ],
+                        "name":  "Diego T. Ortiz ES",
+                        "address":  "Brgy. Pingit, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104454"
+                                       ],
+                        "name":  "Dikapanikian ES",
+                        "address":  "Brgy. Dikapanikian, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104516"
+                                       ],
+                        "name":  "Dikapinisan ES",
+                        "address":  "Brgy. Dikapinisan, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300681"
+                                       ],
+                        "name":  "Dikapinisan NHS",
+                        "address":  "Brgy. Dikapinisan, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104495"
+                                       ],
+                        "name":  "Dikildit ES",
+                        "address":  "Brgy. Dikildit, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104434"
+                                       ],
+                        "name":  "Dilaguidi ES",
+                        "address":  "Brgy. Dilaguidi, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "400575"
+                                       ],
+                        "name":  "Dilasag Adventist Elementary School, Inc.",
+                        "address":  "Estegoy St., Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104435"
+                                       ],
+                        "name":  "Dilasag CS",
+                        "address":  "Brgy. Masagana, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "417520"
+                                       ],
+                        "name":  "Dilasag Essential Advent Academy",
+                        "address":  "Poblacion, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "300682"
+                                       ],
+                        "name":  "Dilasag NHS",
+                        "address":  "De Leon St. Brgy. Masagana, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104517",
+                                           "500739"
+                                       ],
+                        "name":  "Dimanayat IS",
+                        "address":  "Brgy. Dimanayat,, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "306513"
+                                       ],
+                        "name":  "Dimanayat IS",
+                        "address":  "Brgy. Dimanayat, San Luis, Aurira",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "1500739"
+                                       ],
+                        "name":  "Dimanayat IS",
+                        "address":  "Brgy. Dimanayat, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104496"
+                                       ],
+                        "name":  "Dimanpudso ES",
+                        "address":  "Brgy. Dimanpudso, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104436"
+                                       ],
+                        "name":  "Dimaseset ES",
+                        "address":  "Brgy. Dimaseset, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300515"
+                                       ],
+                        "name":  "Dimaseset NHS",
+                        "address":  "Purpk 6 Brgy. Dimaseset, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104497"
+                                       ],
+                        "name":  "Dimotol ES",
+                        "address":  "Sitio Dimotol",
+                        "municipality":  "",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104469"
+                                       ],
+                        "name":  "Dinadiawan ES",
+                        "address":  "Brgy. Dinadiawan, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300684"
+                                       ],
+                        "name":  "Dinadiawan NHS",
+                        "address":  "Brgy. Dinadiawan, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "400577"
+                                       ],
+                        "name":  "Dinalungan Adventist Elementary School, Inc.",
+                        "address":  "Robles St. Pob. Zone 1, Dinalungan, Aurora",
+                        "municipality":  "Dinalungan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104445"
+                                       ],
+                        "name":  "Dinalungan CS",
+                        "address":  "Flores St., Poblacion Zone II, Dinalungan, Aurora",
+                        "municipality":  "Dinalungan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104455"
+                                       ],
+                        "name":  "Dingalan CS",
+                        "address":  "Barangay Poblacion, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "1417518"
+                                       ],
+                        "name":  "Dingalan Essential Academy",
+                        "address":  "Poblacion",
+                        "municipality":  "",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "417518"
+                                       ],
+                        "name":  "Dingalan Essential Academy",
+                        "address":  "Poblacion, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "417508"
+                                       ],
+                        "name":  "Dingalan Learning \u0026 Tutorial Center",
+                        "address":  "Hilario Street Poblacion Dingalan Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "300685"
+                                       ],
+                        "name":  "Dingalan NHS",
+                        "address":  "Caragsacan, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104437"
+                                       ],
+                        "name":  "Diniog ES",
+                        "address":  "Brgy. Dinog, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "306509"
+                                       ],
+                        "name":  "Diniog NHS",
+                        "address":  "Brgy. Diniog, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104498"
+                                       ],
+                        "name":  "Diome ES",
+                        "address":  "Brgy. Diome, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104518"
+                                       ],
+                        "name":  "Diotorin ES",
+                        "address":  "",
+                        "municipality":  "",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "1503134",
+                                           "503134"
+                                       ],
+                        "name":  "Diotorin Integrated School",
+                        "address":  "Sitio Diotorin, Brgy. Dibayabay, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "1417510",
+                                           "417510"
+                                       ],
+                        "name":  "Dipaculao College of Science and Technology",
+                        "address":  "National Road, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104470"
+                                       ],
+                        "name":  "Dipaculao CS",
+                        "address":  "DoÃƒÂ±a Aurora St., South Pob., Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300693"
+                                       ],
+                        "name":  "Dipaculao NHS",
+                        "address":  "Brgy. Mucdol, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104471"
+                                       ],
+                        "name":  "Ditale ES",
+                        "address":  "Brgy. Ditale Dipaculao Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104446",
+                                           "1503132",
+                                           "503132"
+                                       ],
+                        "name":  "Ditawini Integrated School",
+                        "address":  "Brgy. Ditawini, Dinalungan, Aurora",
+                        "municipality":  "Dinalungan",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104519",
+                                           "1503133",
+                                           "503133"
+                                       ],
+                        "name":  "Diteki Integrated School",
+                        "address":  "Brgy. Diteki, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "306635"
+                                       ],
+                        "name":  "Ditinagyan National High School",
+                        "address":  "Brgy., Ditinagyan, Casiguran",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104520"
+                                       ],
+                        "name":  "Ditumabo ES",
+                        "address":  "Brgy. Ditumabo, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300686"
+                                       ],
+                        "name":  "Ditumabo NHS",
+                        "address":  "Brgy. Ditumabo, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104456"
+                                       ],
+                        "name":  "Dugyan PS",
+                        "address":  "Sitio Dugyan, Brgy. Umiray, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104426"
+                                       ],
+                        "name":  "Dumaguipo ES",
+                        "address":  "Brgy. Cozo, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300687"
+                                       ],
+                        "name":  "Eliseo C. Ronquillo Sr.  Memorial NHS",
+                        "address":  "Brgy. Quirino, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104448"
+                                       ],
+                        "name":  "Emeterio Inocillas ES",
+                        "address":  "Brgy. Nipoo, Dinalungan, Aurora",
+                        "municipality":  "Dinalungan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104480"
+                                       ],
+                        "name":  "Emeterio M. Quirino ES",
+                        "address":  "Brgy. Salay, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "157501"
+                                       ],
+                        "name":  "Esperanza ES",
+                        "address":  "Brgy. Esperanza II, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104499"
+                                       ],
+                        "name":  "Estonilo ES",
+                        "address":  "Brgy. Sto. Cristo, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "400579"
+                                       ],
+                        "name":  "Father John Karash Memorial High School",
+                        "address":  "Mahoney St., Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104487"
+                                       ],
+                        "name":  "Felipe R. Valdez ES",
+                        "address":  "Brgy. Bazal, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "157510"
+                                       ],
+                        "name":  "Florida ES",
+                        "address":  "Purok 6, Brgy. Florida, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104427"
+                                       ],
+                        "name":  "Francisco Benitez ES",
+                        "address":  "Brgy. Cozo, Casiguran",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104500"
+                                       ],
+                        "name":  "Francisco Q. Dagyapen Memorial ES",
+                        "address":  "Brgy. Dianawan, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104501"
+                                       ],
+                        "name":  "Galintuja ES",
+                        "address":  "Brgy. Galintuja, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "417519"
+                                       ],
+                        "name":  "Gumacas Essential Missionary School",
+                        "address":  "Brgy. Cozo, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "1417519"
+                                       ],
+                        "name":  "Gumacas Essential Missionary School",
+                        "address":  "Brgy. Cozo",
+                        "municipality":  "",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104472"
+                                       ],
+                        "name":  "Gupa ES",
+                        "address":  "Brgy. Gupa, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "157511"
+                                       ],
+                        "name":  "Hacienda ES",
+                        "address":  "Sitio Hacienda, Brgy. Nonong Sr., San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "417513"
+                                       ],
+                        "name":  "Hephzibah Academy of Asia - Maria Aurora Inc.",
+                        "address":  "Brgy. Bazal, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "417516"
+                                       ],
+                        "name":  "Home of Muntisuri Baptist Academy, Inc.",
+                        "address":  "Brgy. Marikit, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "157512"
+                                       ],
+                        "name":  "Horseshoe ES",
+                        "address":  "Brgy. Caragsacan, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "400569"
+                                       ],
+                        "name":  "House of Brighter Kids",
+                        "address":  "",
+                        "municipality":  "",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104457"
+                                       ],
+                        "name":  "Ibona ES",
+                        "address":  "Brgy. Ibona, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300688"
+                                       ],
+                        "name":  "Ibona NHS",
+                        "address":  "Brgy. Ibona, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "408066"
+                                       ],
+                        "name":  "Ipil Ecumenical Development Center of Dipaculao, Inc.",
+                        "address":  "Brgy. Ipil, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104473"
+                                       ],
+                        "name":  "Ipil ES",
+                        "address":  "Brgy. Ipil, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "417514"
+                                       ],
+                        "name":  "Jesus the Divine Shepherd Christian Learning Center",
+                        "address":  "Sitio setan, brgy. calabuanan, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "400580"
+                                       ],
+                        "name":  "John Wesley Child Development Center",
+                        "address":  "Ares Street, North Poblacion, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "300689"
+                                       ],
+                        "name":  "Juan C. Angara Memorial NHS",
+                        "address":  "Brgy. Dibaraybay, Dinalungan, Aurora",
+                        "municipality":  "Dinalungan",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104502"
+                                       ],
+                        "name":  "Kadayakan ES",
+                        "address":  "Brgy. Kadayakan, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104521"
+                                       ],
+                        "name":  "Kalapnit ES",
+                        "address":  "Sitio Kalapnit, Brgy. Dibalo, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104522"
+                                       ],
+                        "name":  "Kamalatan ES",
+                        "address":  "Sitio Kamalatan, Brgy. Nonong Sr., San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104438"
+                                       ],
+                        "name":  "Kasaysayan ES",
+                        "address":  "Brgy. Diagyan, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104523"
+                                       ],
+                        "name":  "L. Pimentel ES",
+                        "address":  "Brgy. L. Pimentel, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104474"
+                                       ],
+                        "name":  "Laboy ES",
+                        "address":  "Brgy. Laboy, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104439"
+                                       ],
+                        "name":  "Lawang ES",
+                        "address":  "Brgy. Lawang",
+                        "municipality":  "",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "157514"
+                                       ],
+                        "name":  "Lawang West ES",
+                        "address":  "Brgy. Lawang, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104486"
+                                       ],
+                        "name":  "Leon B. Hulipas ES",
+                        "address":  "Brgy. Baubo, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104503"
+                                       ],
+                        "name":  "Leon Diaz Sr. ES",
+                        "address":  "Brgy. San Joaquin, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104475"
+                                       ],
+                        "name":  "Lipit ES",
+                        "address":  "Brgy. Lipit, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "1502271",
+                                           "502271"
+                                       ],
+                        "name":  "Lipit Integrated School",
+                        "address":  "Brgy. Lipit, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "157504"
+                                       ],
+                        "name":  "Lobbot ES",
+                        "address":  "Brgy. Lobbot, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300690"
+                                       ],
+                        "name":  "Lual NHS",
+                        "address":  "Brgy. Lual, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "401800"
+                                       ],
+                        "name":  "Lyceum of the East",
+                        "address":  "Maria Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104458"
+                                       ],
+                        "name":  "Malamig ES",
+                        "address":  "Brgy. Umiray, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104476"
+                                       ],
+                        "name":  "Maligaya ES",
+                        "address":  "Brgy. Maligaya, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104440"
+                                       ],
+                        "name":  "Manggitahan ES",
+                        "address":  "Brgy. Manggitahan, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300692"
+                                       ],
+                        "name":  "Manggitahan NHS",
+                        "address":  "Brgy. Manggitahan, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104447"
+                                       ],
+                        "name":  "Mapalad ES",
+                        "address":  "Brgy. Mapalad, Dinalungan, Aurora",
+                        "municipality":  "Dinalungan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104485"
+                                       ],
+                        "name":  "Marcos R. Necesito Sr. Memorial ES",
+                        "address":  "Brgy. Bangco, Maria Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "417501"
+                                       ],
+                        "name":  "Maria Aurora Christian School",
+                        "address":  "Brgy. 1, Maria Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104504"
+                                       ],
+                        "name":  "Maria Aurora CS",
+                        "address":  "Silvestre St., Brgy. 3, Pob., Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300691"
+                                       ],
+                        "name":  "Maria Aurora NHS",
+                        "address":  "Brgy. San Joaquin, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "306501"
+                                       ],
+                        "name":  "Mariano D. Marquez Memorial NHS",
+                        "address":  "Brgy. Simbahan, Dinalungan, Aurora",
+                        "municipality":  "Dinalungan",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "1500117"
+                                       ],
+                        "name":  "Mariano L. Sindac IS",
+                        "address":  "Brgy. Zabali, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "500117"
+                                       ],
+                        "name":  "Mariano L. Sindac IS",
+                        "address":  "Sitio Puntian, Brgy. Zabali, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104428"
+                                       ],
+                        "name":  "Martin Esteves ES",
+                        "address":  "Brgy. Esteves, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104459"
+                                       ],
+                        "name":  "Matawe ES",
+                        "address":  "Purok 2, Brgy. Matawe, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300694"
+                                       ],
+                        "name":  "Mayor Cesario A. Pimentel NHS",
+                        "address":  "Brgy. 01, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104477"
+                                       ],
+                        "name":  "Mijares ES",
+                        "address":  "Brgy. MIjares, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "305397"
+                                       ],
+                        "name":  "Mijares NHS",
+                        "address":  "Brgy. Mijares, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "1400571"
+                                       ],
+                        "name":  "Mount Carmel College",
+                        "address":  "San Luis Street, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "400571"
+                                       ],
+                        "name":  "Mount Carmel College",
+                        "address":  "Quezon Street, Baler,Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "400574"
+                                       ],
+                        "name":  "Mount Carmel College of Casiguran",
+                        "address":  "Osmena St., Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "1400574"
+                                       ],
+                        "name":  "Mount Carmel College of Casiguran",
+                        "address":  "OsmeÃƒÂ±a St.",
+                        "municipality":  "",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "417504"
+                                       ],
+                        "name":  "Mount Carmel School of Dinalungan",
+                        "address":  "Faustino Street Poblacion Zone II, Dinalngan Aurora",
+                        "municipality":  "",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "400581"
+                                       ],
+                        "name":  "Mount Carmel School of Maria Aurora",
+                        "address":  "Silvestre St., Brgy. 2, Pob., Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "1400581"
+                                       ],
+                        "name":  "Mount Carmel School of Maria Aurora",
+                        "address":  "Silvestre St.",
+                        "municipality":  "",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "1400586"
+                                       ],
+                        "name":  "Mount Carmel School of San Luis",
+                        "address":  "Avenida Aurora",
+                        "municipality":  "",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "400586"
+                                       ],
+                        "name":  "Mount Carmel School of San Luis",
+                        "address":  "Avenida St., San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104478"
+                                       ],
+                        "name":  "Mucdol ES",
+                        "address":  "Brgy. Mucdol, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104524"
+                                       ],
+                        "name":  "Nonong Sr. ES",
+                        "address":  "Brgy. Nonong Sr., San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "1500118",
+                                           "500118"
+                                       ],
+                        "name":  "Obligacion IS",
+                        "address":  "Brgy. Obligacion, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "400587"
+                                       ],
+                        "name":  "Our Lady of Consolacion Learning Center",
+                        "address":  "070 Ipil-Ipil Street, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104449"
+                                       ],
+                        "name":  "Paleg ES",
+                        "address":  "PALEG,DINALUNGAN,AURORA",
+                        "municipality":  "Dinalungan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104460"
+                                       ],
+                        "name":  "Paltic ES",
+                        "address":  "Brgy. Paltic, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "157508"
+                                       ],
+                        "name":  "Paraiso ES",
+                        "address":  "Brgy. Culat, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104450"
+                                       ],
+                        "name":  "Paulino L. Bautista ES",
+                        "address":  "Brgy. Simbahan, Dinalungan, Aurora",
+                        "municipality":  "Dinalungan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104441"
+                                       ],
+                        "name":  "Pedro Orata ES",
+                        "address":  "Sitio Dipasaleng Brgy. Diniog, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "400582"
+                                       ],
+                        "name":  "Philos Montessori Learning Center",
+                        "address":  "Evangelista St., Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104479"
+                                       ],
+                        "name":  "Puangi ES",
+                        "address":  "Brgy. Puangi, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300676"
+                                       ],
+                        "name":  "Puangi NHS",
+                        "address":  "Brgy. Puangi, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104505"
+                                       ],
+                        "name":  "Punglo ES",
+                        "address":  "Brgy. Punglo, Maria Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104506"
+                                       ],
+                        "name":  "Quirino ES",
+                        "address":  "Brgy. Quirino, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "157506"
+                                       ],
+                        "name":  "Ramada ES",
+                        "address":  "Purok 2, Brgy. Ramada, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "306503"
+                                       ],
+                        "name":  "Ramada NHS",
+                        "address":  "Purok 2, Brgy. Ramada, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104526"
+                                       ],
+                        "name":  "Real ES",
+                        "address":  "Brgy. Real, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104415"
+                                       ],
+                        "name":  "Reserva ES",
+                        "address":  "Brgy. Reserva, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300683"
+                                       ],
+                        "name":  "Rodrigo D. Palmero Memorial NHS",
+                        "address":  "Brgy. Bannawag",
+                        "municipality":  "",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104525"
+                                       ],
+                        "name":  "Rosauro R. Tangson ES",
+                        "address":  "Sitio Alasanay, Dimanayat",
+                        "municipality":  "",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "306508"
+                                       ],
+                        "name":  "Rosauro R. Tangson, Sr. NHS",
+                        "address":  "Brgy. San Isidro, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104416"
+                                       ],
+                        "name":  "Ruperto P. Zubia, Sr. ES",
+                        "address":  "Brgy. Sabang, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "417515"
+                                       ],
+                        "name":  "S.T.A. Excellencia School of Aurora Inc.",
+                        "address":  "Brgy. Bianoan, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "400578"
+                                       ],
+                        "name":  "Saint Patrick\u0027s Academy",
+                        "address":  "Yakal I, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104429"
+                                       ],
+                        "name":  "San Ildefonso ES",
+                        "address":  "Brgy. San Ildefonso, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104527"
+                                       ],
+                        "name":  "San Isidro ES",
+                        "address":  "Purok 2, Brgy. San Isidro, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104507"
+                                       ],
+                        "name":  "San Jose ES",
+                        "address":  "Brgy. San Jose, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104508"
+                                       ],
+                        "name":  "San Juan ES",
+                        "address":  "Brgy. San Juan, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104509"
+                                       ],
+                        "name":  "San Leonardo ES",
+                        "address":  "Brgy. San Leonardo, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104528"
+                                       ],
+                        "name":  "San Luis CS",
+                        "address":  "Amazona St., Brgy. l, Pob., San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104481"
+                                       ],
+                        "name":  "Sapangkawayan ES",
+                        "address":  "Brgy. Sapang Kawayan, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104417"
+                                       ],
+                        "name":  "Setan ES",
+                        "address":  "Sitio Setan, Brgy. Calabuanan, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104461"
+                                       ],
+                        "name":  "Singawan ES",
+                        "address":  "Sitio Singawan, Brgy. Umiray, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "408065"
+                                       ],
+                        "name":  "St. John Ecumenical Learning Center of Maria Aurora, Inc.",
+                        "address":  "Brgy. San Juan, Maria Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "157515"
+                                       ],
+                        "name":  "Sta. Lucia ES",
+                        "address":  "Brgy. Sta. Lucia, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "157505"
+                                       ],
+                        "name":  "Sto. Tomas ES",
+                        "address":  "Purok 4, Brgy. Sto. Tomas, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104510"
+                                       ],
+                        "name":  "Suguit ES",
+                        "address":  "Brgy. Suguit, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "302766"
+                                       ],
+                        "name":  "Suguit NHS",
+                        "address":  "Brgy. Suguit, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104418"
+                                       ],
+                        "name":  "Suklayin ES",
+                        "address":  "Kalumpit St. Brgy. Suclayin, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "417509"
+                                       ],
+                        "name":  "Sunrise Kidcare Academy",
+                        "address":  "Magsaysay Avenue, Poblacion",
+                        "municipality":  "",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "417502"
+                                       ],
+                        "name":  "Susannah Wesley Child Devepment Center",
+                        "address":  "Brgy. 03, Burgos Street, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "157503"
+                                       ],
+                        "name":  "Tanawan ES",
+                        "address":  "Brgy. Tanawan, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104482"
+                                       ],
+                        "name":  "Teodorico A. Molina, Sr. ES",
+                        "address":  "Brgy. Dimabuno, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "306254"
+                                       ],
+                        "name":  "Teresita Ong Palmero National High School",
+                        "address":  "Brgy. Nonong, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104430"
+                                       ],
+                        "name":  "Tinib-Calangcuasan ES",
+                        "address":  "Brgy. Calangcuasan, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "1500738",
+                                           "500738"
+                                       ],
+                        "name":  "Tinib-Calangcuasan IS",
+                        "address":  "Brgy. Calangcuasan, Casiguran, Aurora",
+                        "municipality":  "Casiguran",
+                        "levels":  [
+                                       "Elementary",
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "306514"
+                                       ],
+                        "name":  "Tinib-Calangcuasan IS",
+                        "address":  "Brgy. Calangcuasan",
+                        "municipality":  "",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104483"
+                                       ],
+                        "name":  "Toytoyan ES",
+                        "address":  "Brgy. Toytoyan, Dipaculao, Aurora",
+                        "municipality":  "Dipaculao",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "417525"
+                                       ],
+                        "name":  "Tribal Center for Development Foundation, Inc. - Sentrong Paaralan ng mga Agta",
+                        "address":  "Sition Dipuntian, Brgy. Cozo",
+                        "municipality":  "",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104462"
+                                       ],
+                        "name":  "Umiray ES",
+                        "address":  "Brgy. Umiray, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300695"
+                                       ],
+                        "name":  "Umiray NHS",
+                        "address":  "Brgy. Umiray, Dingalan, Aurora",
+                        "municipality":  "Dingalan",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104442"
+                                       ],
+                        "name":  "Ura ES",
+                        "address":  "Brgy. Ura, Dilasag, Aurora",
+                        "municipality":  "Dilasag",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "104511"
+                                       ],
+                        "name":  "Villa Aurora ES",
+                        "address":  "Sitio Dimani, Brgy. Villa , Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "306505"
+                                       ],
+                        "name":  "Villa Aurora NHS",
+                        "address":  "Sitio Dimani, Brgy. Villa , Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "400572"
+                                       ],
+                        "name":  "Viyosh School",
+                        "address":  "034 San Luis Ext., Brgy. Buhangin, Baler, Aurora",
+                        "municipality":  "Baler",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104512"
+                                       ],
+                        "name":  "Wenceslao ES",
+                        "address":  "Brgy. Wenceslao, Ma. Aurora, Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "300696"
+                                       ],
+                        "name":  "Wenceslao NHS",
+                        "address":  "Purok 3, National Road",
+                        "municipality":  "",
+                        "levels":  [
+                                       "High school"
+                                   ],
+                        "public_inventory":  true
+                    },
+                    {
+                        "school_ids":  [
+                                           "400583"
+                                       ],
+                        "name":  "Wesley Kiddie Development Center",
+                        "address":  "Bitong Street, Brgy. 02, Maria Aurora",
+                        "municipality":  "Maria Aurora",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "400584"
+                                       ],
+                        "name":  "Wesleyan University - Philippines",
+                        "address":  "Brgy. 01",
+                        "municipality":  "",
+                        "levels":  [
+
+                                   ],
+                        "public_inventory":  false
+                    },
+                    {
+                        "school_ids":  [
+                                           "104529"
+                                       ],
+                        "name":  "Zarah ES",
+                        "address":  "Duco I, Brgy. Zarah, San Luis, Aurora",
+                        "municipality":  "San Luis",
+                        "levels":  [
+                                       "Elementary"
+                                   ],
+                        "public_inventory":  true
+                    }
+                ]
+}
