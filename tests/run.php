@@ -193,7 +193,7 @@ try {
     $r=request('freshAdmin','?page=activate');
     check($r['status']===200 && str_contains($r['body'],'id="account-setup"') && !str_contains($r['body'],'id="sidebar"') && !str_contains($r['body'],'class="mobile-bottom"'),'Setup screen does not show unusable workspace links');
     $setupToken=token($r); $activationPassword='Activated-password-45678';
-    $activateData=['csrf'=>$setupToken,'action'=>'activate','current_password'=>$password,'new_password'=>$activationPassword,'confirm_password'=>$activationPassword];
+    $activateData=['csrf'=>$setupToken,'action'=>'activate','current_password'=>$password,'new_password'=>$activationPassword,'confirm_password'=>$activationPassword,'designation'=>'Nurse','employment_status'=>'Permanent','district_id'=>$district,'location_id'=>$location];
     check(request('freshAdmin','?page=activate',array_merge($activateData,['csrf'=>'']))['status']===419,'Activation still requires CSRF');
     $invalid=request('freshAdmin','?page=activate',array_merge($activateData,['current_password'=>'Wrong-password-123']));
     check($invalid['status']===422 && str_contains($invalid['body'],'Current password is incorrect.') && str_contains($invalid['body'],'id="account-setup"'),'Incorrect temporary password leaves a visible actionable error');
@@ -247,8 +247,10 @@ try {
         check($browser->evaluate('!document.querySelector(".sidebar") && !!document.querySelector("#account-setup")'),'Chrome first sign-in has a dedicated setup screen');
         $browser->screenshot($preview.'/activation-desktop.png',1440,1000); $browser->screenshot($preview.'/activation-mobile.png',390,844);
         check($browser->evaluate('Math.max(document.documentElement.scrollWidth,document.body.scrollWidth) <= 390'),'Account setup fits phone width');
-        $browser->evaluate('document.querySelector("input[name=current_password]").value='.json_encode($activationPassword).';document.querySelector("input[name=new_password]").value="Browser-activated-12345";document.querySelector("input[name=confirm_password]").value="Browser-activated-12345";');
-        $browser->click('.activation-form button[type=submit]');
+        $browser->evaluate('document.querySelector("#setup-current-password").value='.json_encode($activationPassword).';document.querySelector("#setup-new-password").value="Browser-activated-12345";document.querySelector("#setup-confirm-password").value="Browser-activated-12345";');
+        $browser->click('[data-setup-next]');
+        $browser->evaluate('document.querySelector("#setup-district").value='.json_encode((string)$district).';document.querySelector("#setup-location").value='.json_encode((string)$location).';');
+        $browser->click('#activation-personnel-form button[type=submit]');
         $browser->wait('!!document.querySelector("#main-content")');
         check($browser->evaluate('document.body.dataset.page === "dashboard"'),'Chrome password setup opens the dashboard');
         $browser->command('Emulation.setDeviceMetricsOverride',['width'=>1440,'height'=>1100,'deviceScaleFactor'=>1,'mobile'=>false]);

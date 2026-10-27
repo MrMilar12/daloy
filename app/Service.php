@@ -164,7 +164,7 @@ final class Service {
             }
             $email=$this->text($d,'email'); if(!filter_var($email,FILTER_VALIDATE_EMAIL)) throw new DomainException('Enter a valid email address.',422);
             $data=['name'=>$this->text($d,'name',120),'email'=>mb_strtolower($email),'role'=>$role,'active'=>$active,'employee_number'=>$this->text($d,'employee_number',60,false)?:null,'designation'=>$this->text($d,'designation',120),'district_id'=>empty($d['district_id'])?null:$this->reference('districts',$d['district_id']),'location_id'=>empty($d['location_id'])?null:$this->reference('locations',$d['location_id']),'employment_status'=>$this->choice($d,'employment_status',['Permanent','Contractual','Job Order','Temporary']),'phone'=>$this->text($d,'phone',40,false),'specialization'=>$this->text($d,'specialization',190,false),'skills'=>$this->text($d,'skills',3000,false)];
-            $schoolIds=null;
+            $schoolIds=null; $schoolNames=[]; $newSchoolIds=[];
             if(array_key_exists('school_ids',$d) || isset($d['schools_present'])) {
                 if(!is_array($d['school_ids']??[])) throw new DomainException('Select valid school assignments.',422);
                 $schoolIds=[];
@@ -173,9 +173,10 @@ final class Service {
                     if(!is_scalar($schoolId) || !filter_var($schoolId,FILTER_VALIDATE_INT) || (int)$schoolId<1) throw new DomainException('Select valid school assignments.',422);
                     $school=$this->record('locations',(int)$schoolId);
                     if($school['type']!=='School' || (!$school['active'] && !in_array($schoolId,$previous))) throw new DomainException('Select an active school.',422);
-                    $schoolIds[]=(int)$schoolId;
+                    $schoolIds[]=(int)$schoolId; $schoolNames[(int)$schoolId]=$school['name'];
                 }
                 $schoolIds=array_values(array_unique($schoolIds));
+                $newSchoolIds=array_values(array_diff($schoolIds,array_map('intval',$previous),array_filter([(int)($data['location_id']??0)])));
                 if($role!=='nurse' && $schoolIds) throw new DomainException('Multiple school assignments are for nursing personnel.',422);
                 if($old) $old['school_ids']=$previous;
             }
@@ -185,6 +186,10 @@ final class Service {
                 $this->db->run('DELETE FROM nurse_locations WHERE nurse_id=?',[$id]);
                 foreach($schoolIds??[] as $schoolId) $this->db->insert('nurse_locations',['nurse_id'=>$id,'location_id'=>$schoolId]);
                 $data['school_ids']=$schoolIds??[];
+            }
+            if($role==='nurse' && $newSchoolIds) {
+                $names=array_map(fn($schoolId)=>$schoolNames[$schoolId],$newSchoolIds);
+                $this->notify($id,'Additional school assigned','You have been assigned to '.implode(', ',$names).'. View your profile for school coverage.','?page=profile');
             }
             $this->audit($old?'Account updated':'Account created','users',$id,$old,$data); return $id;
         });
@@ -201,7 +206,9 @@ final class Service {
     public function password(mixed $raw): string { $p=(string)$raw; if(strlen($p)<12 || strlen($p)>72) throw new DomainException('Use a password between 12 and 72 bytes.',422); return $p; }
     public function profile(array $d,?string $photo=null): void {
         $this->db->transaction(function() use($d,$photo) {
-            $old=$this->record('users',(int)$this->actor['id']); $data=['phone'=>$this->text($d,'phone',40,false)];
+            $old=$this->record('users',(int)$this->actor['id']); $data=[]; if(trim((string)($d['phone']??''))!=='') $data['phone']=$this->text($d,'phone',40,false);
+            if($old['must_change_password']) { foreach(['employee_number'=>60,'designation'=>120,'employment_status'=>60,'specialization'=>190,'skills'=>5000] as $field=>$limit) if(trim((string)($d[$field]??''))!=='') $data[$field]=$this->text($d,$field,$limit,false); }
+            if($old['must_change_password']) { if(!empty($d['district_id'])) $data['district_id']=$this->reference('districts',$d['district_id']); if(!empty($d['location_id'])) $data['location_id']=$this->reference('locations',$d['location_id']); }
             if($photo) $data['photo']=$photo;
             if(!empty($d['new_password'])) {
                 if(!password_verify((string)($d['current_password']??''),$old['password_hash'])) throw new DomainException('Current password is incorrect.',422);

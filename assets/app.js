@@ -1,23 +1,10 @@
 (() => {
   'use strict';
-  document.querySelector('.github-connect')?.remove();
-  const topActions = document.querySelector('.top-actions');
-  if (topActions && !topActions.querySelector('.github-connect')) {
-    const github = document.createElement('a');
-    github.className = 'github-connect';
-    github.href = 'https://github.com/';
-    github.target = '_blank';
-    github.rel = 'noopener';
-    github.setAttribute('aria-label', 'Connect GitHub account');
-    github.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.68c-2.78.6-3.37-1.18-3.37-1.18-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.6 9.6 0 0 1 12 7.02a9.6 9.6 0 0 1 2.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg><span>Connect GitHub</span>';
-    const before = topActions.querySelector('.today-label');
-    topActions.insertBefore(github, before || topActions.firstChild);
-  }
   const githubUpdater = document.querySelector('[data-github-updater]');
   githubUpdater?.querySelector('[data-github-check]')?.addEventListener('click', async event => {
     const button=event.currentTarget, status=githubUpdater.querySelector('[data-github-status]'), result=githubUpdater.querySelector('[data-github-result]');
-    button.disabled=true; status.textContent='Checking GitHub…'; result.hidden=false; result.textContent='Contacting MrMilar12/daloy on GitHub.';
-    try { const response=await fetch('api.php?action=github_updates',{credentials:'same-origin',headers:{Accept:'application/json'}}); const data=await response.json(); if(!response.ok||data.error) throw new Error(data.error||'Unable to check GitHub updates.'); status.textContent=data.available?'Update available':'Up to date'; result.innerHTML=`<div class="github-update-summary"><span class="github-update-icon">${data.available?'↑':'✓'}</span><div><strong>${data.available?'New system update found':'Your system is up to date'}</strong><small>${data.available?'A verified VRS update is ready to install.':'No newer commit is available on the configured branch.'}</small></div></div><div class="github-update-commit"><span>Latest commit</span><code>${data.latest.slice(0,12)}</code><p>${data.message||'No commit message available.'}</p></div>${data.available?'<button type="button" class="primary github-install" data-github-install>Install update</button>':''}`; result.classList.toggle('has-update',data.available); result.querySelector('[data-github-install]')?.addEventListener('click',async()=>{const password=await new Promise(resolve=>{const dialog=document.createElement('dialog');dialog.className='update-password-dialog';dialog.innerHTML='<form method=dialog><h3>Authorize system update</h3><p>Enter your administrator password to continue.</p><input type=password name=password autocomplete=current-password required placeholder=Password><div class=dialog-actions><button value=cancel>Cancel</button><button class=primary value=confirm>Install update</button></div></form>';document.body.appendChild(dialog);dialog.addEventListener('close',()=>{const value=dialog.returnValue==='confirm'?dialog.querySelector('input').value:'';dialog.remove();resolve(value);},{once:true});dialog.showModal();});if(!password)return;const csrf=document.querySelector('meta[name="csrf-token"]')?.content||'';const form=new URLSearchParams({csrf,password,latest:data.latest});const install=await fetch('api.php?action=github_update_apply',{method:'POST',credentials:'same-origin',headers:{Accept:'application/json'},body:form});const answer=await install.json();if(!install.ok||answer.error){alert(answer.error||'Update failed.');return;}alert(answer.message+' The system will reload after maintenance.');location.reload();}); } catch(error) { status.textContent='Check failed'; result.textContent=error.message; } finally { button.disabled=false; }
+    button.disabled=true; status.textContent='Checking GitHub'; result.hidden=false; result.textContent='Contacting MrMilar12/daloy on GitHub.';
+    try { const response=await fetch('api.php?action=github_updates',{credentials:'same-origin',headers:{Accept:'application/json'}}); const data=await response.json(); if(!response.ok||data.error) throw new Error(data.error||'Unable to check GitHub updates.'); status.textContent=data.available?'Update available':'Up to date'; result.innerHTML=`<div class="github-update-summary"><span class="github-update-icon">${data.available?'':''}</span><div><strong>${data.available?'New system update found':'Your system is up to date'}</strong><small>${data.available?'A verified DALOY update is ready to install.':'No newer commit is available on the configured branch.'}</small></div></div><div class="github-update-commit"><span>Latest commit</span><code>${data.latest.slice(0,12)}</code><p>${data.message||'No commit message available.'}</p></div>${data.available?'<button type="button" class="primary github-install" data-github-install>Install update</button>':''}`; result.classList.toggle('has-update',data.available); result.querySelector('[data-github-install]')?.addEventListener('click',async()=>{const password=await new Promise(resolve=>{const dialog=document.createElement('dialog');dialog.className='update-password-dialog';dialog.innerHTML='<form method=dialog><h3>Authorize system update</h3><p>Enter your administrator password to continue.</p><input type=password name=password autocomplete=current-password required placeholder=Password><div class=dialog-actions><button value=cancel>Cancel</button><button class=primary value=confirm>Install update</button></div></form>';document.body.appendChild(dialog);dialog.addEventListener('close',()=>{const value=dialog.returnValue==='confirm'?dialog.querySelector('input').value:'';dialog.remove();resolve(value);},{once:true});dialog.showModal();});if(!password)return;const csrf=document.querySelector('meta[name="csrf-token"]')?.content||'';const form=new URLSearchParams({csrf,password,latest:data.latest});const install=await fetch('api.php?action=github_update_apply',{method:'POST',credentials:'same-origin',headers:{Accept:'application/json'},body:form});const answer=await install.json();if(!install.ok||answer.error){alert(answer.error||'Update failed.');return;}alert(answer.message+' The system will reload after maintenance.');location.reload();}); } catch(error) { status.textContent='Check failed'; result.textContent=error.message; } finally { button.disabled=false; }
   });
   const updateProgress = document.querySelector('[data-update-progress]');
   const updateBar = document.querySelector('[data-update-progress-bar]');
@@ -26,12 +13,39 @@
   document.addEventListener('click', event => {
     if (!event.target.closest('[data-github-install]') || !updateProgress) return;
     updateProgress.hidden = false;
-    const stages = [[12,'Preparing update…'],[30,'Enabling maintenance mode…'],[56,'Downloading DALOY files…'],[78,'Installing system files…'],[94,'Finalizing update…']];
+    const stages = [[12,'Preparing update'],[30,'Enabling maintenance mode'],[56,'Downloading DALOY files'],[78,'Installing system files'],[94,'Finalizing update']];
     let index = 0;
     const advance = () => { const [percent,label]=stages[Math.min(index++,stages.length-1)]; updateBar.style.width=percent+'%'; updatePercent.textContent=percent+'%'; updateLabel.textContent=label; };
     advance();
     const timer=setInterval(() => { if(index<stages.length) advance(); else clearInterval(timer); }, 900);
   });
+  const passwordForm = document.querySelector('#activation-password-form');
+  const personnelForm = document.querySelector('#activation-personnel-form');
+  if (passwordForm && personnelForm) {
+    const panels = [...document.querySelectorAll('[data-setup-panel]')];
+    const indicators = [...document.querySelectorAll('[data-setup-indicator]')];
+    const setStep = step => {
+      panels.forEach(panel => { panel.hidden = panel.dataset.setupPanel !== String(step); });
+      indicators.forEach(item => item.classList.toggle('active', item.dataset.setupIndicator === String(step)));
+      document.querySelector('#account-setup')?.scrollIntoView({ block: 'start' });
+    };
+    passwordForm.querySelector('[data-setup-next]')?.addEventListener('click', () => {
+      const invalid = [...passwordForm.querySelectorAll('input[required]')].find(field => !field.checkValidity());
+      if (invalid) { invalid.reportValidity(); return; }
+      const current = passwordForm.querySelector('#setup-current-password');
+      const next = passwordForm.querySelector('#setup-new-password');
+      const confirm = passwordForm.querySelector('#setup-confirm-password');
+      if (next.value !== confirm.value) { confirm.setCustomValidity('Passwords do not match.'); confirm.reportValidity(); return; }
+      confirm.setCustomValidity('');
+      personnelForm.querySelector('[data-password-value="current_password"]').value = current.value;
+      personnelForm.querySelector('[data-password-value="new_password"]').value = next.value;
+      personnelForm.querySelector('[data-password-value="confirm_password"]').value = confirm.value;
+      setStep(2);
+      personnelForm.querySelector('#setup-employee-number')?.focus();
+    });
+    personnelForm.querySelector('[data-setup-back]')?.addEventListener('click', () => setStep(1));
+    if (document.body.dataset.setupInitialStep === '2') setStep(2);
+  }
   const displayChoices = [...document.querySelectorAll('[data-display-choice]')];
   const setDisplay = display => {
     document.body.dataset.display = display;
@@ -79,7 +93,7 @@
         const label = document.createElement('span');
         label.textContent = name;
         const close = document.createElement('span');
-        close.textContent = '×';
+        close.textContent = '';
         close.setAttribute('aria-hidden', 'true');
         button.append(label, close);
         button.addEventListener('click', () => {
@@ -111,7 +125,7 @@
     const show = button.getAttribute('aria-pressed') !== 'true';
     button.form.querySelectorAll('input[name$="password"]').forEach(input => { input.type = show ? 'text' : 'password'; });
     button.setAttribute('aria-pressed', String(show));
-    button.textContent = show ? 'Hide passwords' : 'Show passwords';
+    button.textContent = show ? (button.dataset.hideLabel || 'Hide passwords') : (button.dataset.showLabel || 'Show passwords');
   }));
   document.querySelectorAll('form[data-confirm]').forEach(form => form.addEventListener('submit', event => { if (!confirm(form.dataset.confirm)) event.preventDefault(); }));
   document.querySelectorAll('form[data-validate]').forEach(form => {
@@ -128,7 +142,7 @@
       if (!start.value || !end.value || !form.elements.nurse_id.value || end.value <= start.value) return;
       controller?.abort(); controller = new AbortController();
       const params = new URLSearchParams({ action: 'conflicts', nurse_id: form.elements.nurse_id.value, starts_at: start.value, ends_at: end.value, exclude_id: form.elements.id?.value || '0' });
-      preview.className = 'span-2 conflict-preview loading'; preview.textContent = 'Checking recorded commitments…';
+      preview.className = 'span-2 conflict-preview loading'; preview.textContent = 'Checking recorded commitments';
       try {
         const response = await fetch('api.php?' + params, { signal: controller.signal, credentials: 'same-origin', headers: { Accept: 'application/json' } });
         const data = await response.json();
@@ -148,3 +162,4 @@
     });
   });
 })();
+

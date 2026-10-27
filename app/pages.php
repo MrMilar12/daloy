@@ -9,7 +9,8 @@ switch($page) {
     case 'schedule': case 'calendar': require __DIR__.'/pages/schedule.php'; break;
     case 'deployment': case 'activities': require __DIR__.'/pages/deployment.php'; break;
     case 'leave': case 'availability': require __DIR__.'/pages/availability.php'; break;
-    case 'users': case 'nurses': case 'profile': require __DIR__.'/pages/users.php'; break;
+    case 'profile': require __DIR__.'/pages/profile.php'; break;
+    case 'users': case 'nurses': require __DIR__.'/pages/users.php'; break;
     case 'locations': case 'configuration': case 'settings': require __DIR__.'/pages/configuration.php'; break;
     case 'notifications': require __DIR__.'/pages/notifications.php'; break;
     case 'reports': case 'audit': require __DIR__.'/pages/reports.php'; break;
