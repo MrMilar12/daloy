@@ -8,6 +8,7 @@ switch($page) {
     case 'dashboard': require __DIR__.'/pages/dashboard.php'; break;
     case 'schedule': case 'calendar': require __DIR__.'/pages/schedule.php'; break;
     case 'deployment': case 'activities': require __DIR__.'/pages/deployment.php'; break;
+    case 'deployment-history': require __DIR__.'/pages/deployment-history.php'; break;
     case 'leave': case 'availability': require __DIR__.'/pages/availability.php'; break;
     case 'profile': require __DIR__.'/pages/profile.php'; break;
     case 'users': case 'nurses': require __DIR__.'/pages/users.php'; break;

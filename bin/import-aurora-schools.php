@@ -6,5 +6,6 @@ require ROOT.'/app/AuroraSchools.php';
 try {
     $db=new Database($config);
     $count=import_aurora_schools($db);
-    echo "Imported $count Aurora school locations. Existing records were preserved.\n";
+    $venues=import_aurora_venues($db);
+    echo "Imported $count Aurora school locations and $venues venue locations. Existing records were preserved.\n";
 } catch(Throwable $e) { fwrite(STDERR,$e->getMessage()."\n"); exit(1); }

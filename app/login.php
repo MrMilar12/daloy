@@ -15,13 +15,16 @@
     </header>
     <main class="auth-shell">
         <section class="auth-story" aria-labelledby="auth-story-title">
+            <div class="auth-story-waves" aria-hidden="true"></div>
             <div class="auth-story-kicker"><span></span> NURSING WORKFORCE MANAGEMENT</div>
-            <img class="auth-logo" src="<?=e(asset_url('daloy-logo.png'))?>" alt="DALOY: Duty Allocation &amp; Logistics Operations for Your Workforce" width="1536" height="1024" fetchpriority="high">
+            <div class="auth-logo-frame"><img class="auth-logo" src="<?=e(asset_url('daloy-logo.png'))?>" alt="DALOY: Duty Allocation &amp; Logistics Operations for Your Workforce" width="1536" height="1024" fetchpriority="high"></div>
             <div class="auth-story-copy">
-                <h1 id="auth-story-title">Better care starts<br>with a connected team.</h1>
-                <p>Plan your duty. Coordinate your team.<br>Keep every assignment in view.</p>
+                <span class="auth-story-label">DALOY · SDO AURORA</span>
+                <h1 id="auth-story-title">One team.<br><strong>Better care.</strong></h1>
+                <p>Plan nursing duties, coordinate school coverage, and keep every assignment in view.</p>
             </div>
-            <div class="auth-story-footer"><span class="auth-plus" aria-hidden="true">+</span><span>Supporting the people<br><strong>who care for our schools.</strong></span></div>
+
+            <div class="auth-story-footer"><span class="auth-plus" aria-hidden="true">+</span><span>Supporting the people who care for our schools.</span></div>
         </section>
         <section class="login-form auth-panel" aria-labelledby="auth-title">
             <div class="auth-panel-content">

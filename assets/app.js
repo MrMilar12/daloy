@@ -1,5 +1,19 @@
 (() => {
   'use strict';
+  const activityModal = document.querySelector('[data-activity-modal]');
+  if (activityModal?.showModal) {
+    activityModal.showModal();
+    activityModal.addEventListener('cancel', event => { event.preventDefault(); location.href='?page=activities'; });
+    activityModal.addEventListener('click', event => { if (event.target === activityModal) location.href='?page=activities'; });
+    activityModal.querySelector('[name="destination_name"]')?.focus({ preventScroll: true });
+  }
+  document.querySelectorAll('[data-record-modal]').forEach(modal => {
+    if (!modal.showModal) { modal.setAttribute('open', ''); return; }
+    modal.showModal();
+    modal.addEventListener('cancel', event => { event.preventDefault(); const close = modal.querySelector('.record-modal-close'); if (close) location.href = close.href; else modal.close(); });
+    modal.addEventListener('click', event => { if (event.target === modal) { const close = modal.querySelector('.record-modal-close'); if (close) location.href = close.href; else modal.close(); } });
+    modal.querySelector('input:not([type="hidden"]),select,textarea')?.focus({ preventScroll: true });
+  });
   const githubUpdater = document.querySelector('[data-github-updater]');
   githubUpdater?.querySelector('[data-github-check]')?.addEventListener('click', async event => {
     const button=event.currentTarget, status=githubUpdater.querySelector('[data-github-status]'), result=githubUpdater.querySelector('[data-github-result]');
@@ -19,33 +33,6 @@
     advance();
     const timer=setInterval(() => { if(index<stages.length) advance(); else clearInterval(timer); }, 900);
   });
-  const passwordForm = document.querySelector('#activation-password-form');
-  const personnelForm = document.querySelector('#activation-personnel-form');
-  if (passwordForm && personnelForm) {
-    const panels = [...document.querySelectorAll('[data-setup-panel]')];
-    const indicators = [...document.querySelectorAll('[data-setup-indicator]')];
-    const setStep = step => {
-      panels.forEach(panel => { panel.hidden = panel.dataset.setupPanel !== String(step); });
-      indicators.forEach(item => item.classList.toggle('active', item.dataset.setupIndicator === String(step)));
-      document.querySelector('#account-setup')?.scrollIntoView({ block: 'start' });
-    };
-    passwordForm.querySelector('[data-setup-next]')?.addEventListener('click', () => {
-      const invalid = [...passwordForm.querySelectorAll('input[required]')].find(field => !field.checkValidity());
-      if (invalid) { invalid.reportValidity(); return; }
-      const current = passwordForm.querySelector('#setup-current-password');
-      const next = passwordForm.querySelector('#setup-new-password');
-      const confirm = passwordForm.querySelector('#setup-confirm-password');
-      if (next.value !== confirm.value) { confirm.setCustomValidity('Passwords do not match.'); confirm.reportValidity(); return; }
-      confirm.setCustomValidity('');
-      personnelForm.querySelector('[data-password-value="current_password"]').value = current.value;
-      personnelForm.querySelector('[data-password-value="new_password"]').value = next.value;
-      personnelForm.querySelector('[data-password-value="confirm_password"]').value = confirm.value;
-      setStep(2);
-      personnelForm.querySelector('#setup-employee-number')?.focus();
-    });
-    personnelForm.querySelector('[data-setup-back]')?.addEventListener('click', () => setStep(1));
-    if (document.body.dataset.setupInitialStep === '2') setStep(2);
-  }
   const displayChoices = [...document.querySelectorAll('[data-display-choice]')];
   const setDisplay = display => {
     document.body.dataset.display = display;

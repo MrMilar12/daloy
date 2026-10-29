@@ -63,7 +63,8 @@ CREATE TABLE IF NOT EXISTS schedules (
  INDEX schedule_window (nurse_id, starts_at, ends_at), INDEX schedule_dates (starts_at, ends_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE IF NOT EXISTS activities (
- id INTEGER PRIMARY KEY AUTO_INCREMENT, title VARCHAR(190) NOT NULL, location_id INTEGER NOT NULL,
+ id INTEGER PRIMARY KEY AUTO_INCREMENT, title VARCHAR(190) NOT NULL, location_id INTEGER NULL,
+ destination_name VARCHAR(190) NOT NULL, destination_address TEXT NULL,
  starts_at DATETIME NOT NULL, ends_at DATETIME NOT NULL, organizer VARCHAR(190) NOT NULL DEFAULT '',
  required_nurses INTEGER NOT NULL, required_skill VARCHAR(190) NOT NULL DEFAULT '',
  reason_id INTEGER NOT NULL, instructions TEXT NULL, status VARCHAR(20) NOT NULL DEFAULT 'Open',
@@ -73,7 +74,7 @@ CREATE TABLE IF NOT EXISTS activities (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE TABLE IF NOT EXISTS deployments (
  id INTEGER PRIMARY KEY AUTO_INCREMENT, activity_id INTEGER NOT NULL, nurse_id INTEGER NOT NULL,
- location_id INTEGER NOT NULL, starts_at DATETIME NOT NULL, ends_at DATETIME NOT NULL,
+ location_id INTEGER NULL, starts_at DATETIME NOT NULL, ends_at DATETIME NOT NULL,
  reason VARCHAR(190) NOT NULL, instructions TEXT NULL, original_assignment TEXT NULL,
  authorized_by INTEGER NOT NULL, status VARCHAR(20) NOT NULL DEFAULT 'Assigned',
  acknowledged_at DATETIME NULL, cancelled_at DATETIME NULL, cancellation_reason TEXT NULL, created_at DATETIME NOT NULL,

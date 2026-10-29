@@ -39,6 +39,8 @@ try {
     });
     require ROOT.'/app/AuroraSchools.php';
     $schools=import_aurora_schools($db);
+    $venues=import_aurora_venues($db);
     echo "Imported $schools Aurora school locations.\n";
+    echo "Imported $venues Aurora venue locations.\n";
     echo "Installation complete. Open http://localhost/daloy/\n";
 } catch(Throwable $e) { fwrite(STDERR,$e->getMessage()."\n"); exit(1); }

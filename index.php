@@ -2,9 +2,10 @@
 declare(strict_types=1);
 require __DIR__.'/app/bootstrap.php';
 require __DIR__.'/app/Auth.php';
+require __DIR__.'/app/Schema.php';
 start_session();
 if(is_file(ROOT.'/storage/update-maintenance.json') && ($_GET['page']??'')!=='health') { http_response_code(503); ?><!doctype html><meta charset="utf-8"><title>System maintenance</title><style>body{font:16px system-ui;background:#f5f8fc;color:#17344a;display:grid;place-items:center;min-height:100vh}main{background:white;padding:40px;border-radius:18px;text-align:center;box-shadow:0 10px 30px #17344a18}h1{margin-top:0;color:#b91f36}</style><main><h1>System maintenance</h1><p>DALOY is applying an update. Please try again shortly.</p></main><?php exit; }
-try { $db=new Database($config); $db->run("CREATE TABLE IF NOT EXISTS registration_requests (id INTEGER PRIMARY KEY AUTO_INCREMENT,name VARCHAR(120) NOT NULL,email VARCHAR(190) NOT NULL UNIQUE,password_hash VARCHAR(255) NOT NULL,status VARCHAR(20) NOT NULL DEFAULT 'pending',reviewed_by INTEGER NULL,reviewed_at DATETIME NULL,created_at DATETIME NOT NULL)"); $installed=$db->one("SELECT setting_value FROM system_settings WHERE setting_key='organization'"); if(!$installed) throw new RuntimeException('Not installed'); }
+try { $db=new Database($config); ensure_custom_destination_schema($db); $db->run("CREATE TABLE IF NOT EXISTS registration_requests (id INTEGER PRIMARY KEY AUTO_INCREMENT,name VARCHAR(120) NOT NULL,email VARCHAR(190) NOT NULL UNIQUE,password_hash VARCHAR(255) NOT NULL,status VARCHAR(20) NOT NULL DEFAULT 'pending',reviewed_by INTEGER NULL,reviewed_at DATETIME NULL,created_at DATETIME NOT NULL)"); $installed=$db->one("SELECT setting_value FROM system_settings WHERE setting_key='organization'"); if(!$installed) throw new RuntimeException('Not installed'); }
 catch(Throwable $e) { http_response_code(503); require __DIR__.'/app/setup.php'; exit; }
 $auth=new Auth($db); $user=$auth->user(); $page=(string)($_GET['page']??'dashboard'); $error=null;
 if($_SERVER['REQUEST_METHOD']==='POST') {
@@ -51,10 +52,6 @@ if($_SERVER['REQUEST_METHOD']==='POST') {
                 case 'settings': $service->settings($_POST); break;
                 case 'activate':
                     if(!$user['must_change_password']) throw new DomainException('Your account is already set up. Change your password from My profile.',409);
-                    if(trim((string)($_POST['designation']??''))==='') throw new DomainException('Enter your position or designation.',422);
-                    if(!in_array((string)($_POST['employment_status']??''),['Permanent','Contractual','Job Order','Temporary'],true)) throw new DomainException('Select your employment status.',422);
-                    if($db->one('SELECT id FROM districts WHERE active=1 LIMIT 1') && empty($_POST['district_id'])) throw new DomainException('Select your assigned district or area.',422);
-                    if($db->one('SELECT id FROM locations WHERE active=1 LIMIT 1') && empty($_POST['location_id'])) throw new DomainException('Select your home school or office.',422);
                     $service->profile(array_merge($_POST,['phone'=>$user['phone']]));
                     session_regenerate_id(true);
                     $_SESSION['credential_version']=hash('sha256',$service->record('users',(int)$user['id'])['password_hash']);
@@ -87,7 +84,7 @@ if($user['must_change_password']) {
     exit;
 }
 if($page==='activate') redirect('?page=dashboard');
-$allowed=['dashboard','schedule','calendar','availability','deployment','leave','notifications','profile'];
+$allowed=['dashboard','schedule','calendar','availability','deployment','deployment-history','leave','notifications','profile'];
 if($service->manager()) $allowed=array_merge($allowed,['nurses','locations','activities','reports']);
 if($user['role']==='admin') $allowed=array_merge($allowed,['users','configuration','audit','settings']);
 if(!in_array($page,$allowed,true)) { http_response_code(403); $error='You do not have access to that page.'; $page='dashboard'; }

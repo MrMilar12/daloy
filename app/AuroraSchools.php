@@ -27,3 +27,22 @@ function import_aurora_schools(Database $db): int {
         return $added;
     });
 }
+
+/** Import known province-wide event venues without overwriting local edits. */
+function import_aurora_venues(Database $db): int {
+    $venues=[['name'=>'Aurora Sports Complex','type'=>'Sports Venue','municipality'=>'Baler','address'=>'Aurora Sports Complex, Barangay Reserva, Baler, Aurora, Philippines']];
+    return $db->transaction(function() use($db,$venues): int {
+        $added=0;
+        foreach($venues as $venue) {
+            $municipality=$db->one('SELECT id FROM municipalities WHERE name=?',[$venue['municipality']])['id']??$db->insert('municipalities',['name'=>$venue['municipality']]);
+            $existing=$db->one('SELECT id,address FROM locations WHERE name=? AND type=? ORDER BY id LIMIT 1',[$venue['name'],$venue['type']]);
+            if($existing) {
+                if(trim((string)$existing['address'])==='' || $existing['address']==='Barangay Reserva, Baler, Aurora') $db->update('locations',(int)$existing['id'],['address'=>$venue['address'],'municipality_id'=>$municipality]);
+                continue;
+            }
+            $db->insert('locations',['name'=>$venue['name'],'type'=>$venue['type'],'municipality_id'=>$municipality,'address'=>$venue['address'],'required_nurses'=>0]);
+            $added++;
+        }
+        return $added;
+    });
+}
