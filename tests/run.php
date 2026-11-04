@@ -160,7 +160,7 @@ try {
     check(str_contains($login['headers'],'Content-Security-Policy:') && str_contains(strtolower($login['headers']),'httponly'),'CSP and HttpOnly session cookie present');
     check(request('admin','',['action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===419,'Missing CSRF rejected');
     check(request('admin','',['csrf'=>token($login),'action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===303,'Administrator signs in');
-    $pageHeadings=['dashboard'=>'Your workforce, in flow.','schedule'=>'Master schedule','calendar'=>'Workforce calendar','availability'=>'Availability','deployment'=>'Deployment center','leave'=>'Leave & unavailability','notifications'=>'Notifications','profile'=>'My profile','users'=>'User accounts','nurses'=>'Nursing personnel','locations'=>'Schools & duty locations','activities'=>'Activities & events','reports'=>'Reports','audit'=>'Audit trail','settings'=>'Workspace settings','configuration'=>'Configuration'];
+    $pageHeadings=['dashboard'=>'Your workforce, in flow.','schedule'=>'Master schedule','calendar'=>'Workforce calendar','availability'=>'Availability','deployment'=>'Deployment center','leave'=>'Leave & unavailability','notifications'=>'Notifications','profile'=>'My profile','users'=>'User accounts','nurses'=>'Nursing personnel','locations'=>'Schools & duty locations','activities'=>'Activities & events','reports'=>'Reports','audit'=>'Audit trail','settings'=>'Workspace settings','configuration'=>'Configuration','admin-guide'=>'How to use DALOY'];
     foreach($pageHeadings as $page=>$heading) {
         $r=request('admin','?page='.$page); check($r['status']===200 && str_contains($r['body'],'data-page="'.$page.'"') && str_contains($r['body'],'<h1>'.e($heading).'</h1>'),'HTTP link opens its own page: '.$page);
     }
@@ -170,6 +170,7 @@ try {
     foreach(['pdf','xlsx','print'] as $fmt) { $r=request('admin','export.php?type=monthly&from=2035-01-01&to=2035-01-31&format='.$fmt); check($r['status']===200 && strlen($r['body'])>100,'HTTP export: '.$fmt); }
     $login=request('nurse'); check(request('nurse','',['csrf'=>token($login),'action'=>'login','email'=>$n1['email'],'password'=>$password])['status']===303,'Nurse signs in');
     check(request('nurse','?page=users')['status']===403,'Nurse cannot open user administration');
+    $nurseGuide=request('nurse','?page=admin-guide'); check($nurseGuide['status']===403 && !str_contains($nurseGuide['body'],'?page=admin-guide'),'Nurse cannot open or navigate to administrator guide');
     check(request('nurse','?page=schedule&edit='.$schedule2)['status']===403,'Nurse cannot open another nurse’s editor');
     check(request('nurse','api.php?action=conflicts&nurse_id='.$n2['id'].'&starts_at=2035-01-01T08:00&ends_at=2035-01-01T17:00')['status']===403,'Conflict API enforces ownership');
     check(request('nurse','export.php?type=monthly&from=2035-01-01&to=2035-01-31')['status']===403,'HTTP export enforces role');

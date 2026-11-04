@@ -86,7 +86,7 @@ if($user['must_change_password']) {
 if($page==='activate') redirect('?page=dashboard');
 $allowed=['dashboard','schedule','calendar','availability','deployment','deployment-history','leave','notifications','profile'];
 if($service->manager()) $allowed=array_merge($allowed,['nurses','locations','activities','reports']);
-if($user['role']==='admin') $allowed=array_merge($allowed,['users','configuration','audit','settings']);
+if($user['role']==='admin') $allowed=array_merge($allowed,['users','configuration','audit','settings','admin-guide']);
 if(!in_array($page,$allowed,true)) { http_response_code(403); $error='You do not have access to that page.'; $page='dashboard'; }
 require __DIR__.'/app/View.php';
 try { ob_start(); require __DIR__.'/app/pages.php'; $content=prepare_page_views(ob_get_contents()); ob_end_clean(); }
