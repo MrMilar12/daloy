@@ -98,6 +98,7 @@ final class GitHubUpdater {
             }
             if(!$out->close()) throw new RuntimeException('Could not finish the update backup.');
 
+            $changedFiles=0;
             foreach($allowed as $path=>$archivePath) {
                 $data=$zip->getFromName($archivePath);
                 if($data===false) throw new RuntimeException('An application file is missing from the update archive.');
@@ -105,13 +106,36 @@ final class GitHubUpdater {
                 if(!is_dir(dirname($full)) && !mkdir(dirname($full),0755,true) && !is_dir(dirname($full))) {
                     throw new RuntimeException('Could not create an application directory.');
                 }
-                if(file_put_contents($full,$data,LOCK_EX)===false) throw new RuntimeException('Could not install an application file.');
+                $existingHash=is_file($full)?hash_file('sha256',$full):false;
+                if($existingHash!==false && hash_equals($existingHash,hash('sha256',$data))) continue;
+                $staged=tempnam(dirname($full),'.daloy-update-');
+                if($staged===false) throw new RuntimeException('Could not stage an application file.');
+                $written=file_put_contents($staged,$data,LOCK_EX);
+                if($written===false || $written!==strlen($data)) {
+                    unlink($staged);
+                    throw new RuntimeException('Could not completely write an application file.');
+                }
+                if(is_file($full)) {
+                    $mode=fileperms($full);
+                    if($mode!==false) @chmod($staged,$mode&0777);
+                }
+                if(!rename($staged,$full)) {
+                    unlink($staged);
+                    throw new RuntimeException('Could not replace an application file.');
+                }
+                $changedFiles++;
             }
-            $this->db->run("INSERT INTO system_settings(setting_key,setting_value) VALUES('github_update_sha',?) ON DUPLICATE KEY UPDATE setting_value=VALUES(setting_value)",[$sha]);
+            if(function_exists('opcache_reset') && filter_var((string)ini_get('opcache.enable'),FILTER_VALIDATE_BOOLEAN) && !opcache_reset()) {
+                throw new RuntimeException('Files were installed, but PHP could not refresh its opcode cache. Restart Apache or PHP before using the updated system.');
+            }
+            $upsert=$this->db->pdo->getAttribute(PDO::ATTR_DRIVER_NAME)==='sqlite'
+                ? "INSERT INTO system_settings(setting_key,setting_value) VALUES('github_update_sha',?) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value"
+                : "INSERT INTO system_settings(setting_key,setting_value) VALUES('github_update_sha',?) ON DUPLICATE KEY UPDATE setting_value=VALUES(setting_value)";
+            $this->db->run($upsert,[$sha]);
             $zip->close();
             unlink($tmp);
             unlink($this->maintenance());
-            return ['message'=>'Update installed successfully.','backup'=>basename($backup),'sha'=>$sha];
+            return ['message'=>'Update installed successfully. '.$changedFiles.' application file(s) changed.','backup'=>basename($backup),'sha'=>$sha,'files_changed'=>$changedFiles];
         } catch(Throwable $e) {
             if($zip instanceof ZipArchive) $zip->close();
             if(is_file($tmp)) unlink($tmp);
