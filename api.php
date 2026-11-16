@@ -23,7 +23,7 @@ try {
             $sha=(string)($_POST['latest']??'');
             try { $check=$updater->check(); }
             catch(RuntimeException $e) { throw new DomainException($e->getMessage(),502); }
-            if(!preg_match('/^[a-f0-9]{40}$/',$sha) || $sha!==$check['latest'] || !$check['available']) throw new DomainException('Check for updates again before installing.',409);
+            if(!preg_match('/^[a-f0-9]{40}$/',$sha) || $sha!==$check['latest']) throw new DomainException('Check for updates again before installing.',409);
             try { $result=$updater->apply($check); }
             catch(RuntimeException $e) { throw new DomainException($e->getMessage(),502); }
             foreach($db->all('SELECT id FROM users WHERE active=1 AND id<>?',[$user['id']]) as $recipient) {

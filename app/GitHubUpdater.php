@@ -107,7 +107,8 @@ final class GitHubUpdater {
                     throw new RuntimeException('Could not create an application directory.');
                 }
                 $existingHash=is_file($full)?hash_file('sha256',$full):false;
-                if($existingHash!==false && hash_equals($existingHash,hash('sha256',$data))) continue;
+                $expectedHash=hash('sha256',$data);
+                if($existingHash!==false && hash_equals($existingHash,$expectedHash)) continue;
                 $staged=tempnam(dirname($full),'.daloy-update-');
                 if($staged===false) throw new RuntimeException('Could not stage an application file.');
                 $written=file_put_contents($staged,$data,LOCK_EX);
@@ -123,7 +124,19 @@ final class GitHubUpdater {
                     unlink($staged);
                     throw new RuntimeException('Could not replace an application file.');
                 }
+                $installedHash=hash_file('sha256',$full);
+                if($installedHash===false || !hash_equals($expectedHash,$installedHash)) {
+                    throw new RuntimeException('An installed application file did not match the update archive. The update was not marked complete; repair it or restore the backup.');
+                }
                 $changedFiles++;
+            }
+            foreach($allowed as $path=>$archivePath) {
+                $full=$this->root.'/'.$path;
+                $expected=$zip->getFromName($archivePath);
+                $installedHash=is_file($full)?hash_file('sha256',$full):false;
+                if($expected===false || $installedHash===false || !hash_equals(hash('sha256',$expected),$installedHash)) {
+                    throw new RuntimeException('Update verification failed for '.$path.'. The update was not marked complete; repair it or restore the backup.');
+                }
             }
             if(function_exists('opcache_reset') && filter_var((string)ini_get('opcache.enable'),FILTER_VALIDATE_BOOLEAN) && !opcache_reset()) {
                 throw new RuntimeException('Files were installed, but PHP could not refresh its opcode cache. Restart Apache or PHP before using the updated system.');
