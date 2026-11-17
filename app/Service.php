@@ -12,7 +12,7 @@ final class Service {
     }
     public function choice(array $d,string $key,array $values): string { $v=$this->text($d,$key); if(!in_array($v,$values,true)) throw new DomainException('Invalid '.str_replace('_',' ',$key).'.',422); return $v; }
     public function positive(array $d,string $key,int $min=1,int $max=10000): int {
-        $v=filter_var($d[$key]??null,FILTER_VALIDATE_INT); if($v===false || $v<$min || $v>$max) throw new DomainException("Invalid $key (allowed $minÃ¢â‚¬â€œ$max).",422); return $v;
+        $v=filter_var($d[$key]??null,FILTER_VALIDATE_INT); if($v===false || $v<$min || $v>$max) throw new DomainException("Invalid $key (allowed $min–$max).",422); return $v;
     }
     public function reference(string $table,mixed $id): int { $id=(int)$id; $r=$this->record($table,$id); if(isset($r['active']) && !$r['active']) throw new DomainException('The selected record is inactive.',422); return $id; }
     public function nurse(mixed $id): int { $id=$this->reference('users',$id); if($this->record('users',$id)['role']!=='nurse') throw new DomainException('Select an active nurse.',422); return $id; }
@@ -58,7 +58,7 @@ final class Service {
             $data=['nurse_id'=>$nurse,'location_id'=>$this->reference('locations',$d['location_id']??0),'duty_type_id'=>$this->reference('duty_types',$d['duty_type_id']??0),'starts_at'=>$start,'ends_at'=>$end,'remarks'=>$this->text($d,'remarks',3000,false),'updated_at'=>now()];
             if($id) $this->db->update('schedules',$id,$data); else $id=$this->db->insert('schedules',$data+['created_by'=>$this->actor['id'],'created_at'=>now(),'status'=>'Scheduled']);
             $this->audit($old?'Schedule updated':'Schedule created','schedules',$id,$old,$data);
-            $this->notify($nurse,'Duty schedule '.($old?'updated':'created'),$start.' Ã‚Â· '.$this->record('locations',$data['location_id'])['name'],'?page=schedule'); return $id;
+            $this->notify($nurse,'Duty schedule '.($old?'updated':'created'),$start.' · '.$this->record('locations',$data['location_id'])['name'],'?page=schedule'); return $id;
         });
     }
     public function cancel(array $d): void {
@@ -68,7 +68,7 @@ final class Service {
             if(in_array($table,['deployments','activities'])) $this->requireRole(['admin','head']); else $this->own((int)$r['nurse_id']);
             if(($r['status']??'')==='Cancelled') throw new DomainException('This record is already cancelled.',422);
             if($table==='leave_records' && $r['status']==='Approved') $this->requireRole(['admin','head']);
-            if($table==='activities' && $this->db->one("SELECT id FROM deployments WHERE activity_id=? AND status<>'Cancelled'",[$r['id']])) throw new DomainException('Cancel the activityÃ¢â‚¬â„¢s deployments first.',409);
+            if($table==='activities' && $this->db->one("SELECT id FROM deployments WHERE activity_id=? AND status<>'Cancelled'",[$r['id']])) throw new DomainException("Cancel the activity's deployments first.",409);
             $change=['status'=>'Cancelled']; if($table==='deployments') $change+=['cancelled_at'=>now(),'cancellation_reason'=>$reason];
             $this->db->update($table,(int)$r['id'],$change); $this->audit('Cancelled',$table,(int)$r['id'],$r,$change,$reason);
             if(isset($r['nurse_id'])) $this->notify((int)$r['nurse_id'],'Assignment / availability record cancelled',$reason);
@@ -96,7 +96,7 @@ final class Service {
             if(!empty($a['location_id']) && !$this->record('locations',(int)$a['location_id'])['active']) $reasons[]='Destination is inactive';
             if($a['ends_at']<=now()) $reasons[]='Requirement has ended';
             $conflicts=$this->conflicts((int)$u['id'],$a['starts_at'],$a['ends_at']);
-            foreach($conflicts as $c) $reasons[]=$c['label'].' ('.$c['starts_at'].' â€“ '.$c['ends_at'].')';
+            foreach($conflicts as $c) $reasons[]=$c['label'].' ('.$c['starts_at'].' – '.$c['ends_at'].')';
             unset($u['password_hash']); $list[]=$u+['eligible'=>!$reasons,'unavailable'=>(bool)$conflicts,'reasons'=>$reasons];
         } return $list;
     }
@@ -112,7 +112,7 @@ final class Service {
             $home=$u['location_id']?$this->record('locations',(int)$u['location_id'])['name']:'No home location recorded';
             $data=['activity_id'=>$a['id'],'nurse_id'=>$nurse,'location_id'=>$a['location_id'],'starts_at'=>$a['starts_at'],'ends_at'=>$a['ends_at'],'reason'=>$this->record('deployment_reasons',(int)$a['reason_id'])['name'],'instructions'=>$a['instructions'],'original_assignment'=>$home,'authorized_by'=>$this->actor['id'],'created_at'=>now(),'status'=>'Assigned'];
             $id=$this->db->insert('deployments',$data); $this->audit('Deployment assigned','deployments',$id,null,$data);
-            $this->notify($nurse,'New official duty assignment',$a['title'].' Ã‚Â· '.$a['starts_at'].'. Please review and acknowledge.','?page=deployment'); return $id;
+            $this->notify($nurse,'New official duty assignment',$a['title'].' · '.$a['starts_at'].'. Please review and acknowledge.','?page=deployment'); return $id;
         });
     }
     public function acknowledge(array $d): void {
@@ -131,7 +131,7 @@ final class Service {
             $type=$this->choice($d,'type',['Vacation Leave','Sick Leave','Official Leave','Other Leave','Unavailability']);
             $data=['nurse_id'=>$nurse,'type'=>$type,'starts_at'=>$start,'ends_at'=>$end,'reason'=>$this->text($d,'reason',3000),'attachment'=>$attachment,'created_at'=>now(),'status'=>'Submitted'];
             $id=$this->db->insert('leave_records',$data); $this->audit('Leave submitted','leave_records',$id,null,$data);
-            $this->notifyHeads('Leave request for review',$this->record('users',$nurse)['name'].' Ã‚Â· '.$start,'?page=leave'); return $id;
+            $this->notifyHeads('Leave request for review',$this->record('users',$nurse)['name'].' · '.$start,'?page=leave'); return $id;
         });
     }
     public function reviewLeave(array $d): void {
@@ -142,7 +142,7 @@ final class Service {
             if($status==='Approved') $this->assertFree((int)$r['nurse_id'],$r['starts_at'],$r['ends_at'],'leave_records',(int)$r['id']);
             $change=['status'=>$status,'reviewed_by'=>$this->actor['id'],'reviewed_at'=>now(),'review_note'=>$this->text($d,'review_note',2000,false)];
             $this->db->update('leave_records',(int)$r['id'],$change); $this->audit('Leave '.$status,'leave_records',(int)$r['id'],$r,$change);
-            $this->notify((int)$r['nurse_id'],'Leave request '.$status,$r['starts_at'].' Ã‚Â· '.$change['review_note'],'?page=leave');
+            $this->notify((int)$r['nurse_id'],'Leave request '.$status,$r['starts_at'].' · '.$change['review_note'],'?page=leave');
         });
     }
     public function availability(array $d): int {

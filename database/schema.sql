@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS registration_requests (
  name VARCHAR(120) NOT NULL,
  email VARCHAR(190) NOT NULL UNIQUE,
  password_hash VARCHAR(255) NOT NULL,
+ requested_role VARCHAR(20) NOT NULL DEFAULT 'nurse',
  status VARCHAR(20) NOT NULL DEFAULT 'pending',
  reviewed_by INTEGER NULL,
  reviewed_at DATETIME NULL,

@@ -13,14 +13,14 @@ function range_label(array $r): string { return e(date('M j, Y',strtotime($r['st
 function options(string $table,string $where='active=1'): array { global $db; return array_column($db->all("SELECT id,name FROM $table WHERE $where ORDER BY name"),'name','id'); }
 function input(string $name,string $label,mixed $value='',string $type='text',bool $required=true,string $extra=''): void { ?><label><?=e($label)?><input type="<?=e($type)?>" name="<?=e($name)?>" value="<?=e($value)?>" <?=$required?'required':''?> <?=$extra?>></label><?php }
 function select_field(string $name,string $label,array $options,mixed $value='',bool $required=true): void { ?><label><?=e($label)?><select name="<?=e($name)?>" <?=$required?'required':''?>><option value=""><?=$required?'Select an option':'All / none'?></option><?php foreach($options as $k=>$v): ?><option value="<?=e($k)?>" <?=(string)$value===(string)$k?'selected':''?>><?=e($v)?></option><?php endforeach ?></select></label><?php }
-function school_assignments_field(array $record): void {
+function school_assignments_field(array $record,bool $enabled=true): void {
     global $db;
     $selected=$record['school_ids']??(isset($record['id'])?array_column($db->all('SELECT location_id FROM nurse_locations WHERE nurse_id=?',[$record['id']]),'location_id'):[]);
     if(!is_array($selected)) $selected=[];
     $snapshot=json_decode(file_get_contents(ROOT.'/database/aurora-schools.json'),true,512,JSON_THROW_ON_ERROR);
     $names=array_column(array_filter($snapshot['schools'],fn($s)=>!empty($s['levels']) && !empty($s['public_inventory'])),'name');
     $schools=$db->all("SELECT l.*,m.name municipality_name FROM locations l LEFT JOIN municipalities m ON m.id=l.municipality_id WHERE l.type='School' ORDER BY l.name,l.id");
-    ?><fieldset class="span-2 school-assignments">
+    ?><fieldset id="nurse-school-assignments" class="span-2 school-assignments" data-nurse-school-assignments <?=$enabled?'':'hidden disabled'?>>
         <legend class="sr-only">Additional assigned schools</legend>
         <input type="hidden" name="schools_present" value="1">
         <div class="school-picker-heading"><span class="school-picker-icon" aria-hidden="true"><?=icon('locations')?></span><div><h3>Additional schools</h3><p>Expand this nurse’s coverage beyond their home school.</p></div><span class="school-selection-badge" aria-live="polite"><?=count(array_unique($selected))?> selected</span></div>

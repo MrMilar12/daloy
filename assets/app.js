@@ -95,6 +95,17 @@
     picker.addEventListener('change', update);
     update();
   });
+  const accountRole = document.querySelector('select[name="role"]');
+  const nurseAssignments = document.querySelector('[data-nurse-school-assignments]');
+  if (accountRole && nurseAssignments) {
+    const updateNurseAssignments = () => {
+      const enabled = accountRole.value === 'nurse';
+      nurseAssignments.hidden = !enabled;
+      nurseAssignments.disabled = !enabled;
+    };
+    accountRole.addEventListener('change', updateNurseAssignments);
+    updateNurseAssignments();
+  }
   const root = document.documentElement;
   try { root.dataset.theme = localStorage.getItem('daloy-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch (_) {}
   document.querySelectorAll('.theme-toggle').forEach(button => button.addEventListener('click', () => {

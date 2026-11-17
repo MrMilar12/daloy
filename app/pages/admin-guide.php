@@ -24,9 +24,9 @@ page_heading('ADMINISTRATOR GUIDE','How to use DALOY','Follow these steps to pre
 <section class="card inset">
     <h2>3. Create and review user accounts</h2>
     <ol>
-        <li>Open <a href="?page=users">User accounts</a> to create administrator, Nurse Head, and nurse accounts. Add each nurse's employee details, home assignment, additional schools, and relevant skills or competencies.</li>
+        <li>Open <a href="?page=users">User accounts</a> to create administrator, Nurse Head, and nurse accounts. Home school / office assignment is optional; use “No school or office assignment” for office-based staff. Additional school assignments are only for nurses.</li>
         <li>Provide temporary passwords through an approved private channel. Users must change them at first sign-in.</li>
-        <li>Review pending registration requests in User accounts before approving them. An approved request creates a nurse account.</li>
+        <li>Review the requested account type on each pending registration. Approve the person as a nurse or Nurse Head / Office Supervisor; office supervisors can remain unassigned to a school.</li>
         <li>Deactivate accounts when access should end. Do not delete or repurpose an account with workforce history; its records are retained.</li>
     </ol>
 </section>

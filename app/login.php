@@ -40,6 +40,12 @@
                     <?php if($register): ?>
                     <label for="auth-name">Full name</label>
                     <input id="auth-name" name="name" required maxlength="120" autocomplete="name" value="<?=e($_POST['name']??'')?>" placeholder="Enter your full name">
+                    <label for="auth-requested-role">Requested account type</label>
+                    <select id="auth-requested-role" name="requested_role" required>
+                        <option value="nurse" <?=($_POST['requested_role']??'nurse')==='nurse'?'selected':''?>>Nurse</option>
+                        <option value="head" <?=($_POST['requested_role']??'')==='head'?'selected':''?>>Nurse Head / Office Supervisor</option>
+                    </select>
+                    <p class="auth-help">This is a request only. An administrator will approve your account type. Office supervisors do not need a school assignment.</p>
                     <?php endif ?>
                     <label for="auth-email">Email address</label>
                     <input id="auth-email" name="email" type="email" required maxlength="190" autocomplete="<?=$register?'email':'username'?>" value="<?=e($_POST['email']??'')?>" placeholder="you@example.gov.ph">

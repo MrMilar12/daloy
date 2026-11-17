@@ -37,6 +37,9 @@ try {
     $as->deleteUser(['id'=>$deletable['id']]);
     check(!$db->one('SELECT id FROM users WHERE id=?',[$deletable['id']]) && !$db->one('SELECT id FROM notifications WHERE user_id=?',[$deletable['id']]),'Deleting an unused account removes it and its notifications');
     check((bool)$db->one("SELECT id FROM audit_logs WHERE record_type='users' AND record_id=? AND action='Account deleted'",[$deletable['id']]),'Account deletion is retained in audit history');
+    $officeHeadId=$as->saveUser(['name'=>'Office Head Account','email'=>'officehead@example.test','role'=>'head','active'=>1,'designation'=>'Office Head','employment_status'=>'Permanent','password'=>$password]);
+    $officeHead=$as->record('users',$officeHeadId);
+    check($officeHead['location_id']===null && !$as->assignedLocations($officeHeadId),'Admin-created office head can have no school assignment');
     denied(fn()=>$ns->schedule($base),409,'Overlapping schedule blocked');
     denied(fn()=>$ns->schedule(array_merge($base,['nurse_id'=>$n2['id']])),403,'Nurse cannot create another nurse’s schedule');
     denied(fn()=>$ns->schedule(array_merge($base,['starts_at'=>'2035-02-30T08:00'])),422,'Invalid calendar dates blocked');
@@ -172,6 +175,18 @@ try {
     foreach($pageHeadings as $page=>$heading) {
         $r=request('admin','?page='.$page); check($r['status']===200 && str_contains($r['body'],'data-page="'.$page.'"') && str_contains($r['body'],'<h1>'.e($heading).'</h1>'),'HTTP link opens its own page: '.$page);
     }
+    $userForm=request('admin','?page=users&new=1');
+    check(str_contains($userForm['body'],'No school or office assignment') && str_contains($userForm['body'],'data-nurse-school-assignments'),'Internal account form makes school assignment optional');
+    $registration=request('publicRegistration','?register=1');
+    check(str_contains($registration['body'],'name="requested_role"') && str_contains($registration['body'],'value="head"'),'Public registration can request an office-head account');
+    $registrationPost=request('publicRegistration','?register=1',['csrf'=>token($registration),'action'=>'register','name'=>'External Office Head','email'=>'external.officehead@example.test','requested_role'=>'head','password'=>'Strong-Registration-123']);
+    check($registrationPost['status']===303 && $db->one('SELECT id FROM registration_requests WHERE email=? AND requested_role=?',['external.officehead@example.test','head']),'Public office-head registration is recorded as a role request');
+    $externalRequest=$db->one('SELECT id FROM registration_requests WHERE email=?',['external.officehead@example.test']);
+    $review=request('admin','?page=users&request='.$externalRequest['id']);
+    check(str_contains($review['body'],'Approve account as') && str_contains($review['body'],'value="head" selected'),'Admin review can approve the requested office-head role');
+    $approved=request('admin','',['csrf'=>token($review),'action'=>'register_review','request_id'=>$externalRequest['id'],'decision'=>'approve','role'=>'head']);
+    $externalHead=$db->one('SELECT role,location_id FROM users WHERE email=?',['external.officehead@example.test']);
+    check($approved['status']===303 && $externalHead['role']==='head' && $externalHead['location_id']===null,'Approved external office head is created without a school assignment');
     $httpDeletable=$makeUser('nurse','HTTP Deletable Nurse');
     $r=request('admin','?page=users');
     check(str_contains($r['body'],'value="delete_user"'),'Administrator user list offers account deletion');
