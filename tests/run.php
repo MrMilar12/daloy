@@ -60,6 +60,11 @@ try {
     denied(fn()=>$ns->cancel(['table'=>'leave_records','id'=>$leave,'reason'=>'Bypass']),403,'Nurse cannot revoke approved leave');
     $aBase=['title'=>'Test Outreach','location_id'=>$location,'starts_at'=>'2035-01-10T08:00','ends_at'=>'2035-01-10T17:00','required_nurses'=>1,'required_skill'=>'First aid','reason_id'=>$reason,'instructions'=>'Bring supplies'];
     $activity=$hs->activity($aBase); $candidates=$hs->candidates($activity);
+    check($as->record('activities',$activity)['destination_name']===$as->record('locations',$location)['name'] && (int)$as->record('activities',$activity)['location_id']===$location,'Activity destination is derived from its selected location');
+    denied(fn()=>$hs->activity(array_merge($aBase,['location_id'=>'','destination_name'=>''])),422,'Activity without a selected location requires a destination name');
+    $customActivity=$hs->activity(array_merge($aBase,['title'=>'Custom destination activity','location_id'=>'','destination_name'=>'Community Hall','destination_address'=>'Off-directory venue']));
+    $customRecord=$as->record('activities',$customActivity);
+    check($customRecord['location_id']===null && $customRecord['destination_name']==='Community Hall','Activity accepts a custom destination without a directory location');
     check(count($candidates)===3,'Candidates include unavailable personnel');
     check(!$candidates[0]['eligible'] || !$candidates[1]['eligible'],'Candidate list explains conflicts');
     denied(fn()=>$hs->deploy(['activity_id'=>$activity,'nurse_id'=>$n1['id']]),409,'Leave blocks deployment');

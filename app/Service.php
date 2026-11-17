@@ -80,8 +80,19 @@ final class Service {
             if($old && $old['status']==='Cancelled') throw new DomainException('Create a new requirement for a cancelled activity.',422);
             if($id && $this->db->one('SELECT id FROM deployments WHERE activity_id=?',[$id])) throw new DomainException('This requirement has deployment history. Create a replacement requirement to preserve the original details.',409);
             [$start,$end]=$this->window($d);
-            $destination=$this->text($d,'destination_name',190); $address=$this->text($d,'destination_address',1000,false); $locationId=null;
-            if($old && !empty($old['location_id'])) { $saved=$this->record('locations',(int)$old['location_id']); if($destination===$saved['name'] && $address===(string)$saved['address']) $locationId=(int)$saved['id']; }
+            $selectedLocation=null;
+            if(!empty($d['location_id'])) {
+                $selectedLocationId=$this->reference('locations',$d['location_id']);
+                $selectedLocation=$this->record('locations',$selectedLocationId);
+            }
+            $destination=$this->text($d,'destination_name',190,false);
+            $address=$this->text($d,'destination_address',1000,false);
+            if($destination==='' && $selectedLocation) $destination=$selectedLocation['name'];
+            if($address==='' && $selectedLocation) $address=(string)$selectedLocation['address'];
+            if($destination==='') $destination=$this->text($d,'destination_name',190);
+            $locationId=null;
+            if($selectedLocation && $destination===$selectedLocation['name'] && $address===(string)$selectedLocation['address']) $locationId=(int)$selectedLocation['id'];
+            elseif($old && !empty($old['location_id'])) { $saved=$this->record('locations',(int)$old['location_id']); if($destination===$saved['name'] && $address===(string)$saved['address']) $locationId=(int)$saved['id']; }
             $data=['title'=>$this->text($d,'title'),'location_id'=>$locationId,'destination_name'=>$destination,'destination_address'=>$address?:null,'starts_at'=>$start,'ends_at'=>$end,'organizer'=>$this->text($d,'organizer',190,false),'required_nurses'=>$this->positive($d,'required_nurses',1,1000),'required_skill'=>$this->text($d,'required_skill',190,false),'reason_id'=>$this->reference('deployment_reasons',$d['reason_id']??0),'instructions'=>$this->text($d,'instructions',5000,false)];
             if($id) $this->db->update('activities',$id,$data); else $id=$this->db->insert('activities',$data+['created_by'=>$this->actor['id'],'created_at'=>now(),'status'=>'Open']);
             $this->audit($old?'Requirement updated':'Requirement created','activities',$id,$old,$data);
