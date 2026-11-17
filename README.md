@@ -59,7 +59,7 @@ For a **separate demonstration installation**, point the configuration at a new 
 | Activities | Multi-day requirements, required nurse count, organizer, destination, reason, instructions, competency requirement |
 | Deployment | Candidate explanations, manual authorization, capacity checks, notifications, acknowledgment, cancellation with reason, retained history |
 | Notifications | Personal in-app inbox, unread count, related-record links, mark all as read |
-| Reports | Daily/weekly/monthly rosters, individual history, school/district assignments, deployment/activity personnel, availability, leave, conflicts, audit |
+| Reports | Daily/weekly/monthly rosters, individual history, school/district assignments, deployment/activity personnel, assignment history, availability, leave, conflicts, audit |
 | Exports | Actual `.xlsx` ZIP/XML files, paginated `.pdf` documents, browser print / PDF |
 | Administration | Account creation/reset/deactivation, catalogs, workspace notice, organization name, audit trail |
 | Interface | Native responsive CSS, mobile quick navigation, light/dark preference, keyboard focus indicators, empty/error states |

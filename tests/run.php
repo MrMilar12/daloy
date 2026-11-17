@@ -80,6 +80,8 @@ try {
     denied(fn()=>$hs->cancel(['table'=>'activities','id'=>$activity,'reason'=>'Cancel']),409,'Activity cannot be cancelled with live assignments');
     $hs->cancel(['table'=>'deployments','id'=>$deployment,'reason'=>'Activity rescheduled']); check($as->record('deployments',$deployment)['acknowledged_at']===$ack,'Cancellation preserves acknowledgment history');
     denied(fn()=>$n3s->acknowledge(['id'=>$deployment]),409,'Cancelled deployment cannot be acknowledged');
+    $history=Reports::build($as,'assignment_history',['starts_at'=>'2035-01-01 00:00','ends_at'=>'2035-02-01 00:00']); $historyRows=array_values(array_filter($history['rows'],fn($row)=>(int)$row[0]===$deployment));
+    check(count($historyRows)===1 && $historyRows[0][6]==='Cancelled' && $historyRows[0][9]===$ack && $historyRows[0][11]==='Activity rescheduled','Assignment history includes cancelled assignments and acknowledgment details');
     $skillActivity=$hs->activity(array_merge($aBase,['title'=>'Advanced competency','required_skill'=>'Advanced trauma certification']));
     denied(fn()=>$hs->deploy(['activity_id'=>$skillActivity,'nurse_id'=>$n3['id']]),422,'Missing competency blocks deployment');
     $locationData=$as->record('locations',$location); $as->catalog(array_merge($locationData,['table'=>'locations','active'=>0]));
