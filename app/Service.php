@@ -195,6 +195,33 @@ final class Service {
             $this->audit($old?'Account updated':'Account created','users',$id,$old,$data); return $id;
         });
     }
+    public function deleteUser(array $d): void {
+        $this->requireRole(['admin']);
+        $this->db->transaction(function() use($d) {
+            $id=$this->positive($d,'id',1,PHP_INT_MAX);
+            if($id===(int)$this->actor['id']) throw new DomainException('You cannot delete your own account.',422);
+            $old=$this->record('users',$id);
+            if($old['role']==='admin' && $old['active'] && (int)$this->db->one("SELECT COUNT(*) AS count FROM users WHERE role='admin' AND active=1")['count']<=1) {
+                throw new DomainException('You cannot delete the last active administrator account.',422);
+            }
+            foreach([
+                'schedules'=>['nurse_id','created_by'],
+                'activities'=>['created_by'],
+                'deployments'=>['nurse_id','authorized_by'],
+                'leave_records'=>['nurse_id','reviewed_by'],
+                'availability_records'=>['nurse_id'],
+            ] as $table=>$columns) {
+                foreach($columns as $column) if($this->db->one("SELECT id FROM $table WHERE $column=? LIMIT 1",[$id])) {
+                    throw new DomainException('This account is linked to operational history. Deactivate it instead of deleting it.',409);
+                }
+            }
+            $this->audit('Account deleted','users',$id,$old,null);
+            $this->db->run('UPDATE registration_requests SET reviewed_by=NULL WHERE reviewed_by=?',[$id]);
+            $this->db->run('DELETE FROM notifications WHERE user_id=?',[$id]);
+            $this->db->run('DELETE FROM nurse_locations WHERE nurse_id=?',[$id]);
+            $this->db->run('DELETE FROM users WHERE id=?',[$id]);
+        });
+    }
     public function monthlyNurseSchedules(string $month): array {
         $this->requireRole(['admin','head']);
         $first=DateTimeImmutable::createFromFormat('!Y-m',$month);

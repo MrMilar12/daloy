@@ -48,6 +48,7 @@ if($_SERVER['REQUEST_METHOD']==='POST') {
                 case 'review_leave': $service->reviewLeave($_POST); break;
                 case 'availability': $service->availability($_POST); break;
                 case 'user': $service->saveUser($_POST); break;
+                case 'delete_user': $service->deleteUser($_POST); break;
                 case 'catalog': $service->catalog($_POST); break;
                 case 'settings': $service->settings($_POST); break;
                 case 'activate':
@@ -68,7 +69,7 @@ if($_SERVER['REQUEST_METHOD']==='POST') {
                 default: throw new DomainException('Unknown action.',422);
             }
         } catch(Throwable $e) { if($file && is_file(ROOT.'/storage/uploads/'.$file)) unlink(ROOT.'/storage/uploads/'.$file); throw $e; }
-        $_SESSION['flash']='Changes saved successfully.';
+        $_SESSION['flash']=$action==='delete_user'?'Account deleted.':'Changes saved successfully.';
         $return=(string)($_POST['return']??'?page='.$page); if(!preg_match('/^\?page=[a-z_]+(?:&[a-z_]+=[a-zA-Z0-9_-]+)*$/D',$return)) $return='?page=dashboard'; redirect($return);
     } catch(DomainException $e) { $error=$e->getMessage(); http_response_code(in_array($e->getCode(),[401,403,404,409,419,422,429])?$e->getCode():422); }
     catch(PDOException $e) { error_log((string)$e); $error=$e->getCode()==='23000'?'That email, employee number, or configuration name is already in use.':'The change could not be saved. Please try again.'; http_response_code(422); }

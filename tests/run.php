@@ -29,6 +29,14 @@ try {
     check($shift>0,'Configurable district, municipality, location, duty, reason and shift');
     $base=['nurse_id'=>$n1['id'],'location_id'=>$location,'duty_type_id'=>$duty,'starts_at'=>'2035-01-10T08:00','ends_at'=>'2035-01-10T17:00','remarks'=>'<script>alert("x")</script>'];
     $schedule=$ns->schedule($base); check($schedule>0,'Nurse creates own schedule');
+    denied(fn()=>$hs->deleteUser(['id'=>$n2['id']]),403,'Supervisor cannot delete accounts');
+    denied(fn()=>$as->deleteUser(['id'=>$admin['id']]),422,'Administrator cannot delete self');
+    denied(fn()=>$as->deleteUser(['id'=>$n1['id']]),409,'Account with operational history cannot be deleted');
+    $deletable=$makeUser('nurse','Deletable Nurse');
+    $as->notify((int)$deletable['id'],'Test notification','Delete with account');
+    $as->deleteUser(['id'=>$deletable['id']]);
+    check(!$db->one('SELECT id FROM users WHERE id=?',[$deletable['id']]) && !$db->one('SELECT id FROM notifications WHERE user_id=?',[$deletable['id']]),'Deleting an unused account removes it and its notifications');
+    check((bool)$db->one("SELECT id FROM audit_logs WHERE record_type='users' AND record_id=? AND action='Account deleted'",[$deletable['id']]),'Account deletion is retained in audit history');
     denied(fn()=>$ns->schedule($base),409,'Overlapping schedule blocked');
     denied(fn()=>$ns->schedule(array_merge($base,['nurse_id'=>$n2['id']])),403,'Nurse cannot create another nurse’s schedule');
     denied(fn()=>$ns->schedule(array_merge($base,['starts_at'=>'2035-02-30T08:00'])),422,'Invalid calendar dates blocked');
@@ -164,6 +172,11 @@ try {
     foreach($pageHeadings as $page=>$heading) {
         $r=request('admin','?page='.$page); check($r['status']===200 && str_contains($r['body'],'data-page="'.$page.'"') && str_contains($r['body'],'<h1>'.e($heading).'</h1>'),'HTTP link opens its own page: '.$page);
     }
+    $httpDeletable=$makeUser('nurse','HTTP Deletable Nurse');
+    $r=request('admin','?page=users');
+    check(str_contains($r['body'],'value="delete_user"'),'Administrator user list offers account deletion');
+    $deleted=request('admin','',['csrf'=>token($r),'action'=>'delete_user','id'=>$httpDeletable['id'],'return'=>'?page=users']);
+    check($deleted['status']===303 && !$db->one('SELECT id FROM users WHERE id=?',[$httpDeletable['id']]),'Account can be deleted through the CSRF-protected HTTP form');
     foreach(['schedule&new=1','schedule&edit='.$touching,'activities&new=1','activities&edit='.$skillActivity,'deployment&activity='.$activity,'leave&new=1','availability&new=1','users&new=1','users&edit='.$n1['id'],'locations&new=1','locations&edit='.$location,'configuration&tab=shifts&new=1','calendar&view=week&date=2035-01-10','calendar&view=day&date=2035-01-10','calendar&view=month&date=2035-01-10'] as $page) check(request('admin','?page='.$page)['status']===200,'HTTP editor / view: '.$page);
     check(str_contains(request('admin','?page=calendar&view=month&date=2035-01-31')['body'],'date=2035-02-01'),'Month navigation does not skip February from January 31');
     $r=request('admin','?page=schedule&from=2035-01-01&to=2035-01-31&status=Cancelled'); check(str_contains($r['body'],'&lt;script&gt;') && !str_contains($r['body'],'<script>alert'),'Stored remarks are HTML escaped');
