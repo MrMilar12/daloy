@@ -7,6 +7,45 @@ final class GitHubUpdater {
         return $this->root.'/storage/update-maintenance.json';
     }
 
+    private function repositoryHead(): ?string {
+        $gitPath=$this->root.'/.git';
+        if((!is_dir($gitPath) && !is_file($gitPath)) || !function_exists('proc_open')) return null;
+        $process=@proc_open(['git','-C',$this->root,'rev-parse','--verify','HEAD'],[0=>['pipe','r'],1=>['pipe','w'],2=>['pipe','w']],$pipes,null,null,['bypass_shell'=>true]);
+        if(!is_resource($process)) return null;
+        fclose($pipes[0]);
+        $output=stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+        stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+        $status=proc_close($process);
+        $sha=trim($output);
+        return $status===0 && preg_match('/^[a-f0-9]{40}$/',$sha)?$sha:null;
+    }
+
+    private function saveInstalledSha(string $sha): void {
+        $upsert=$this->db->pdo->getAttribute(PDO::ATTR_DRIVER_NAME)==='sqlite'
+            ? "INSERT INTO system_settings(setting_key,setting_value) VALUES('github_update_sha',?) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value"
+            : "INSERT INTO system_settings(setting_key,setting_value) VALUES('github_update_sha',?) ON DUPLICATE KEY UPDATE setting_value=VALUES(setting_value)";
+        $this->db->run($upsert,[$sha]);
+    }
+
+    public function notifyAdminsForUpdate(string $sha): bool {
+        if(!preg_match('/^[a-f0-9]{40}$/',$sha)) throw new InvalidArgumentException('Invalid update commit.');
+        return $this->db->transaction(function() use ($sha): bool {
+            $notified=(string)($this->db->one("SELECT setting_value FROM system_settings WHERE setting_key='github_update_notified_sha'")['setting_value']??'');
+            if($notified===$sha) return false;
+            $message='A verified DALOY update is ready to install ('.substr($sha,0,12).'). Review it in Workspace settings.';
+            foreach($this->db->all("SELECT id FROM users WHERE role='admin' AND active=1") as $admin) {
+                $this->db->insert('notifications',['user_id'=>$admin['id'],'title'=>'New system update available','message'=>$message,'link'=>'?page=settings','created_at'=>now()]);
+            }
+            $upsert=$this->db->pdo->getAttribute(PDO::ATTR_DRIVER_NAME)==='sqlite'
+                ? "INSERT INTO system_settings(setting_key,setting_value) VALUES('github_update_notified_sha',?) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value"
+                : "INSERT INTO system_settings(setting_key,setting_value) VALUES('github_update_notified_sha',?) ON DUPLICATE KEY UPDATE setting_value=VALUES(setting_value)";
+            $this->db->run($upsert,[$sha]);
+            return true;
+        });
+    }
+
     public function check(string $repository='MrMilar12/daloy', string $branch='main'): array {
         if(!preg_match('~^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$~',$repository) || !preg_match('~^[A-Za-z0-9._/-]+$~',$branch)) {
             throw new InvalidArgumentException('Invalid GitHub repository or branch.');
@@ -39,7 +78,13 @@ final class GitHubUpdater {
             $commitUrl=(string)($c['html_url']??'https://github.com/'.$repository.'/commit/'.$sha);
         }
         if(!preg_match('/^[a-f0-9]{40}$/',$sha)) throw new RuntimeException('GitHub returned an invalid commit.');
-        $current=(string)($this->db->one("SELECT setting_value FROM system_settings WHERE setting_key='github_update_sha'")['setting_value']??'');
+        $stored=(string)($this->db->one("SELECT setting_value FROM system_settings WHERE setting_key='github_update_sha'")['setting_value']??'');
+        $repositoryHead=$this->repositoryHead();
+        $current=$stored;
+        if($repositoryHead!==null && hash_equals($sha,$repositoryHead)) {
+            $current=$repositoryHead;
+            if($stored!==$repositoryHead) $this->saveInstalledSha($repositoryHead);
+        }
         return [
             'repository'=>$repository,
             'branch'=>$branch,
@@ -141,10 +186,7 @@ final class GitHubUpdater {
             if(function_exists('opcache_reset') && filter_var((string)ini_get('opcache.enable'),FILTER_VALIDATE_BOOLEAN) && !opcache_reset()) {
                 throw new RuntimeException('Files were installed, but PHP could not refresh its opcode cache. Restart Apache or PHP before using the updated system.');
             }
-            $upsert=$this->db->pdo->getAttribute(PDO::ATTR_DRIVER_NAME)==='sqlite'
-                ? "INSERT INTO system_settings(setting_key,setting_value) VALUES('github_update_sha',?) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value"
-                : "INSERT INTO system_settings(setting_key,setting_value) VALUES('github_update_sha',?) ON DUPLICATE KEY UPDATE setting_value=VALUES(setting_value)";
-            $this->db->run($upsert,[$sha]);
+            $this->saveInstalledSha($sha);
             $zip->close();
             unlink($tmp);
             unlink($this->maintenance());

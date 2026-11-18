@@ -205,3 +205,63 @@ dialog.record-modal::backdrop{background:#102235a8;backdrop-filter:blur(5px);-we
 @media(max-width:1250px){.topbar{padding:0 24px}.top-actions{gap:6px}.today-label{margin-right:0}.top-actions .notification-label{display:none}}
 @media(max-width:1020px){.top-user>span{display:none}.top-user{padding-left:9px}}
 @media(max-width:760px){.topbar{height:66px;padding:0 14px}.topbar-brandline{gap:8px}.menu-toggle{display:inline-flex;width:34px;height:36px;padding:0;font-size:20px}.breadcrumb{gap:7px}.breadcrumb-context,.breadcrumb-separator,.today-label,.topbar-divider,.top-user,.notification-label{display:none}.breadcrumb strong{display:block;max-width:calc(100vw - 190px);overflow:hidden;text-overflow:ellipsis;font-size:13px}.top-actions{gap:3px}.top-actions .icon-button{min-width:34px;height:36px;padding:0 8px}.signout{width:36px;height:36px;justify-content:center;padding:0}.signout span{display:none}}
+.settings-page-intro{display:grid;grid-template-columns:54px minmax(0,1fr) auto;align-items:center;gap:17px;margin:18px 0;padding:22px 24px;border:1px solid color-mix(in srgb,var(--teal) 18%,var(--border));border-radius:17px;background:linear-gradient(112deg,color-mix(in srgb,var(--surface) 92%,var(--primary)),color-mix(in srgb,var(--surface) 93%,var(--teal)) 72%,var(--surface));box-shadow:0 8px 24px #18364b08}
+.settings-page-intro-mark,.settings-panel-mark{display:grid;place-items:center;flex:none;width:48px;height:48px;border:1px solid color-mix(in srgb,var(--teal) 22%,var(--border));border-radius:14px;background:var(--surface);color:var(--teal)}
+.settings-page-intro-mark svg,.settings-panel-mark svg{width:22px;height:22px}
+.settings-page-intro-copy{min-width:0}.settings-page-intro-copy .eyebrow,.settings-panel-heading .eyebrow{display:block;margin-bottom:4px;font-size:8px;letter-spacing:1px}
+.settings-page-intro-copy h2{margin:0 0 5px;font-size:18px;letter-spacing:-.4px}.settings-page-intro-copy p{margin:0;color:var(--muted);font-size:11px;line-height:1.55}
+.settings-page-intro-tag{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid var(--border);border-radius:12px;background:color-mix(in srgb,var(--surface) 82%,transparent)}
+.settings-page-intro-tag>span{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--soft);color:var(--primary)}.settings-page-intro-tag svg{width:15px;height:15px}
+.settings-page-intro-tag strong,.settings-page-intro-tag small{display:block}.settings-page-intro-tag strong{font-size:10px}.settings-page-intro-tag small{margin-top:3px;color:var(--muted);font-size:9px}
+.settings-panels{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(310px,.92fr);align-items:stretch;gap:18px}
+.settings-workspace-panel,.settings-updater-panel,.settings-server-panel{min-width:0;margin:0;padding:22px}
+.settings-panel-heading{display:flex;align-items:flex-start;gap:13px;margin:0 0 18px;padding:0 0 16px;border-bottom:1px solid var(--border)}
+.settings-panel-heading>div{min-width:0}.settings-panel-heading h2{margin:0 0 5px;font-size:15px;letter-spacing:-.3px}.settings-panel-heading p{margin:0;color:var(--muted);font-size:10px;line-height:1.5}
+.settings-panel-mark{width:40px;height:40px;border-radius:12px}.settings-panel-mark svg{width:19px;height:19px}.settings-update-mark{background:color-mix(in srgb,var(--teal) 9%,var(--surface));color:var(--teal)}
+.settings-workspace-panel .form-grid{grid-template-columns:minmax(0,1fr);gap:13px;margin:0}
+.settings-workspace-panel .form-grid>label{min-width:0;margin:0;font-size:10px;font-weight:650}.settings-workspace-panel .form-grid>label.span-2{grid-column:1/-1}
+.settings-workspace-panel .form-grid input,.settings-workspace-panel .form-grid textarea{margin-top:6px;border-radius:10px;background:var(--bg)}
+.settings-workspace-panel .form-grid input{min-height:43px}.settings-workspace-panel .form-grid textarea{min-height:105px;resize:vertical}
+.settings-workspace-panel .settings-form-hint{margin:-5px 0 0;color:var(--muted);font-size:9px;line-height:1.5}
+.settings-workspace-panel .form-actions{display:flex;justify-content:flex-end;gap:9px;margin:3px 0 0;padding-top:14px;border-top:1px solid var(--border)}
+.settings-workspace-panel .form-actions.span-2{grid-column:1/-1}
+.settings-updater-panel{display:flex;flex-direction:column}
+.settings-updater-panel .settings-panel-heading{margin-bottom:15px}
+.settings-updater-repository{display:flex;align-items:center;gap:10px;min-width:0;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg)}
+.settings-repository-mark{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:10px;background:var(--surface);color:var(--primary)}.settings-repository-mark svg{width:17px;height:17px}
+.settings-updater-repository>div{flex:1;min-width:0}.settings-updater-repository strong,.settings-updater-repository small{display:block;overflow-wrap:anywhere}.settings-updater-repository strong{font-size:10px}.settings-updater-repository small{margin-top:3px;color:var(--muted);font-size:9px}
+.settings-updater-panel .github-updater-status{flex:none;padding:5px 8px;border:1px solid var(--border);border-radius:20px;font-size:8px}
+.settings-updater-panel .github-updater-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:15px 0 0;padding:0}
+.settings-updater-panel .github-updater-actions button{min-height:38px;padding:9px 12px;border-radius:9px;font-size:10px}
+.settings-updater-panel .github-updater-actions>a{display:inline-flex;align-items:center;gap:5px;color:var(--muted);font-size:9px;font-weight:650}.settings-updater-panel .github-updater-actions>a:hover{color:var(--primary)}
+.settings-updater-panel .update-progress,.settings-updater-panel .github-updater-result{margin-top:13px}.settings-updater-panel [hidden]{display:none!important}
+.settings-server-panel{margin-top:18px}
+.settings-server-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.settings-server-grid>div{display:flex;flex-direction:column;min-width:0;min-height:95px;gap:5px;padding:13px;border:1px solid var(--border);border-radius:12px;background:var(--bg)}
+.settings-server-grid>div>span{color:var(--muted);font-size:8px;font-weight:750;letter-spacing:.7px}
+.settings-server-grid strong{font-size:11px;overflow-wrap:anywhere}.settings-server-grid small{color:var(--muted);font-size:9px;line-height:1.45}
+.settings-server-grid code{font-size:10px}
+.settings-backup-note{display:flex;align-items:flex-start;gap:9px;margin:13px 0 0;padding:12px;border:1px solid color-mix(in srgb,var(--teal) 17%,var(--border));border-radius:11px;background:color-mix(in srgb,var(--teal) 5%,var(--surface));color:var(--muted);font-size:9px;line-height:1.55}
+.settings-backup-note>span:first-child{display:grid;place-items:center;flex:none;width:20px;height:20px;border-radius:6px;background:color-mix(in srgb,var(--teal) 12%,var(--surface));color:var(--teal)}.settings-backup-note svg{width:13px;height:13px}.settings-backup-note a{font-weight:700}
+[data-theme=dark] .settings-page-intro{border-color:var(--border);background:linear-gradient(112deg,#192d40,#193839 72%,#142431)}[data-theme=dark] .settings-page-intro-mark,[data-theme=dark] .settings-panel-mark{border-color:#35545a;background:#1a3038;color:#80d2c7}[data-theme=dark] .settings-page-intro-tag{background:#152633}[data-theme=dark] .settings-page-intro-tag>span,[data-theme=dark] .settings-repository-mark{background:#1b303a;color:#a6d9e8}[data-theme=dark] .settings-update-mark{background:#1b3c3b;color:#80d2c7}[data-theme=dark] .settings-workspace-panel .form-grid input,[data-theme=dark] .settings-workspace-panel .form-grid textarea,[data-theme=dark] .settings-updater-repository,[data-theme=dark] .settings-server-grid>div{background:#12232e;border-color:var(--border)}[data-theme=dark] .settings-backup-note{border-color:#2b4d4d;background:#173333}
+@media(max-width:900px){.settings-panels{grid-template-columns:1fr}}
+@media(max-width:600px){.settings-page-intro{grid-template-columns:42px minmax(0,1fr);gap:12px;padding:17px}.settings-page-intro-mark{width:40px;height:40px;border-radius:12px}.settings-page-intro-copy h2{font-size:16px}.settings-page-intro-tag{grid-column:1/-1;justify-self:start;margin-left:52px;padding:7px 10px}.settings-workspace-panel,.settings-updater-panel,.settings-server-panel{padding:17px}.settings-panel-heading{gap:10px;margin-bottom:15px;padding-bottom:13px}.settings-panel-mark{width:36px;height:36px}.settings-server-grid{grid-template-columns:1fr}.settings-server-grid>div{min-height:0;padding:11px}.settings-updater-panel .github-updater-actions{align-items:stretch;flex-direction:column}.settings-updater-panel .github-updater-actions button{width:100%}.settings-updater-panel .github-updater-actions>a{justify-content:center;padding:7px}.settings-workspace-panel .form-actions{flex-wrap:wrap}.settings-workspace-panel .form-actions>*{flex:1 1 auto}}
+dialog.github-update-dialog{width:min(490px,calc(100vw - 32px));max-width:none;max-height:calc(100vh - 32px);padding:0;border:0;border-radius:19px;background:transparent;color:var(--text);overflow:visible}
+dialog.github-update-dialog::backdrop{background:#102235a8;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.github-update-dialog-card{position:relative;width:100%;max-height:calc(100vh - 32px);overflow:auto;margin:0;padding:28px;border:1px solid var(--border);border-radius:19px;background:linear-gradient(145deg,var(--surface),color-mix(in srgb,var(--surface) 95%,var(--teal)));box-shadow:0 28px 90px #10223545}
+.github-update-dialog-close{position:absolute;top:15px;right:15px;display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--border);border-radius:50%;background:var(--surface);color:var(--muted);font-size:22px;line-height:1}
+.github-update-dialog-close:hover{background:var(--soft);color:var(--text)}
+.github-update-dialog-heading{display:flex;align-items:flex-start;gap:14px;padding-right:25px}
+.github-update-dialog-mark{display:grid;place-items:center;flex:none;width:46px;height:46px;border:1px solid color-mix(in srgb,var(--teal) 25%,var(--border));border-radius:14px;background:color-mix(in srgb,var(--teal) 10%,var(--surface));color:var(--teal);font-size:25px}
+.github-update-dialog-heading .eyebrow{display:block;margin:1px 0 5px;font-size:8px;letter-spacing:.9px}
+.github-update-dialog-heading h2{margin:0 0 6px;font-size:19px;letter-spacing:-.4px}
+.github-update-dialog-heading p{margin:0;color:var(--muted);font-size:11px;line-height:1.55}
+.github-update-dialog-commit{margin:21px 0 18px;padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--bg)}
+.github-update-dialog-commit>div{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.github-update-dialog-commit span{color:var(--muted);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+.github-update-dialog-commit code{padding:5px 8px;border-radius:7px;background:var(--soft);color:var(--text);font-size:10px}
+.github-update-dialog-commit p{margin:10px 0 0;color:var(--text);font-size:11px;line-height:1.55;overflow-wrap:anywhere}
+.github-update-dialog-actions{display:flex;justify-content:flex-end;gap:9px;padding-top:16px;border-top:1px solid var(--border)}
+.github-update-dialog-actions button{min-height:38px;padding:9px 13px;border-radius:9px;font-size:10px}
+[data-theme=dark] .github-update-dialog-card{background:var(--surface)}[data-theme=dark] .github-update-dialog-mark{border-color:#35545a;background:#1b3c3b;color:#80d2c7}[data-theme=dark] .github-update-dialog-commit{border-color:var(--border);background:#12232e}[data-theme=dark] .github-update-dialog-commit code{background:#203742}
+@media(max-width:600px){dialog.github-update-dialog{width:calc(100vw - 20px);max-height:calc(100vh - 20px);border-radius:15px}.github-update-dialog-card{max-height:calc(100vh - 20px);padding:22px 18px;border-radius:15px}.github-update-dialog-close{top:12px;right:12px;width:31px;height:31px}.github-update-dialog-heading{gap:11px;padding-right:22px}.github-update-dialog-mark{width:40px;height:40px;border-radius:12px;font-size:22px}.github-update-dialog-heading h2{font-size:17px}.github-update-dialog-commit{margin:17px 0 15px;padding:12px}.github-update-dialog-actions button{flex:1}}

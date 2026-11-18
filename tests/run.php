@@ -2,12 +2,16 @@
 declare(strict_types=1);
 if(PHP_SAPI!=='cli') exit;
 require dirname(__DIR__).'/app/bootstrap.php';
+require ROOT.'/app/View.php';
 require ROOT.'/app/Reports.php';
 require ROOT.'/app/Backup.php';
+require ROOT.'/app/GitHubUpdater.php';
 set_error_handler(function($severity,$message,$file,$line) { if(!(error_reporting() & $severity)) return true; throw new ErrorException($message,0,$severity,$file,$line); });
 $passed=0;
 function check(bool $condition,string $message): void { global $passed; if(!$condition) throw new RuntimeException('FAIL: '.$message); $passed++; echo "PASS $message\n"; }
 function denied(callable $fn,int $code,string $message): void { try { $fn(); } catch(DomainException $e) { check($e->getCode()===$code,$message.' ('.$e->getCode().')'); return; } throw new RuntimeException('FAIL: '.$message.' was permitted'); }
+check(range_label(['starts_at'=>'2026-11-19 08:00:00','ends_at'=>'2026-11-20 17:00:00'])==='Nov 19, 2026<small>8:00 AM – Nov 20, 2026, 5:00 PM</small>','Multi-day assignment shows the end year');
+check(range_label(['starts_at'=>'2026-11-19 08:00:00','ends_at'=>'2026-11-19 17:00:00'])==='Nov 19, 2026<small>8:00 AM – 5:00 PM</small>','Same-day assignment keeps a compact date range');
 $name='daloy_test_'.bin2hex(random_bytes(5));
 $server=new PDO(preg_replace('/;?dbname=[^;]+/','',$config['dsn']),$config['username'],$config['password'],[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
 $server->exec("CREATE DATABASE `$name` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
@@ -20,6 +24,10 @@ try {
     $password='Test-workforce-'.bin2hex(random_bytes(8));
     $makeUser=function(string $role,string $label) use($db,$password): array { $id=$db->insert('users',['name'=>$label,'email'=>strtolower(str_replace(' ','',$label)).'@example.test','role'=>$role,'password_hash'=>password_hash($password,PASSWORD_DEFAULT),'must_change_password'=>0,'skills'=>'First aid, Basic life support','created_at'=>now()]); return $db->one('SELECT * FROM users WHERE id=?',[$id]); };
     $admin=$makeUser('admin','Test Admin'); $head=$makeUser('head','Test Head'); $n1=$makeUser('nurse','Nurse One'); $n2=$makeUser('nurse','Nurse Two'); $n3=$makeUser('nurse','Nurse Three');
+    $updater=new GitHubUpdater($db,ROOT); $updateSha=str_repeat('a',40);
+    check($updater->notifyAdminsForUpdate($updateSha),'New update notifies administrators');
+    check(!$updater->notifyAdminsForUpdate($updateSha),'Repeated update check does not duplicate notification');
+    check($updater->notifyAdminsForUpdate(str_repeat('b',40)) && (int)$db->one('SELECT COUNT(*) AS count FROM notifications WHERE user_id=?',[$admin['id']])['count']===2,'New commit notifies administrators again');
     $as=new Service($db,$admin); $hs=new Service($db,$head); $ns=new Service($db,$n1); $n2s=new Service($db,$n2);
     $district=$as->catalog(['table'=>'districts','name'=>'Test District','active'=>1]);
     $municipality=$as->catalog(['table'=>'municipalities','name'=>'Test Municipality','active'=>1]);
@@ -189,6 +197,8 @@ try {
     check(str_contains($login['headers'],'Content-Security-Policy:') && str_contains(strtolower($login['headers']),'httponly'),'CSP and HttpOnly session cookie present');
     check(request('admin','',['action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===419,'Missing CSRF rejected');
     check(request('admin','',['csrf'=>token($login),'action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===303,'Administrator signs in');
+    $settingsPage=request('admin','?page=settings');
+    check($settingsPage['status']===200 && str_contains($settingsPage['body'],'settings-page-intro') && str_contains($settingsPage['body'],'data-github-check') && str_contains($settingsPage['body'],'data-github-update-dialog') && str_contains($settingsPage['body'],'data-github-install') && str_contains($settingsPage['body'],'name="organization"') && str_contains($settingsPage['body'],'SESSION TIMEOUT'),'Workspace settings render the redesigned panels and controls');
     $assignablePage=request('admin','?page=deployment&activity='.$activity);
     check($assignablePage['status']===200 && str_contains($assignablePage['body'],'class="deploy-confirm"') && str_contains($assignablePage['body'],'Confirm deployment'),'Eligible nurses can review and confirm deployment in the candidate modal');
     $assignedHttp=request('admin','?page=deployment&activity='.$activity,['csrf'=>token($assignablePage),'action'=>'deploy','activity_id'=>$activity,'nurse_id'=>$n3['id'],'return'=>'?page=deployment&activity='.$activity]);

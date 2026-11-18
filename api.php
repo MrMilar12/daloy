@@ -9,8 +9,10 @@ try {
         case 'github_updates':
             $service->requireRole(['admin']);
             require_once __DIR__.'/app/GitHubUpdater.php';
-            try { $check=(new GitHubUpdater($db,ROOT))->check(); }
+            $updater=new GitHubUpdater($db,ROOT);
+            try { $check=$updater->check(); }
             catch(RuntimeException $e) { throw new DomainException($e->getMessage(),502); }
+            $check['notification_created']=$check['available']?$updater->notifyAdminsForUpdate($check['latest']):false;
             $check['checked_at']=date('c');
             json_out($check);
         case 'github_update_apply':
