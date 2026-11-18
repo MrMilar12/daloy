@@ -92,6 +92,13 @@ try {
     check(in_array('Destination is inactive',$hs->candidates($activity)[0]['reasons'],true),'Candidate list flags inactive destination');
     denied(fn()=>$hs->deploy(['activity_id'=>$activity,'nurse_id'=>$n3['id']]),422,'Inactive location blocks deployment');
     $as->catalog(array_merge($locationData,['table'=>'locations','active'=>1]));
+    $genericActivity=$hs->activity(array_merge($aBase,['title'=>'Generic nurse requirement','required_skill'=>'NURSES']));
+    $genericCandidate=array_values(array_filter($hs->candidates($genericActivity),fn($candidate)=>(int)$candidate['id']===(int)$n3['id']))[0];
+    check($as->record('activities',$genericActivity)['required_skill']==='' && $genericCandidate['eligible'],'Generic nurse label does not impose a competency filter');
+    $genericDeployment=$hs->deploy(['activity_id'=>$genericActivity,'nurse_id'=>$n3['id']]);
+    $hs->cancel(['table'=>'deployments','id'=>$genericDeployment,'reason'=>'Test cleanup']);
+    $cancelledActivity=$hs->activity(array_merge($aBase,['title'=>'Cancelled test requirement']));
+    $hs->cancel(['table'=>'activities','id'=>$cancelledActivity,'reason'=>'Test cancellation']);
     $available=$ns->availability(['starts_at'=>'2035-01-15T08:00','ends_at'=>'2035-01-15T17:00','status'=>'Unavailable','reason'=>'Authorized unavailability']);
     denied(fn()=>$ns->schedule(array_merge($base,['starts_at'=>'2035-01-15T09:00','ends_at'=>'2035-01-15T10:00'])),409,'Unavailability blocks assignments');
     denied(fn()=>$ns->availability(['starts_at'=>'2035-01-15T09:00','ends_at'=>'2035-01-15T10:00','status'=>'Available']),409,'Available flag cannot bypass a blocker');
@@ -188,6 +195,8 @@ try {
     check($assignedHttp['status']===303 && $db->one("SELECT id FROM deployments WHERE activity_id=? AND nurse_id=? AND status<>'Cancelled'",[$activity,$n3['id']]),'Deployment completes through the candidate form');
     $candidatePage=request('admin','?page=deployment&activity='.$skillActivity);
     check($candidatePage['status']===200 && str_contains($candidatePage['body'],'data-candidates-modal') && str_contains($candidatePage['body'],'Missing required competency: Advanced trauma certification') && !str_contains($candidatePage['body'],'Review &amp; deploy'),'Candidate modal explains and blocks missing competency');
+    $cancelledPage=request('admin','?page=deployment&activity='.$cancelledActivity);
+    check($cancelledPage['status']===200 && str_contains($cancelledPage['body'],'This requirement was cancelled and cannot accept nurses.') && str_contains($cancelledPage['body'],'Create a new requirement') && !str_contains($cancelledPage['body'],'Nurse / home assignment'),'Cancelled requirement explains why its candidate list is unavailable');
     $endedPage=request('admin','?page=activities&status=Ended');
     check($endedPage['status']===200 && str_contains($endedPage['body'],'Ended test requirement') && str_contains($endedPage['body'],'Ended. Create a new requirement to assign nurses.') && !str_contains($endedPage['body'],'?page=deployment&activity='.$endedActivity),'Ended requirements are labeled and cannot be reopened for assignment');
     check(!str_contains(request('admin','?page=activities')['body'],'Ended test requirement'),'Ended requirements do not appear in the open list');

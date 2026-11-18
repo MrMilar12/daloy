@@ -93,7 +93,9 @@ final class Service {
             $locationId=null;
             if($selectedLocation && $destination===$selectedLocation['name'] && $address===(string)$selectedLocation['address']) $locationId=(int)$selectedLocation['id'];
             elseif($old && !empty($old['location_id'])) { $saved=$this->record('locations',(int)$old['location_id']); if($destination===$saved['name'] && $address===(string)$saved['address']) $locationId=(int)$saved['id']; }
-            $data=['title'=>$this->text($d,'title'),'location_id'=>$locationId,'destination_name'=>$destination,'destination_address'=>$address?:null,'starts_at'=>$start,'ends_at'=>$end,'organizer'=>$this->text($d,'organizer',190,false),'required_nurses'=>$this->positive($d,'required_nurses',1,1000),'required_skill'=>$this->text($d,'required_skill',190,false),'reason_id'=>$this->reference('deployment_reasons',$d['reason_id']??0),'instructions'=>$this->text($d,'instructions',5000,false)];
+            $requiredSkill=$this->text($d,'required_skill',190,false);
+            if(in_array(mb_strtolower($requiredSkill),['nurse','nurses'],true)) $requiredSkill='';
+            $data=['title'=>$this->text($d,'title'),'location_id'=>$locationId,'destination_name'=>$destination,'destination_address'=>$address?:null,'starts_at'=>$start,'ends_at'=>$end,'organizer'=>$this->text($d,'organizer',190,false),'required_nurses'=>$this->positive($d,'required_nurses',1,1000),'required_skill'=>$requiredSkill,'reason_id'=>$this->reference('deployment_reasons',$d['reason_id']??0),'instructions'=>$this->text($d,'instructions',5000,false)];
             if($id) $this->db->update('activities',$id,$data); else $id=$this->db->insert('activities',$data+['created_by'=>$this->actor['id'],'created_at'=>now(),'status'=>'Open']);
             $this->audit($old?'Requirement updated':'Requirement created','activities',$id,$old,$data);
             $this->notifyHeads('Personnel required',$data['title'].' needs '.$data['required_nurses'].' nurse(s).','?page=deployment&activity='.$id); return $id;
@@ -113,7 +115,9 @@ final class Service {
         } return $list;
     }
     private function hasCompetency(array $nurse,string $required): bool {
-        return mb_stripos((string)$nurse['specialization']."\n".(string)$nurse['skills'],trim($required),0,'UTF-8')!==false;
+        $required=trim($required);
+        if(in_array(mb_strtolower($required),['nurse','nurses'],true)) return true;
+        return mb_stripos((string)$nurse['specialization']."\n".(string)$nurse['skills'],$required,0,'UTF-8')!==false;
     }
     public function deploy(array $d): int {
         $this->requireRole(['admin','head']); return $this->db->transaction(function() use($d) {

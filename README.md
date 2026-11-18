@@ -68,7 +68,7 @@ For a **separate demonstration installation**, point the configuration at a new 
 ## Operational rules
 
 - All times use **Asia/Manila**. Intervals include their start and exclude their end: 08:00–12:00 and 12:00–17:00 do not conflict. Overnight duty uses the following calendar date for the end time.
-- A nurse is a potential candidate only when their account is active, no blocking record overlaps the **entire requested interval**, and any specified competency is recorded. Competency matching is a case-insensitive substring search in administrator-managed specialization/skills, not certification verification.
+- A nurse is a potential candidate only when their account is active, no blocking record overlaps the **entire requested interval**, and any specific competency is recorded. Generic values such as “Nurse” or “Nurses” do not filter candidates; specific skills are matched case-insensitively against administrator-managed specialization/skills, not certification verification.
 - “Available” means no recorded blocker. It is not a claim that a nurse has confirmed availability. An explicit available record cannot override duty, deployment, approved leave, or an unavailable/off-duty record.
 - Day-level dashboard status summarizes the selected interval. A person with part-day duty is counted as scheduled for that day. “On Duty” refers to an assignment currently in progress.
 - Coverage is a count of distinct nurses assigned at any point during the selected day. It is not proof of continuous shift coverage; review exact intervals in the calendar.
