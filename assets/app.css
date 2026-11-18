@@ -260,8 +260,18 @@ dialog.github-update-dialog::backdrop{background:#102235a8;backdrop-filter:blur(
 .github-update-dialog-commit>div{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .github-update-dialog-commit span{color:var(--muted);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
 .github-update-dialog-commit code{padding:5px 8px;border-radius:7px;background:var(--soft);color:var(--text);font-size:10px}
-.github-update-dialog-commit p{margin:10px 0 0;color:var(--text);font-size:11px;line-height:1.55;overflow-wrap:anywhere}
+.github-update-dialog-message{margin:10px 0 0;color:var(--text);font-size:11px;line-height:1.6;overflow-wrap:anywhere}
 .github-update-dialog-actions{display:flex;justify-content:flex-end;gap:9px;padding-top:16px;border-top:1px solid var(--border)}
 .github-update-dialog-actions button{min-height:38px;padding:9px 13px;border-radius:9px;font-size:10px}
 [data-theme=dark] .github-update-dialog-card{background:var(--surface)}[data-theme=dark] .github-update-dialog-mark{border-color:#35545a;background:#1b3c3b;color:#80d2c7}[data-theme=dark] .github-update-dialog-commit{border-color:var(--border);background:#12232e}[data-theme=dark] .github-update-dialog-commit code{background:#203742}
 @media(max-width:600px){dialog.github-update-dialog{width:calc(100vw - 20px);max-height:calc(100vh - 20px);border-radius:15px}.github-update-dialog-card{max-height:calc(100vh - 20px);padding:22px 18px;border-radius:15px}.github-update-dialog-close{top:12px;right:12px;width:31px;height:31px}.github-update-dialog-heading{gap:11px;padding-right:22px}.github-update-dialog-mark{width:40px;height:40px;border-radius:12px;font-size:22px}.github-update-dialog-heading h2{font-size:17px}.github-update-dialog-commit{margin:17px 0 15px;padding:12px}.github-update-dialog-actions button{flex:1}}
+.github-update-commit-message,.github-update-dialog-message{min-width:0;overflow-wrap:anywhere;line-height:1.6}
+.github-update-commit-message{margin-top:4px;padding:10px 12px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);font-size:11px}
+.github-update-dialog-message{padding-top:10px;border-top:1px solid var(--border)}
+.github-update-commit-message p,.github-update-dialog-message p{margin:0}
+.github-update-commit-message p+p,.github-update-dialog-message p+p{margin-top:8px}
+.github-update-commit-message ul,.github-update-dialog-message ul{margin:8px 0;padding-left:19px}
+.github-update-commit-message li+li,.github-update-dialog-message li+li{margin-top:4px}
+.github-update-commit-message li::marker,.github-update-dialog-message li::marker{color:var(--teal)}
+.github-update-commit-message strong,.github-update-dialog-message strong{color:var(--primary);font-weight:750}
+.github-update-commit-message code,.github-update-dialog-message code{padding:1px 4px;border-radius:4px;background:var(--soft);font-size:.95em}

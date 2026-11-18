@@ -83,6 +83,59 @@
     const entities={amp:'&',lt:'<',gt:'>',quot:'"'};
     return (message||'No commit message available.').replace(/&(amp|lt|gt|quot|#0?39);/g, (entity,name) => name[0]==='#'?"'":entities[name]);
   };
+  const renderCommitMessage = (container, rawMessage) => {
+    container.replaceChildren();
+    const appendInlineMarkdown = (element, text) => {
+      const tokenPattern=/(\*\*.+?\*\*|`[^`]+`)/g;
+      let offset=0;
+      let match;
+      while ((match=tokenPattern.exec(text))!==null) {
+        if (match.index>offset) element.append(document.createTextNode(text.slice(offset,match.index)));
+        const token=match[0];
+        const formatted=document.createElement(token.startsWith('**')?'strong':'code');
+        formatted.textContent=token.startsWith('**')?token.slice(2,-2):token.slice(1,-1);
+        element.append(formatted);
+        offset=tokenPattern.lastIndex;
+      }
+      element.append(document.createTextNode(text.slice(offset)));
+    };
+    const lines=makeCommitMessage(rawMessage).replace(/\r\n?/g,'\n').split('\n');
+    let paragraph=[];
+    let list=null;
+    const flushParagraph = () => {
+      if (!paragraph.length) return;
+      const block=document.createElement('p');
+      appendInlineMarkdown(block,paragraph.join(' '));
+      container.append(block);
+      paragraph=[];
+    };
+    const flushList = () => {
+      if (!list) return;
+      container.append(list);
+      list=null;
+    };
+    lines.forEach(rawLine => {
+      const line=rawLine.trim();
+      if (!line) {
+        flushParagraph();
+        flushList();
+        return;
+      }
+      const item=line.match(/^[-*]\s+(.+)$/);
+      if (item) {
+        flushParagraph();
+        if (!list) list=document.createElement('ul');
+        const listItem=document.createElement('li');
+        appendInlineMarkdown(listItem,item[1]);
+        list.append(listItem);
+        return;
+      }
+      flushList();
+      paragraph.push(line);
+    });
+    flushParagraph();
+    flushList();
+  };
   const renderCurrentVersion = (result, data) => {
     result.replaceChildren();
     result.classList.remove('has-update');
@@ -101,8 +154,9 @@
     commitLabel.textContent='Latest commit';
     const commitHash=document.createElement('code');
     commitHash.textContent=data.latest.slice(0,12);
-    const commitMessage=document.createElement('p');
-    commitMessage.textContent=makeCommitMessage(data.message);
+    const commitMessage=document.createElement('div');
+    commitMessage.className='github-update-commit-message';
+    renderCommitMessage(commitMessage,data.message);
     commit.append(commitLabel,commitHash,commitMessage);
     result.append(summary,commit);
     result.hidden=false;
@@ -142,7 +196,7 @@
         status.textContent='Update available';
         result.hidden=true;
         updateCommit.textContent=data.latest.slice(0,12);
-        updateMessage.textContent=makeCommitMessage(data.message);
+        renderCommitMessage(updateMessage,data.message);
         if (data.notification_created) updateNotificationBadges();
         if (!automatic||data.notification_created) updateDialog.showModal();
       } else {

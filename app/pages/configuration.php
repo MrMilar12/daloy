@@ -50,7 +50,7 @@ if($page==='settings') {
                         </div>
                         <div class="github-update-dialog-commit">
                             <div><span>Latest commit</span><code data-github-update-commit></code></div>
-                            <p data-github-update-message></p>
+                            <div class="github-update-dialog-message" data-github-update-message></div>
                         </div>
                         <div class="github-update-dialog-actions">
                             <button type="button" data-github-update-close>Not now</button>
