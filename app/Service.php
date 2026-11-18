@@ -106,10 +106,14 @@ final class Service {
             if($a['status']==='Cancelled') $reasons[]='Requirement cancelled';
             if(!empty($a['location_id']) && !$this->record('locations',(int)$a['location_id'])['active']) $reasons[]='Destination is inactive';
             if($a['ends_at']<=now()) $reasons[]='Requirement has ended';
+            if($a['required_skill']!=='' && !$this->hasCompetency($u,$a['required_skill'])) $reasons[]='Missing required competency: '.$a['required_skill'];
             $conflicts=$this->conflicts((int)$u['id'],$a['starts_at'],$a['ends_at']);
             foreach($conflicts as $c) $reasons[]=$c['label'].' ('.$c['starts_at'].' – '.$c['ends_at'].')';
             unset($u['password_hash']); $list[]=$u+['eligible'=>!$reasons,'unavailable'=>(bool)$conflicts,'reasons'=>$reasons];
         } return $list;
+    }
+    private function hasCompetency(array $nurse,string $required): bool {
+        return mb_stripos((string)$nurse['specialization']."\n".(string)$nurse['skills'],trim($required),0,'UTF-8')!==false;
     }
     public function deploy(array $d): int {
         $this->requireRole(['admin','head']); return $this->db->transaction(function() use($d) {
@@ -119,6 +123,7 @@ final class Service {
             $count=$this->db->one("SELECT COUNT(*) n FROM deployments WHERE activity_id=? AND status<>'Cancelled'",[$a['id']]);
             if($count['n'] >= $a['required_nurses']) throw new DomainException('This requirement is already fully staffed.',409);
             $u=$this->record('users',$nurse);
+            if($a['required_skill']!=='' && !$this->hasCompetency($u,$a['required_skill'])) throw new DomainException('The nurse does not have the required competency recorded for this requirement.',422);
             $this->assertFree($nurse,$a['starts_at'],$a['ends_at']);
             $home=$u['location_id']?$this->record('locations',(int)$u['location_id'])['name']:'No home location recorded';
             $data=['activity_id'=>$a['id'],'nurse_id'=>$nurse,'location_id'=>$a['location_id'],'starts_at'=>$a['starts_at'],'ends_at'=>$a['ends_at'],'reason'=>$this->record('deployment_reasons',(int)$a['reason_id'])['name'],'instructions'=>$a['instructions'],'original_assignment'=>$home,'authorized_by'=>$this->actor['id'],'created_at'=>now(),'status'=>'Assigned'];

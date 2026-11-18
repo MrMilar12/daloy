@@ -58,7 +58,7 @@ try {
     $hs->reviewLeave(['id'=>$leave,'status'=>'Approved','review_note'=>'Approved by head']);
     denied(fn()=>$ns->schedule($base),409,'Approved leave blocks schedule');
     denied(fn()=>$ns->cancel(['table'=>'leave_records','id'=>$leave,'reason'=>'Bypass']),403,'Nurse cannot revoke approved leave');
-    $aBase=['title'=>'Test Outreach','location_id'=>$location,'starts_at'=>'2035-01-10T08:00','ends_at'=>'2035-01-10T17:00','required_nurses'=>1,'required_skill'=>'First aid','reason_id'=>$reason,'instructions'=>'Bring supplies'];
+    $aBase=['title'=>'Test Outreach','location_id'=>$location,'starts_at'=>'2035-01-10T08:00','ends_at'=>'2035-01-10T17:00','required_nurses'=>1,'required_skill'=>'FIRST AID','reason_id'=>$reason,'instructions'=>'Bring supplies'];
     $activity=$hs->activity($aBase); $candidates=$hs->candidates($activity);
     check($as->record('activities',$activity)['destination_name']===$as->record('locations',$location)['name'] && (int)$as->record('activities',$activity)['location_id']===$location,'Activity destination is derived from its selected location');
     denied(fn()=>$hs->activity(array_merge($aBase,['location_id'=>'','destination_name'=>''])),422,'Activity without a selected location requires a destination name');
@@ -66,6 +66,7 @@ try {
     $customRecord=$as->record('activities',$customActivity);
     check($customRecord['location_id']===null && $customRecord['destination_name']==='Community Hall','Activity accepts a custom destination without a directory location');
     check(count($candidates)===3,'Candidates include unavailable personnel');
+    check(count(array_filter($candidates,fn($candidate)=>(int)$candidate['id']===(int)$n3['id'] && $candidate['eligible']))===1,'Competency matching is case-insensitive');
     check(!$candidates[0]['eligible'] || !$candidates[1]['eligible'],'Candidate list explains conflicts');
     denied(fn()=>$hs->deploy(['activity_id'=>$activity,'nurse_id'=>$n1['id']]),409,'Leave blocks deployment');
     denied(fn()=>$hs->deploy(['activity_id'=>$activity,'nurse_id'=>$n2['id']]),409,'Duty blocks deployment');
@@ -83,7 +84,10 @@ try {
     $history=Reports::build($as,'assignment_history',['starts_at'=>'2035-01-01 00:00','ends_at'=>'2035-02-01 00:00']); $historyRows=array_values(array_filter($history['rows'],fn($row)=>(int)$row[0]===$deployment));
     check(count($historyRows)===1 && $historyRows[0][6]==='Cancelled' && $historyRows[0][9]===$ack && $historyRows[0][11]==='Activity rescheduled','Assignment history includes cancelled assignments and acknowledgment details');
     $skillActivity=$hs->activity(array_merge($aBase,['title'=>'Advanced competency','required_skill'=>'Advanced trauma certification']));
+    $skillCandidate=array_values(array_filter($hs->candidates($skillActivity),fn($candidate)=>(int)$candidate['id']===(int)$n3['id']))[0];
+    check(!$skillCandidate['eligible'] && in_array('Missing required competency: Advanced trauma certification',$skillCandidate['reasons'],true),'Candidate list explains missing competency');
     denied(fn()=>$hs->deploy(['activity_id'=>$skillActivity,'nurse_id'=>$n3['id']]),422,'Missing competency blocks deployment');
+    $endedActivity=$hs->activity(array_merge($aBase,['title'=>'Ended test requirement','starts_at'=>date('Y-m-d\TH:i',strtotime('-3 days')),'ends_at'=>date('Y-m-d\TH:i',strtotime('-2 days'))]));
     $locationData=$as->record('locations',$location); $as->catalog(array_merge($locationData,['table'=>'locations','active'=>0]));
     check(in_array('Destination is inactive',$hs->candidates($activity)[0]['reasons'],true),'Candidate list flags inactive destination');
     denied(fn()=>$hs->deploy(['activity_id'=>$activity,'nurse_id'=>$n3['id']]),422,'Inactive location blocks deployment');
@@ -178,6 +182,15 @@ try {
     check(str_contains($login['headers'],'Content-Security-Policy:') && str_contains(strtolower($login['headers']),'httponly'),'CSP and HttpOnly session cookie present');
     check(request('admin','',['action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===419,'Missing CSRF rejected');
     check(request('admin','',['csrf'=>token($login),'action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===303,'Administrator signs in');
+    $assignablePage=request('admin','?page=deployment&activity='.$activity);
+    check($assignablePage['status']===200 && str_contains($assignablePage['body'],'class="deploy-confirm"') && str_contains($assignablePage['body'],'Confirm deployment'),'Eligible nurses can review and confirm deployment in the candidate modal');
+    $assignedHttp=request('admin','?page=deployment&activity='.$activity,['csrf'=>token($assignablePage),'action'=>'deploy','activity_id'=>$activity,'nurse_id'=>$n3['id'],'return'=>'?page=deployment&activity='.$activity]);
+    check($assignedHttp['status']===303 && $db->one("SELECT id FROM deployments WHERE activity_id=? AND nurse_id=? AND status<>'Cancelled'",[$activity,$n3['id']]),'Deployment completes through the candidate form');
+    $candidatePage=request('admin','?page=deployment&activity='.$skillActivity);
+    check($candidatePage['status']===200 && str_contains($candidatePage['body'],'data-candidates-modal') && str_contains($candidatePage['body'],'Missing required competency: Advanced trauma certification') && !str_contains($candidatePage['body'],'Review &amp; deploy'),'Candidate modal explains and blocks missing competency');
+    $endedPage=request('admin','?page=activities&status=Ended');
+    check($endedPage['status']===200 && str_contains($endedPage['body'],'Ended test requirement') && str_contains($endedPage['body'],'Ended. Create a new requirement to assign nurses.') && !str_contains($endedPage['body'],'?page=deployment&activity='.$endedActivity),'Ended requirements are labeled and cannot be reopened for assignment');
+    check(!str_contains(request('admin','?page=activities')['body'],'Ended test requirement'),'Ended requirements do not appear in the open list');
     $pageHeadings=['dashboard'=>'Your workforce, in flow.','schedule'=>'Master schedule','calendar'=>'Workforce calendar','availability'=>'Availability','deployment'=>'Deployment center','leave'=>'Leave & unavailability','notifications'=>'Notifications','profile'=>'My profile','users'=>'User accounts','nurses'=>'Nursing personnel','locations'=>'Schools & duty locations','activities'=>'Activities & events','reports'=>'Reports','audit'=>'Audit trail','settings'=>'Workspace settings','configuration'=>'Configuration','admin-guide'=>'How to use DALOY'];
     foreach($pageHeadings as $page=>$heading) {
         $r=request('admin','?page='.$page); check($r['status']===200 && str_contains($r['body'],'data-page="'.$page.'"') && str_contains($r['body'],'<h1>'.e($heading).'</h1>'),'HTTP link opens its own page: '.$page);
