@@ -16,9 +16,20 @@
         <time class="today-label" datetime="<?=date('Y-m-d')?>"><?=icon('calendar')?> <span><?=date('D, M j, Y')?></span></time>
         <span class="topbar-divider" aria-hidden="true"></span>
         <button class="theme-toggle icon-button" type="button" aria-label="Toggle color theme">◐</button>
-        <a class="icon-button notification-button" href="?page=notifications" aria-label="Notifications, <?=$unread?> unread">
-            <?=icon('notifications')?><span class="notification-label">Notifications</span><?php if($unread): ?><span class="notification-count"><?=$unread?></span><?php endif ?>
-        </a>
+        <div class="notification-menu" data-notification-menu>
+            <button class="icon-button notification-button" type="button" aria-label="Notifications, <?=$unread?> unread" aria-expanded="false" aria-controls="notification-dropdown" data-notification-toggle>
+                <?=icon('notifications')?><span class="notification-label">Notifications</span><?php if($unread): ?><span class="notification-count"><?=$unread?></span><?php endif ?>
+            </button>
+            <section class="notification-dropdown" id="notification-dropdown" aria-labelledby="notification-dropdown-title" hidden>
+                <header class="notification-dropdown-header">
+                    <h2 id="notification-dropdown-title">Notifications</h2>
+                    <span class="notification-dropdown-unread" data-notification-unread></span>
+                </header>
+                <p class="notification-dropdown-status" data-notification-status role="status"></p>
+                <div class="notification-dropdown-list" data-notification-list></div>
+                <footer class="notification-dropdown-footer"><a href="?page=notifications">View all notifications <span aria-hidden="true">→</span></a></footer>
+            </section>
+        </div>
         <div class="top-user">
             <?=avatar($user['name'])?>
             <span class="top-user-copy"><strong><?=e($user['name'])?></strong><small><?=e(['admin'=>'Administrator','head'=>'Nurse Head','nurse'=>'Nursing personnel'][$user['role']])?></small></span>

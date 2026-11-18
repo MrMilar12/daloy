@@ -206,6 +206,132 @@
       if (topbar) link.setAttribute('aria-label',`Notifications, ${count} unread`);
     });
   };
+  const notificationMenu=document.querySelector('[data-notification-menu]');
+  const notificationToggle=notificationMenu?.querySelector('[data-notification-toggle]');
+  const notificationDropdown=notificationMenu?.querySelector('.notification-dropdown');
+  const notificationList=notificationMenu?.querySelector('[data-notification-list]');
+  const notificationUnread=notificationMenu?.querySelector('[data-notification-unread]');
+  const notificationStatus=notificationMenu?.querySelector('[data-notification-status]');
+  const csrfToken=document.querySelector('meta[name="csrf-token"]')?.content||'';
+  let loadingNotifications=false;
+  let openingNotification=false;
+  const closeNotificationMenu = (restoreFocus=false) => {
+    if (!notificationDropdown||!notificationToggle) return;
+    notificationDropdown.hidden=true;
+    notificationToggle.setAttribute('aria-expanded','false');
+    if (restoreFocus) notificationToggle.focus();
+  };
+  const renderRecentNotifications = notifications => {
+    if (!notificationList) return;
+    notificationList.replaceChildren();
+    if (!notifications.length) {
+      const empty=document.createElement('div');
+      empty.className='notification-dropdown-empty';
+      const title=document.createElement('strong');
+      title.textContent='You’re all caught up';
+      const message=document.createElement('span');
+      message.textContent='New updates will appear here.';
+      empty.append(title,message);
+      notificationList.append(empty);
+      return;
+    }
+    notifications.forEach(notification => {
+      const link=document.createElement('a');
+      link.className='notification-dropdown-item'+(notification.read_at?' is-read':' is-unread');
+      link.href='?page=notifications';
+      if (typeof notification.link==='string' && notification.link.trim()) {
+        try {
+          const destination=new URL(notification.link,location.href);
+          if (destination.protocol===location.protocol && destination.origin===location.origin) link.href=destination.href;
+        } catch {
+          // Keep the inbox link if an older notification has an invalid destination.
+        }
+      }
+      link.dataset.notificationId=String(notification.id);
+      const marker=document.createElement('span');
+      marker.className='notification-dropdown-marker';
+      marker.setAttribute('aria-hidden','true');
+      const copy=document.createElement('span');
+      copy.className='notification-dropdown-copy';
+      const title=document.createElement('strong');
+      title.textContent=notification.title||'Workspace update';
+      if (!notification.read_at) {
+        const unreadLabel=document.createElement('span');
+        unreadLabel.className='sr-only';
+        unreadLabel.textContent=' Unread';
+        title.append(unreadLabel);
+      }
+      const message=document.createElement('span');
+      message.textContent=notification.message||'';
+      copy.append(title,message);
+      const timestamp=document.createElement('time');
+      const createdAt=new Date(notification.created_at||'');
+      if (!Number.isNaN(createdAt.getTime())) {
+        timestamp.dateTime=createdAt.toISOString();
+        timestamp.textContent=new Intl.DateTimeFormat(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(createdAt);
+        link.append(marker,copy,timestamp);
+      } else {
+        link.append(marker,copy);
+      }
+      notificationList.append(link);
+    });
+  };
+  const loadRecentNotifications = async () => {
+    if (!notificationList||!notificationUnread||!notificationStatus||loadingNotifications) return;
+    loadingNotifications=true;
+    notificationList.replaceChildren();
+    notificationUnread.textContent='';
+    notificationStatus.textContent='Loading notifications…';
+    try {
+      const response=await fetch('api.php?action=notifications_recent',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
+      const data=await response.json();
+      if (!response.ok||!Array.isArray(data.notifications)||!Number.isInteger(data.unread_count)) throw new Error(data.error||'Unable to load notifications.');
+      renderRecentNotifications(data.notifications);
+      notificationUnread.textContent=data.unread_count?`${data.unread_count} unread`:'All caught up';
+      notificationStatus.textContent='';
+      syncNotificationBadges(data.unread_count);
+    } catch {
+      notificationStatus.textContent='Unable to load recent notifications. Open the inbox or try again.';
+    } finally {
+      loadingNotifications=false;
+    }
+  };
+  const markNotificationRead = async notificationId => {
+    const body=new URLSearchParams({csrf:csrfToken,id:notificationId});
+    const response=await fetch('api.php?action=notification_read',{method:'POST',credentials:'same-origin',headers:{Accept:'application/json','Content-Type':'application/x-www-form-urlencoded'},body});
+    const data=await response.json();
+    if (!response.ok||!Number.isInteger(data.unread_count)) throw new Error(data.error||'Unable to mark this notification as read.');
+    syncNotificationBadges(data.unread_count);
+  };
+  notificationToggle?.addEventListener('click',() => {
+    if (!notificationDropdown) return;
+    const opening=notificationDropdown.hidden;
+    notificationDropdown.hidden=!opening;
+    notificationToggle.setAttribute('aria-expanded',String(opening));
+    if (opening) loadRecentNotifications();
+  });
+  notificationList?.addEventListener('click',async event => {
+    const link=event.target instanceof Element?event.target.closest('a[data-notification-id]'):null;
+    if (!link||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey) return;
+    if (!link.classList.contains('is-unread')) return;
+    event.preventDefault();
+    if (openingNotification) return;
+    openingNotification=true;
+    try {
+      await markNotificationRead(link.dataset.notificationId);
+    } catch {
+      // The destination remains available if the read update fails.
+    } finally {
+      openingNotification=false;
+    }
+    location.assign(link.href);
+  });
+  document.addEventListener('click',event => {
+    if (notificationDropdown&&!notificationDropdown.hidden&&!notificationMenu?.contains(event.target)) closeNotificationMenu();
+  });
+  document.addEventListener('keydown',event => {
+    if (event.key==='Escape'&&notificationDropdown&&!notificationDropdown.hidden) closeNotificationMenu(true);
+  });
   const updateNotificationUserId=document.body.dataset.userId;
   if (updateNotificationUserId) {
     const cursorKey=`daloy-system-updates:${updateNotificationUserId}`;

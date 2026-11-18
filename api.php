@@ -39,6 +39,22 @@ try {
             }
             $unreadCount=(int)$db->one('SELECT COUNT(*) AS count FROM notifications WHERE user_id=? AND read_at IS NULL',[$user['id']])['count'];
             json_out(['notifications'=>$notifications,'unread_count'=>$unreadCount]);
+        case 'notifications_recent':
+            $notifications=$db->all('SELECT id,title,message,link,created_at,read_at FROM notifications WHERE user_id=? ORDER BY created_at DESC,id DESC LIMIT 8',[$user['id']]);
+            foreach($notifications as &$notification) {
+                $notification['created_at']=date(DATE_ATOM,strtotime($notification['created_at']));
+            }
+            unset($notification);
+            $unreadCount=(int)$db->one('SELECT COUNT(*) AS count FROM notifications WHERE user_id=? AND read_at IS NULL',[$user['id']])['count'];
+            json_out(['notifications'=>$notifications,'unread_count'=>$unreadCount]);
+        case 'notification_read':
+            if($_SERVER['REQUEST_METHOD']!=='POST') throw new DomainException('POST required.',405);
+            csrf_check();
+            $id=filter_var($_POST['id']??null,FILTER_VALIDATE_INT);
+            if(!$id || !$db->one('SELECT id FROM notifications WHERE id=? AND user_id=?',[$id,$user['id']])) throw new DomainException('Notification not found.',404);
+            $db->run('UPDATE notifications SET read_at=COALESCE(read_at,?) WHERE id=? AND user_id=?',[now(),$id,$user['id']]);
+            $unreadCount=(int)$db->one('SELECT COUNT(*) AS count FROM notifications WHERE user_id=? AND read_at IS NULL',[$user['id']])['count'];
+            json_out(['unread_count'=>$unreadCount]);
         case 'conflicts':
             $id=(int)($_GET['nurse_id']??$user['id']); $service->own($id); [$start,$end]=$service->window($_GET);
             $exclude=(int)($_GET['exclude_id']??0); if($exclude) $service->own((int)$service->record('schedules',$exclude)['nurse_id']);

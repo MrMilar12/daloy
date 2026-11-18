@@ -204,6 +204,17 @@ try {
     check(request('admin','',['csrf'=>token($login),'action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===303,'Administrator signs in');
     $settingsPage=request('admin','?page=settings');
     check($settingsPage['status']===200 && str_contains($settingsPage['body'],'settings-page-intro') && str_contains($settingsPage['body'],'data-github-check') && str_contains($settingsPage['body'],'data-github-update-dialog') && str_contains($settingsPage['body'],'data-github-install') && str_contains($settingsPage['body'],'name="organization"') && str_contains($settingsPage['body'],'SESSION TIMEOUT') && str_contains($settingsPage['body'],'data-user-id="'.$admin['id'].'"') && str_contains($settingsPage['body'],'data-system-update-toasts'),'Workspace settings render the redesigned panels and update popup region');
+    check(str_contains($settingsPage['body'],'data-notification-toggle') && str_contains($settingsPage['body'],'notification-dropdown'),'Header notifications render an accessible dropdown trigger and card');
+    $as->notify((int)$admin['id'],'Dropdown read test','Clicking this update should mark it read.','?page=notifications');
+    $recentNotifications=request('admin','api.php?action=notifications_recent');
+    $recentNotificationsData=json_decode($recentNotifications['body'],true);
+    $dropdownNotification=array_values(array_filter($recentNotificationsData['notifications']??[],fn($notification)=>$notification['title']==='Dropdown read test'))[0]??null;
+    check($recentNotifications['status']===200 && $dropdownNotification!==null && $dropdownNotification['read_at']===null,'Header dropdown loads recent user-scoped notifications');
+    $readDropdown=request('admin','api.php?action=notification_read',['csrf'=>token($settingsPage),'id'=>$dropdownNotification['id']]);
+    $readDropdownData=json_decode($readDropdown['body'],true);
+    check($readDropdown['status']===200 && $db->one('SELECT read_at FROM notifications WHERE id=?',[$dropdownNotification['id']])['read_at']!==null && (int)$readDropdownData['unread_count']===(int)$recentNotificationsData['unread_count']-1,'Opening a notification marks only that user’s item as read and refreshes the unread count');
+    $foreignDropdownId=(int)$db->one('SELECT id FROM notifications WHERE user_id=? ORDER BY id DESC LIMIT 1',[$n1['id']])['id'];
+    check(request('admin','api.php?action=notification_read',['csrf'=>token($settingsPage),'id'=>$foreignDropdownId])['status']===404,'Header notification read endpoint cannot modify another user’s item');
     $updatePoll=request('admin','api.php?action=system_update_notifications&after=0');
     $updatePollData=json_decode($updatePoll['body'],true);
     check($updatePoll['status']===200 && in_array($updateMessage,array_column($updatePollData['notifications']??[],'message'),true) && (int)($updatePollData['unread_count']??-1)>0,'Signed-in users can retrieve their system update popup notifications and unread count');
