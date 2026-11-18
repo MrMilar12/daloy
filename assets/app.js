@@ -121,6 +121,15 @@
         flushList();
         return;
       }
+      const heading=line.match(/^#{1,6}\s+(.+)$/);
+      if (heading) {
+        flushParagraph();
+        flushList();
+        const block=document.createElement('h3');
+        appendInlineMarkdown(block,heading[1]);
+        container.append(block);
+        return;
+      }
       const item=line.match(/^[-*]\s+(.+)$/);
       if (item) {
         flushParagraph();
@@ -213,26 +222,35 @@
       if (!region) return;
       const toast=document.createElement('article');
       toast.className='system-update-toast';
+      const header=document.createElement('div');
+      header.className='system-update-toast-header';
       const icon=document.createElement('span');
       icon.className='system-update-toast-icon';
       icon.setAttribute('aria-hidden','true');
-      icon.textContent='↻';
-      const content=document.createElement('div');
-      content.className='system-update-toast-content';
+      icon.textContent='✓';
+      const heading=document.createElement('div');
+      heading.className='system-update-toast-heading';
+      const eyebrow=document.createElement('span');
+      eyebrow.textContent='UPDATE COMPLETE';
       const title=document.createElement('strong');
       title.textContent=notification.title||'System updated';
+      heading.append(eyebrow,title);
       const message=document.createElement('p');
+      message.className='system-update-toast-message';
       message.textContent=notification.message||'A DALOY system update was installed.';
-      const link=document.createElement('a');
-      link.href='?page=notifications';
-      link.textContent='View notification';
-      content.append(title,message,link);
       const close=document.createElement('button');
       close.type='button';
       close.className='system-update-toast-close';
       close.setAttribute('aria-label','Dismiss update notification');
       close.textContent='×';
-      toast.append(icon,content,close);
+      header.append(icon,heading,close);
+      const footer=document.createElement('div');
+      footer.className='system-update-toast-footer';
+      const link=document.createElement('a');
+      link.href='?page=notifications';
+      link.textContent='View notification';
+      footer.append(link);
+      toast.append(header,message,footer);
       region.prepend(toast);
       const timer=window.setTimeout(() => toast.remove(),15000);
       close.addEventListener('click',() => { window.clearTimeout(timer); toast.remove(); });

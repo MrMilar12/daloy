@@ -257,7 +257,7 @@ dialog.github-update-dialog::backdrop{background:#102235a8;backdrop-filter:blur(
 .github-update-dialog-heading h2{margin:0 0 6px;font-size:19px;letter-spacing:-.4px}
 .github-update-dialog-heading p{margin:0;color:var(--muted);font-size:11px;line-height:1.55}
 .github-update-dialog-commit{margin:21px 0 18px;padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--bg)}
-.github-update-dialog-commit>div{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.github-update-dialog-meta{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .github-update-dialog-commit span{color:var(--muted);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
 .github-update-dialog-commit code{padding:5px 8px;border-radius:7px;background:var(--soft);color:var(--text);font-size:10px}
 .github-update-dialog-message{margin:10px 0 0;color:var(--text);font-size:11px;line-height:1.6;overflow-wrap:anywhere}
@@ -270,20 +270,25 @@ dialog.github-update-dialog::backdrop{background:#102235a8;backdrop-filter:blur(
 .github-update-dialog-message{padding-top:10px;border-top:1px solid var(--border)}
 .github-update-commit-message p,.github-update-dialog-message p{margin:0}
 .github-update-commit-message p+p,.github-update-dialog-message p+p{margin-top:8px}
+.github-update-commit-message h3,.github-update-dialog-message h3{margin:0;color:var(--text);font-size:13px;line-height:1.4;overflow-wrap:anywhere}
+.github-update-commit-message h3+p,.github-update-dialog-message h3+p{margin-top:7px}
 .github-update-commit-message ul,.github-update-dialog-message ul{margin:8px 0;padding-left:19px}
 .github-update-commit-message li+li,.github-update-dialog-message li+li{margin-top:4px}
 .github-update-commit-message li::marker,.github-update-dialog-message li::marker{color:var(--teal)}
 .github-update-commit-message strong,.github-update-dialog-message strong{color:var(--primary);font-weight:750}
 .github-update-commit-message code,.github-update-dialog-message code{padding:1px 4px;border-radius:4px;background:var(--soft);font-size:.95em}
-.system-update-toasts{position:fixed;z-index:220;top:88px;right:22px;display:grid;gap:10px;width:min(390px,calc(100vw - 32px));pointer-events:none}
-.system-update-toast{display:grid;grid-template-columns:38px minmax(0,1fr) 30px;align-items:start;gap:12px;padding:15px;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:14px;background:var(--surface);color:var(--text);box-shadow:0 16px 42px #10223528;animation:system-update-toast-in .2s ease-out;pointer-events:auto}
-.system-update-toast-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:var(--soft);color:var(--teal);font-size:19px;font-weight:750}
-.system-update-toast-content{min-width:0}
-.system-update-toast-content strong{display:block;font-size:12px;font-weight:750}
-.system-update-toast-content p{margin:5px 0 8px;color:var(--muted);font-size:11px;line-height:1.5;overflow-wrap:anywhere}
-.system-update-toast-content a{font-size:10px;font-weight:700;color:var(--primary)}
+.system-update-toasts{position:fixed;z-index:220;top:88px;right:22px;display:grid;gap:10px;width:min(430px,calc(100vw - 32px));pointer-events:none}
+.system-update-toast{display:grid;gap:12px;padding:16px;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:14px;background:var(--surface);color:var(--text);box-shadow:0 16px 42px #10223528;animation:system-update-toast-in .2s ease-out;pointer-events:auto}
+.system-update-toast-header{display:grid;grid-template-columns:38px minmax(0,1fr) 28px;align-items:center;gap:11px}
+.system-update-toast-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:var(--soft);color:var(--teal);font-size:18px;font-weight:750}
+.system-update-toast-heading{display:grid;gap:3px;min-width:0}
+.system-update-toast-heading>span{color:var(--teal);font-size:8px;font-weight:750;letter-spacing:.8px}
+.system-update-toast-heading strong{font-size:13px;font-weight:750}
+.system-update-toast-message{margin:0!important;color:var(--muted);font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.system-update-toast-footer{display:flex;justify-content:flex-end;padding-top:10px;border-top:1px solid var(--border)}
+.system-update-toast-footer a{font-size:10px;font-weight:700;color:var(--primary)}
 .system-update-toast-close{display:grid;place-items:center;width:28px;height:28px;border:1px solid var(--border);border-radius:50%;background:var(--surface);color:var(--muted);font-size:18px;line-height:1}
 .system-update-toast-close:hover{background:var(--soft);color:var(--text)}
 @keyframes system-update-toast-in{from{transform:translateY(-7px);opacity:0}to{transform:translateY(0);opacity:1}}
-@media(max-width:600px){.system-update-toasts{top:76px;right:10px;width:calc(100vw - 20px)}.system-update-toast{grid-template-columns:34px minmax(0,1fr) 28px;gap:10px;padding:13px}.system-update-toast-icon{width:32px;height:32px}}
+@media(max-width:600px){.system-update-toasts{top:76px;right:10px;width:calc(100vw - 20px)}.system-update-toast{gap:10px;padding:14px}.system-update-toast-header{grid-template-columns:34px minmax(0,1fr) 28px;gap:10px}.system-update-toast-icon{width:32px;height:32px}}
 @media(prefers-reduced-motion:reduce){.system-update-toast{animation:none}}

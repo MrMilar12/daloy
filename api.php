@@ -28,7 +28,7 @@ try {
             if(!preg_match('/^[a-f0-9]{40}$/',$sha) || $sha!==$check['latest']) throw new DomainException('Check for updates again before installing.',409);
             try { $result=$updater->apply($check); }
             catch(RuntimeException $e) { throw new DomainException($e->getMessage(),502); }
-            $service->notifyActiveUsers('System updated','DALOY was updated successfully to version '.substr($result['sha'],0,12).'. Refresh the page or sign in again if needed.');
+            $service->notifyActiveUsers('System updated','The latest DALOY update installed successfully.');
             json_out($result);
         case 'system_update_notifications':
             $after=max(0,(int)($_GET['after']??0));

@@ -49,7 +49,7 @@ if($page==='settings') {
                             <div><span class="eyebrow">VERIFIED SYSTEM UPDATE</span><h2 id="github-update-title">New system update found</h2><p>A verified DALOY update is ready to install.</p></div>
                         </div>
                         <div class="github-update-dialog-commit">
-                            <div><span>Latest commit</span><code data-github-update-commit></code></div>
+                            <div class="github-update-dialog-meta"><span>Latest commit</span><code data-github-update-commit></code></div>
                             <div class="github-update-dialog-message" data-github-update-message></div>
                         </div>
                         <div class="github-update-dialog-actions">
