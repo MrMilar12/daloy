@@ -71,6 +71,28 @@ button { cursor: pointer; }
 .auth-footer { text-align: center; color: var(--auth-muted); padding: 24px 0; font-size: 11px; line-height: 1.6; }
 .auth-alert { margin: 0 0 22px; padding: 13px 15px; border: 1px solid #c54855; border-radius: 10px; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
 .auth-success { border-color: #219e81; }
+.auth-snowflake {
+    position: fixed;
+    z-index: 20;
+    pointer-events: none;
+    user-select: none;
+    color: #f4fcff;
+    line-height: 1;
+    text-shadow: 0 0 2px #356e92, 0 0 6px #72c7ed;
+    animation: auth-snowfall var(--snow-duration) linear both;
+}
+@keyframes auth-snowfall {
+    0% { opacity: .95; transform: translate(-50%, -50%) scale(.65); }
+    12% { transform: translate(calc(var(--snow-drift) * .22 - 50%), calc(var(--snow-fall) * .12 - 50%)) scale(1); }
+    92% { opacity: .95; }
+    100% {
+        opacity: 0;
+        transform: translate(var(--snow-drift), var(--snow-fall)) rotate(var(--snow-spin)) scale(.55);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .auth-snowflake { visibility: hidden; }
+}
 @media (max-width: 950px) {
     .auth-story { padding: 32px 28px; }
     .auth-panel { padding: 38px 30px 28px; }

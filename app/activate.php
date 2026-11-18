@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Finish account setup | DALOY</title>
     <link rel="stylesheet" href="<?=e(asset_url('app.css'))?>">
+    <link rel="stylesheet" href="<?=e(asset_url('theme-transition.css'))?>">
     <script src="<?=e(asset_url('app.js'))?>" defer></script>
 </head>
 <body class="activation-body" data-page="activate">

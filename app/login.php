@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title><?=$register?'Request access':'Sign in'?> &middot; DALOY</title>
     <link rel="stylesheet" href="<?=e(asset_url('login.css'))?>">
+    <link rel="stylesheet" href="<?=e(asset_url('theme-transition.css'))?>">
     <script src="<?=e(asset_url('app.js'))?>" defer></script>
 </head>
 <body class="auth-page<?=$register?' auth-registration-page':''?>">

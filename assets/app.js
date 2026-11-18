@@ -529,10 +529,64 @@
   }
   const root = document.documentElement;
   try { root.dataset.theme = localStorage.getItem('daloy-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch (_) {}
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  let lightReflection;
   document.querySelectorAll('.theme-toggle').forEach(button => button.addEventListener('click', () => {
     root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
     try { localStorage.setItem('daloy-theme', root.dataset.theme); } catch (_) {}
+    lightReflection?.remove();
+    lightReflection = undefined;
+    if (root.dataset.theme !== 'light' || reducedMotion.matches) return;
+
+    const anchor = button.getBoundingClientRect();
+    const reflection = document.createElement('div');
+    reflection.className = 'theme-light-reflection';
+    reflection.setAttribute('aria-hidden', 'true');
+    reflection.style.setProperty('--reflection-x', `${anchor.left + anchor.width / 2}px`);
+    reflection.style.setProperty('--reflection-y', `${anchor.top + anchor.height / 2}px`);
+    lightReflection = reflection;
+    document.body.append(reflection);
+    reflection.addEventListener('animationend', event => {
+      if (event.animationName !== 'theme-light-glow') return;
+      reflection.remove();
+      if (lightReflection === reflection) lightReflection = undefined;
+    });
   }));
+  const signInForm = document.querySelector('.auth-page:not(.auth-registration-page) .auth-panel form');
+  if (signInForm) {
+    const releaseSnow = (x, y, count) => {
+      if (reducedMotion.matches) return;
+
+      const fallDistance = Math.max(0, window.innerHeight - y);
+      const flakes = document.createDocumentFragment();
+      for (let index = 0; index < count; index++) {
+        const flake = document.createElement('span');
+        flake.className = 'auth-snowflake';
+        flake.setAttribute('aria-hidden', 'true');
+        flake.textContent = '❄';
+        flake.style.left = x + 'px';
+        flake.style.top = y + 'px';
+        flake.style.fontSize = (10 + Math.random() * 10) + 'px';
+        flake.style.setProperty('--snow-drift', (Math.random() * 100 - 50) + 'px');
+        flake.style.setProperty('--snow-fall', fallDistance + 'px');
+        flake.style.setProperty('--snow-duration', (1.35 + Math.min(fallDistance / 430, 2) + Math.random() * .35) + 's');
+        flake.style.setProperty('--snow-spin', (Math.random() * 130 - 65) + 'deg');
+        flake.addEventListener('animationend', () => flake.remove(), {once:true});
+        flakes.append(flake);
+      }
+      document.body.append(flakes);
+    };
+
+    let lastSnowfall = -Infinity;
+    document.addEventListener('pointermove', event => {
+      if (event.pointerType !== 'mouse' || event.timeStamp - lastSnowfall < 40) return;
+      lastSnowfall = event.timeStamp;
+      releaseSnow(event.clientX, event.clientY, 3);
+    }, {passive:true});
+    signInForm.addEventListener('click', event => {
+      if (event.pointerType === 'touch') releaseSnow(event.clientX, event.clientY, 14);
+    }, {passive:true});
+  }
   document.querySelector('.menu-toggle')?.addEventListener('click', event => {
     const open = document.body.classList.toggle('nav-open');
     event.currentTarget.setAttribute('aria-expanded', String(open));
