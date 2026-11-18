@@ -275,3 +275,15 @@ dialog.github-update-dialog::backdrop{background:#102235a8;backdrop-filter:blur(
 .github-update-commit-message li::marker,.github-update-dialog-message li::marker{color:var(--teal)}
 .github-update-commit-message strong,.github-update-dialog-message strong{color:var(--primary);font-weight:750}
 .github-update-commit-message code,.github-update-dialog-message code{padding:1px 4px;border-radius:4px;background:var(--soft);font-size:.95em}
+.system-update-toasts{position:fixed;z-index:220;top:88px;right:22px;display:grid;gap:10px;width:min(390px,calc(100vw - 32px));pointer-events:none}
+.system-update-toast{display:grid;grid-template-columns:38px minmax(0,1fr) 30px;align-items:start;gap:12px;padding:15px;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:14px;background:var(--surface);color:var(--text);box-shadow:0 16px 42px #10223528;animation:system-update-toast-in .2s ease-out;pointer-events:auto}
+.system-update-toast-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:var(--soft);color:var(--teal);font-size:19px;font-weight:750}
+.system-update-toast-content{min-width:0}
+.system-update-toast-content strong{display:block;font-size:12px;font-weight:750}
+.system-update-toast-content p{margin:5px 0 8px;color:var(--muted);font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+.system-update-toast-content a{font-size:10px;font-weight:700;color:var(--primary)}
+.system-update-toast-close{display:grid;place-items:center;width:28px;height:28px;border:1px solid var(--border);border-radius:50%;background:var(--surface);color:var(--muted);font-size:18px;line-height:1}
+.system-update-toast-close:hover{background:var(--soft);color:var(--text)}
+@keyframes system-update-toast-in{from{transform:translateY(-7px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media(max-width:600px){.system-update-toasts{top:76px;right:10px;width:calc(100vw - 20px)}.system-update-toast{grid-template-columns:34px minmax(0,1fr) 28px;gap:10px;padding:13px}.system-update-toast-icon{width:32px;height:32px}}
+@media(prefers-reduced-motion:reduce){.system-update-toast{animation:none}}

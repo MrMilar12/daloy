@@ -35,6 +35,11 @@ final class Service {
     public function notify(int $id,string $title,string $message,string $link='?page=notifications'): void {
         $this->db->insert('notifications',['user_id'=>$id,'title'=>$title,'message'=>$message,'link'=>$link,'created_at'=>now()]);
     }
+    public function notifyActiveUsers(string $title,string $message,string $link='?page=notifications'): void {
+        $this->db->transaction(function() use ($title,$message,$link): void {
+            foreach($this->db->all('SELECT id FROM users WHERE active=1') as $user) $this->notify((int)$user['id'],$title,$message,$link);
+        });
+    }
     public function notifyHeads(string $title,string $message,string $link): void { foreach($this->db->all("SELECT id FROM users WHERE active=1 AND role IN ('head','admin')") as $u) $this->notify((int)$u['id'],$title,$message,$link); }
     public function conflicts(int $id,string $start,string $end,string $excludeTable='',int $excludeId=0): array {
         $out=[];

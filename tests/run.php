@@ -29,6 +29,11 @@ try {
     check(!$updater->notifyAdminsForUpdate($updateSha),'Repeated update check does not duplicate notification');
     check($updater->notifyAdminsForUpdate(str_repeat('b',40)) && (int)$db->one('SELECT COUNT(*) AS count FROM notifications WHERE user_id=?',[$admin['id']])['count']===2,'New commit notifies administrators again');
     $as=new Service($db,$admin); $hs=new Service($db,$head); $ns=new Service($db,$n1); $n2s=new Service($db,$n2);
+    $updateMessage='DALOY update test completed.';
+    $as->notifyActiveUsers('System updated',$updateMessage);
+    $activeUsers=$db->all('SELECT id FROM users WHERE active=1');
+    $broadcastCount=(int)$db->one('SELECT COUNT(*) AS count FROM notifications WHERE title=? AND message=?',['System updated',$updateMessage])['count'];
+    check($broadcastCount===count($activeUsers),'Successful update notifications reach every active user, including the installer');
     $district=$as->catalog(['table'=>'districts','name'=>'Test District','active'=>1]);
     $municipality=$as->catalog(['table'=>'municipalities','name'=>'Test Municipality','active'=>1]);
     $location=$as->catalog(['table'=>'locations','name'=>'Test School','active'=>1,'type'=>'School','district_id'=>$district,'municipality_id'=>$municipality,'required_nurses'=>2]);
@@ -198,7 +203,15 @@ try {
     check(request('admin','',['action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===419,'Missing CSRF rejected');
     check(request('admin','',['csrf'=>token($login),'action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===303,'Administrator signs in');
     $settingsPage=request('admin','?page=settings');
-    check($settingsPage['status']===200 && str_contains($settingsPage['body'],'settings-page-intro') && str_contains($settingsPage['body'],'data-github-check') && str_contains($settingsPage['body'],'data-github-update-dialog') && str_contains($settingsPage['body'],'data-github-install') && str_contains($settingsPage['body'],'name="organization"') && str_contains($settingsPage['body'],'SESSION TIMEOUT'),'Workspace settings render the redesigned panels and controls');
+    check($settingsPage['status']===200 && str_contains($settingsPage['body'],'settings-page-intro') && str_contains($settingsPage['body'],'data-github-check') && str_contains($settingsPage['body'],'data-github-update-dialog') && str_contains($settingsPage['body'],'data-github-install') && str_contains($settingsPage['body'],'name="organization"') && str_contains($settingsPage['body'],'SESSION TIMEOUT') && str_contains($settingsPage['body'],'data-user-id="'.$admin['id'].'"') && str_contains($settingsPage['body'],'data-system-update-toasts'),'Workspace settings render the redesigned panels and update popup region');
+    $updatePoll=request('admin','api.php?action=system_update_notifications&after=0');
+    $updatePollData=json_decode($updatePoll['body'],true);
+    check($updatePoll['status']===200 && in_array($updateMessage,array_column($updatePollData['notifications']??[],'message'),true) && (int)($updatePollData['unread_count']??-1)>0,'Signed-in users can retrieve their system update popup notifications and unread count');
+    $nursePopupLogin=request('nursePopup');
+    check(request('nursePopup','',['csrf'=>token($nursePopupLogin),'action'=>'login','email'=>$n1['email'],'password'=>$password])['status']===303,'Nursing personnel can sign in to receive update notifications');
+    $nursePopupPoll=request('nursePopup','api.php?action=system_update_notifications&after=0');
+    $nursePopupData=json_decode($nursePopupPoll['body'],true);
+    check($nursePopupPoll['status']===200 && in_array($updateMessage,array_column($nursePopupData['notifications']??[],'message'),true),'System update notifications are available to non-admin users');
     $assignablePage=request('admin','?page=deployment&activity='.$activity);
     check($assignablePage['status']===200 && str_contains($assignablePage['body'],'class="deploy-confirm"') && str_contains($assignablePage['body'],'Confirm deployment'),'Eligible nurses can review and confirm deployment in the candidate modal');
     $assignedHttp=request('admin','?page=deployment&activity='.$activity,['csrf'=>token($assignablePage),'action'=>'deploy','activity_id'=>$activity,'nurse_id'=>$n3['id'],'return'=>'?page=deployment&activity='.$activity]);

@@ -28,10 +28,17 @@ try {
             if(!preg_match('/^[a-f0-9]{40}$/',$sha) || $sha!==$check['latest']) throw new DomainException('Check for updates again before installing.',409);
             try { $result=$updater->apply($check); }
             catch(RuntimeException $e) { throw new DomainException($e->getMessage(),502); }
-            foreach($db->all('SELECT id FROM users WHERE active=1 AND id<>?',[$user['id']]) as $recipient) {
-                $db->insert('notifications',['user_id'=>$recipient['id'],'title'=>'System updated','message'=>'DALOY was updated successfully. Please sign in again if asked.','link'=>'?page=notifications','created_at'=>now()]);
-            }
+            $service->notifyActiveUsers('System updated','DALOY was updated successfully to version '.substr($result['sha'],0,12).'. Refresh the page or sign in again if needed.');
             json_out($result);
+        case 'system_update_notifications':
+            $after=max(0,(int)($_GET['after']??0));
+            if($after===0) {
+                $notifications=$db->all("SELECT id,title,message,created_at FROM notifications WHERE user_id=? AND title='System updated' AND read_at IS NULL ORDER BY id DESC LIMIT 1",[$user['id']]);
+            } else {
+                $notifications=$db->all("SELECT id,title,message,created_at FROM notifications WHERE user_id=? AND title='System updated' AND read_at IS NULL AND id>? ORDER BY id ASC LIMIT 50",[$user['id'],$after]);
+            }
+            $unreadCount=(int)$db->one('SELECT COUNT(*) AS count FROM notifications WHERE user_id=? AND read_at IS NULL',[$user['id']])['count'];
+            json_out(['notifications'=>$notifications,'unread_count'=>$unreadCount]);
         case 'conflicts':
             $id=(int)($_GET['nurse_id']??$user['id']); $service->own($id); [$start,$end]=$service->window($_GET);
             $exclude=(int)($_GET['exclude_id']??0); if($exclude) $service->own((int)$service->record('schedules',$exclude)['nurse_id']);

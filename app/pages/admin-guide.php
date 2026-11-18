@@ -52,7 +52,7 @@ page_heading('ADMINISTRATOR GUIDE','How to use DALOY','Follow these steps to pre
     <h2>6. Monitor activity and report results</h2>
     <ol>
         <li>Use <a href="?page=dashboard">Overview</a> to review the selected day's workforce and open staffing needs.</li>
-        <li>Check <a href="?page=notifications">Notifications</a> for account and workflow updates. Notifications are in-app; DALOY does not send email or SMS.</li>
+        <li>Check <a href="?page=notifications">Notifications</a> for account and workflow updates. Active users receive an in-app popup and inbox notification when a system update completes; DALOY does not send email or SMS.</li>
         <li>Open <a href="?page=reports">Reports</a> to filter rosters, assignment history, availability, leave, and conflicts, then export or print the results. Narrow the date range for large histories.</li>
         <li>Use <a href="?page=audit">Audit trail</a> to review recorded administrative and workforce changes.</li>
     </ol>

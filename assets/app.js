@@ -177,6 +177,99 @@
       if (topbar) link.setAttribute('aria-label',`Notifications, ${count} unread`);
     });
   };
+  const syncNotificationBadges = unreadCount => {
+    const count=Math.max(0,Number(unreadCount)||0);
+    document.querySelectorAll('.notification-button,.sidebar nav a[href="?page=notifications"]').forEach(link => {
+      const topbar=link.matches('.notification-button');
+      const badgeClass=topbar?'notification-count':'count';
+      let badge=link.querySelector('.'+badgeClass);
+      if (!count) {
+        badge?.remove();
+        if (topbar) link.setAttribute('aria-label','Notifications, 0 unread');
+        return;
+      }
+      if (!badge) {
+        badge=document.createElement('span');
+        badge.className=badgeClass;
+        link.append(badge);
+      }
+      badge.textContent=String(count);
+      if (topbar) link.setAttribute('aria-label',`Notifications, ${count} unread`);
+    });
+  };
+  const updateNotificationUserId=document.body.dataset.userId;
+  if (updateNotificationUserId) {
+    const cursorKey=`daloy-system-updates:${updateNotificationUserId}`;
+    let updateCursor=0;
+    try {
+      const savedCursor=localStorage.getItem(cursorKey);
+      if (savedCursor && /^\d+$/.test(savedCursor)) updateCursor=Number(savedCursor);
+    } catch (error) {
+      console.warn('System update notifications could not be remembered in this browser.',error);
+    }
+    let polling=false;
+    const showSystemUpdateToast = notification => {
+      const region=document.querySelector('[data-system-update-toasts]');
+      if (!region) return;
+      const toast=document.createElement('article');
+      toast.className='system-update-toast';
+      const icon=document.createElement('span');
+      icon.className='system-update-toast-icon';
+      icon.setAttribute('aria-hidden','true');
+      icon.textContent='↻';
+      const content=document.createElement('div');
+      content.className='system-update-toast-content';
+      const title=document.createElement('strong');
+      title.textContent=notification.title||'System updated';
+      const message=document.createElement('p');
+      message.textContent=notification.message||'A DALOY system update was installed.';
+      const link=document.createElement('a');
+      link.href='?page=notifications';
+      link.textContent='View notification';
+      content.append(title,message,link);
+      const close=document.createElement('button');
+      close.type='button';
+      close.className='system-update-toast-close';
+      close.setAttribute('aria-label','Dismiss update notification');
+      close.textContent='×';
+      toast.append(icon,content,close);
+      region.prepend(toast);
+      const timer=window.setTimeout(() => toast.remove(),15000);
+      close.addEventListener('click',() => { window.clearTimeout(timer); toast.remove(); });
+    };
+    const pollSystemUpdateNotifications = async () => {
+      if (polling) return;
+      polling=true;
+      try {
+        const params=new URLSearchParams({action:'system_update_notifications',after:String(updateCursor)});
+        const response=await fetch('api.php?'+params,{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
+        const data=await response.json();
+        if (!response.ok||!Array.isArray(data.notifications)||!Number.isInteger(data.unread_count)) throw new Error(data.error||'Unable to check system update notifications.');
+        syncNotificationBadges(data.unread_count);
+        let nextCursor=updateCursor;
+        data.notifications.forEach(notification => {
+          const id=Number(notification.id);
+          if (!Number.isSafeInteger(id)||id<=updateCursor) return;
+          showSystemUpdateToast(notification);
+          nextCursor=Math.max(nextCursor,id);
+        });
+        if (nextCursor>updateCursor) {
+          updateCursor=nextCursor;
+          try { localStorage.setItem(cursorKey,String(updateCursor)); }
+          catch (error) { console.warn('System update notifications will repeat after a page reload.',error); }
+        }
+      } catch (error) {
+        console.error(error instanceof Error?error.message:'Unable to check system update notifications.');
+      } finally {
+        polling=false;
+      }
+    };
+    pollSystemUpdateNotifications();
+    window.setInterval(pollSystemUpdateNotifications,30000);
+    document.addEventListener('visibilitychange',() => {
+      if (document.visibilityState==='visible') pollSystemUpdateNotifications();
+    });
+  }
   const checkForUpdates = async (automatic=false) => {
     if (!githubUpdater||!githubCheckButton) return;
     const button=githubCheckButton;
