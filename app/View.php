@@ -59,7 +59,11 @@ function prepare_page_views(string $html): string {
             foreach($table->getElementsByTagName('th') as $th) { $headers[]=trim($th->textContent); $th->setAttribute('scope','col'); }
             foreach($table->getElementsByTagName('tbody') as $body) foreach($body->getElementsByTagName('tr') as $row) {
                 $row->setAttribute('role','row');
-                foreach($row->getElementsByTagName('td') as $i=>$cell) { $cell->setAttribute('data-label',$headers[$i]??''); $cell->setAttribute('role','cell'); }
+                foreach($row->getElementsByTagName('td') as $i=>$cell) {
+                    $label=$headers[$i]??'';
+                    $cell->setAttribute('data-label',$label); $cell->setAttribute('role','cell');
+                    if(preg_match('/\b(?:actions?|details?)\b/i',$label)) $cell->setAttribute('class',trim($cell->getAttribute('class').' record-action-cell'));
+                }
             }
         }
         foreach($dom->getElementsByTagName('form') as $form) if(strtolower($form->getAttribute('method'))==='get') {

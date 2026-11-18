@@ -44,27 +44,29 @@ body[data-display=card] .record-view-table{display:block;width:100%;min-width:0!
 body[data-display=card] .record-view-table>thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 body[data-display=card] .record-view-table>tbody{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:15px}
 body[data-display=card] .record-view-table>tbody>tr{display:flex;flex-direction:column;min-width:0;border:1px solid var(--border);border-radius:14px;padding:17px;background:var(--surface);box-shadow:0 3px 12px #17344a05;overflow-wrap:anywhere}
-body[data-display=card] .personnel-records-table>tbody{grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),min(100%,460px)));justify-content:start}
-body[data-display=card] .personnel-records-table>tbody>tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:0 12px;width:100%;max-width:100%;padding:18px}
-body[data-display=card] .personnel-records-table>tbody>tr>td{min-width:0}
-body[data-display=card] .personnel-records-table>tbody>tr>td:first-child,body[data-display=card] .personnel-records-table>tbody>tr>td:last-child{grid-column:1/-1}
-body[data-display=card] .personnel-records-table>tbody>tr>td:first-child{padding:14px 18px;margin:-18px -18px 5px;border-bottom:1px solid var(--border);border-radius:13px 13px 0 0;background:linear-gradient(120deg,color-mix(in srgb,var(--surface) 90%,var(--primary)),color-mix(in srgb,var(--surface) 92%,var(--teal)))}
-body[data-display=card] .personnel-records-table>tbody>tr>td:first-child:before{display:none}
-body[data-display=card] .personnel-records-table>tbody>tr>td:not(:first-child):not(:last-child){align-self:stretch;padding:12px;border:1px solid var(--border);border-radius:11px;margin:6px 0;background:color-mix(in srgb,var(--surface) 94%,var(--soft));font-size:11px;line-height:1.55}
-body[data-display=card] .personnel-records-table>tbody>tr>td:not(:first-child):not(:last-child):before{margin-bottom:6px;font-size:8px;letter-spacing:.8px}
-body[data-display=card] .personnel-records-table .person{gap:12px}
-body[data-display=card] .personnel-records-table .person .avatar{width:42px;height:42px;font-size:13px}
-body[data-display=card] .personnel-records-table .person strong{font-size:13px}
-body[data-display=card] .personnel-records-table .personnel-card-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding-top:13px;border-top:1px solid var(--border)}
-body[data-display=card] .personnel-records-table .personnel-card-actions>.button{min-height:34px;padding:7px 11px;border-radius:9px;font-size:10px}
-body[data-display=card] .personnel-records-table .personnel-card-actions details{position:relative}
-body[data-display=card] .personnel-records-table .personnel-contact-summary{display:inline-flex;align-items:center;min-height:34px;margin:0;padding:7px 11px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);font-size:10px;font-weight:650;white-space:nowrap}
-body[data-display=card] .personnel-records-table .personnel-contact-summary:hover{border-color:var(--teal);background:var(--soft)}
-body[data-display=card] .personnel-records-table .personnel-card-actions details p{max-width:100%;margin:8px 0 0;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--soft);font-size:10px;line-height:1.6;overflow-wrap:anywhere}
-body[data-display=card] .personnel-records-table .personnel-card-actions .inline-form{margin:0}
-body[data-display=card] .personnel-records-table .personnel-card-actions .danger-button{min-height:34px;border-radius:9px}
-[data-theme=dark] body[data-display=card] .personnel-records-table>tbody>tr>td:not(:first-child):not(:last-child){background:color-mix(in srgb,var(--surface) 90%,var(--soft))}
-@media(max-width:760px){body[data-display=card] .personnel-records-table>tbody>tr{grid-template-columns:minmax(0,1fr)}body[data-display=card] .personnel-records-table>tbody>tr>td:first-child,body[data-display=card] .personnel-records-table>tbody>tr>td:last-child{grid-column:1}}
+body[data-display=card] .record-view-table>tbody{grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),min(100%,460px)));justify-content:start}
+body[data-display=card] .record-view-table>tbody>tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:0 12px;width:100%;max-width:100%;padding:18px}
+body[data-display=card] .record-view-table>tbody>tr>td{min-width:0}
+body[data-display=card] .record-view-table>tbody>tr>td:first-child,body[data-display=card] .record-view-table>tbody>tr>td.record-action-cell{grid-column:1/-1}
+body[data-display=card] .record-view-table>tbody>tr>td:first-child:not(.record-action-cell){padding:14px 18px;margin:-18px -18px 5px;border-bottom:1px solid var(--border);border-radius:13px 13px 0 0;background:linear-gradient(120deg,color-mix(in srgb,var(--surface) 90%,var(--primary)),color-mix(in srgb,var(--surface) 92%,var(--teal)))}
+body[data-display=card] .record-view-table>tbody>tr>td:first-child:before{display:none}
+body[data-display=card] .record-view-table>tbody>tr>td:not(:first-child):not(.record-action-cell){align-self:stretch;padding:12px;border:1px solid var(--border);border-radius:11px;margin:6px 0;background:color-mix(in srgb,var(--surface) 94%,var(--soft));font-size:11px;line-height:1.55}
+body[data-display=card] .record-view-table>tbody>tr>td:not(:first-child):not(.record-action-cell):before{margin-bottom:6px;font-size:8px;letter-spacing:.8px}
+body[data-display=card] .record-view-table .person{gap:12px}
+body[data-display=card] .record-view-table .person .avatar{width:42px;height:42px;font-size:13px}
+body[data-display=card] .record-view-table .person strong{font-size:13px}
+body[data-display=card] .record-view-table>tbody>tr>td.record-action-cell{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:13px 0 0;border-top:1px solid var(--border)}
+body[data-display=card] .record-view-table>tbody>tr>td.record-action-cell:before{flex:0 0 100%;margin-bottom:1px}
+body[data-display=card] .record-view-table>tbody>tr>td.record-action-cell>a:not(.button){display:inline-flex;align-items:center;min-height:34px;padding:7px 11px;border:1px solid var(--border);border-radius:9px;background:var(--surface);font-size:10px;font-weight:650}
+body[data-display=card] .record-view-table>tbody>tr>td.record-action-cell>details{position:relative}
+body[data-display=card] .record-view-table>tbody>tr>td.record-action-cell summary{display:inline-flex;align-items:center;min-height:34px;margin:0;padding:7px 11px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);font-size:10px;font-weight:650;white-space:nowrap}
+body[data-display=card] .record-view-table>tbody>tr>td.record-action-cell summary:hover,body[data-display=card] .record-view-table>tbody>tr>td.record-action-cell>a:not(.button):hover{border-color:var(--teal);background:var(--soft);text-decoration:none}
+body[data-display=card] .record-view-table>tbody>tr>td.record-action-cell details p{max-width:100%;margin:8px 0 0;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--soft);font-size:10px;line-height:1.6;overflow-wrap:anywhere}
+body[data-display=card] .record-view-table>tbody>tr>td.record-action-cell .inline-form{margin:0}
+body[data-display=card] .record-view-table>tbody>tr>td.record-action-cell .danger-button{min-height:34px;border-radius:9px}
+body[data-display=card] .record-view-table .personnel-card-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;width:100%}
+[data-theme=dark] body[data-display=card] .record-view-table>tbody>tr>td:not(:first-child):not(.record-action-cell){background:color-mix(in srgb,var(--surface) 90%,var(--soft))}
+@media(max-width:760px){body[data-display=card] .record-view-table>tbody>tr{grid-template-columns:minmax(0,1fr)}body[data-display=card] .record-view-table>tbody>tr>td:first-child,body[data-display=card] .record-view-table>tbody>tr>td.record-action-cell{grid-column:1}}
 body[data-display=card] .record-view-table>tbody>tr:hover{border-color:var(--teal);background:var(--surface)}
 body[data-display=card] .record-view-table>tbody>tr>td{display:block;width:auto;max-width:none;min-width:0;padding:9px 0;border:0;white-space:normal;font-size:12px;text-align:left;overflow-wrap:anywhere}
 body[data-display=card] .record-view-table>tbody>tr>td:before{content:attr(data-label);display:block;font-size:9px;text-transform:uppercase;letter-spacing:.7px;font-weight:650;color:var(--muted);margin-bottom:5px}
