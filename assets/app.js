@@ -7,6 +7,12 @@
     activityModal.addEventListener('click', event => { if (event.target === activityModal) location.href='?page=activities'; });
     activityModal.querySelector('[name="destination_name"]')?.focus({ preventScroll: true });
   }
+  const candidatesModal = document.querySelector('[data-candidates-modal]');
+  if (candidatesModal?.showModal) {
+    candidatesModal.showModal();
+    candidatesModal.addEventListener('cancel', event => { event.preventDefault(); location.href='?page=deployment'; });
+    candidatesModal.addEventListener('click', event => { if (event.target === candidatesModal) location.href='?page=deployment'; });
+  }
   document.querySelectorAll('[data-record-modal]').forEach(modal => {
     if (!modal.showModal) { modal.setAttribute('open', ''); return; }
     modal.showModal();
