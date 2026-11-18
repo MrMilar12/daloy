@@ -8,12 +8,13 @@
     <link rel="stylesheet" href="<?=e(asset_url('login.css'))?>">
     <script src="<?=e(asset_url('app.js'))?>" defer></script>
 </head>
-<body class="auth-page">
+<body class="auth-page<?=$register?' auth-registration-page':''?>">
     <header class="auth-topbar">
         <a class="auth-wordmark" href="./" aria-label="DALOY home">DALOY<span>+</span></a>
         <div class="auth-topbar-right"><span>SDO AURORA</span><button class="theme-toggle" type="button" aria-label="Toggle color theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button></div>
     </header>
     <main class="auth-shell">
+        <?php if(!$register): ?>
         <section class="auth-story" aria-labelledby="auth-story-title">
             <div class="auth-story-waves" aria-hidden="true"></div>
             <div class="auth-story-kicker"><span></span> NURSING WORKFORCE MANAGEMENT</div>
@@ -26,12 +27,18 @@
 
             <div class="auth-story-footer"><span class="auth-plus" aria-hidden="true">+</span><span>Supporting the people who care for our schools.</span></div>
         </section>
+        <?php endif ?>
         <section class="login-form auth-panel" aria-labelledby="auth-title">
             <div class="auth-panel-content">
+                <?php if($register): ?>
+                <h1 id="auth-title">Request access</h1>
+                <p class="auth-intro">An administrator will review your request before you can sign in.</p>
+                <?php else: ?>
                 <div class="auth-welcome-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/></svg></div>
-                <span class="auth-kicker"><?=$register?'JOIN YOUR WORKSPACE':'YOUR WORKSPACE, CONNECTED'?></span>
-                <h2 id="auth-title"><?=$register?'Request access':'Welcome back'?></h2>
-                <p class="auth-intro"><?=$register?'Start your DALOY registration. An administrator will review your request.':'Sign in to manage your day with DALOY.'?></p>
+                <span class="auth-kicker">YOUR WORKSPACE, CONNECTED</span>
+                <h2 id="auth-title">Welcome back</h2>
+                <p class="auth-intro">Sign in to manage your day with DALOY.</p>
+                <?php endif ?>
                 <?php if($error): ?><div class="auth-alert" role="alert" tabindex="-1" data-focus-error><?=e($error)?></div><?php endif ?>
                 <?php if(isset($_SESSION['flash'])): ?><div class="auth-alert auth-success" role="status"><?=e($_SESSION['flash'])?></div><?php unset($_SESSION['flash']); endif ?>
                 <form method="post">
@@ -39,26 +46,30 @@
                     <input type="hidden" name="action" value="<?=$register?'register':'login'?>">
                     <?php if($register): ?>
                     <label for="auth-name">Full name</label>
-                    <input id="auth-name" name="name" required maxlength="120" autocomplete="name" value="<?=e($_POST['name']??'')?>" placeholder="Enter your full name">
-                    <label for="auth-requested-role">Requested account type</label>
-                    <select id="auth-requested-role" name="requested_role" required>
-                        <option value="nurse" <?=($_POST['requested_role']??'nurse')==='nurse'?'selected':''?>>Nurse</option>
-                        <option value="head" <?=($_POST['requested_role']??'')==='head'?'selected':''?>>Nurse Head / Office Supervisor</option>
-                    </select>
-                    <p class="auth-help">This is a request only. An administrator will approve your account type. Office supervisors do not need a school assignment.</p>
+                    <input id="auth-name" name="name" required minlength="3" maxlength="120" autocomplete="name" value="<?=e($_POST['name']??'')?>" placeholder="Enter your full name">
                     <?php endif ?>
                     <label for="auth-email">Email address</label>
                     <input id="auth-email" name="email" type="email" required maxlength="190" autocomplete="<?=$register?'email':'username'?>" value="<?=e($_POST['email']??'')?>" placeholder="you@example.gov.ph">
+                    <?php if($register): ?>
+                    <label for="auth-requested-role">Requested account type</label>
+                    <div class="auth-role-select">
+                        <select id="auth-requested-role" name="requested_role" aria-describedby="auth-role-help" required>
+                            <option value="nurse" <?=($_POST['requested_role']??'nurse')==='nurse'?'selected':''?>>Nurse</option>
+                            <option value="head" <?=($_POST['requested_role']??'')==='head'?'selected':''?>>Nurse Head / Office Supervisor</option>
+                        </select>
+                    </div>
+                    <p class="auth-help" id="auth-role-help">Office supervisors can register without a school assignment.</p>
+                    <?php endif ?>
                     <div class="auth-password-label"><label for="auth-password"><?=$register?'Temporary password':'Password'?></label><button class="auth-password-toggle" type="button" data-password-toggle data-show-label="Show password" data-hide-label="Hide password" aria-pressed="false" aria-controls="auth-password">Show password</button></div>
                     <input id="auth-password" name="password" type="password" required maxlength="72" <?=$register?'minlength="12" aria-describedby="auth-password-help"':''?> autocomplete="<?=$register?'new-password':'current-password'?>" placeholder="<?=$register?'Create a temporary password':'Enter your password'?>">
-                    <?php if($register): ?><p class="auth-help" id="auth-password-help">Use 12 or more characters with uppercase, lowercase, and a number. After approval, you will replace this password at first sign-in.</p><?php endif ?>
-                    <button class="auth-submit" type="submit"><?=$register?'Submit registration':'Sign in to DALOY'?><span aria-hidden="true">&rarr;</span></button>
+                    <?php if($register): ?><p class="auth-help" id="auth-password-help">Use at least 12 characters, including an uppercase letter, a lowercase letter, and a number. You’ll set a new password at first sign-in.</p><?php endif ?>
+                    <button class="auth-submit" type="submit"><?=$register?'Submit access request':'Sign in to DALOY'?><span aria-hidden="true">&rarr;</span></button>
                 </form>
                 <div class="auth-register">
                     <span><?=$register?'Already have an account?':'New to DALOY?'?></span>
                     <a href="<?=$register?'./':'?register=1'?>"><?=$register?'Back to sign in':'Register for access'?> <span aria-hidden="true">&rarr;</span></a>
                 </div>
-                <p class="auth-support">Need help signing in?<br>Contact your DALOY system administrator.</p>
+                <?php if(!$register): ?><p class="auth-support">Need help signing in?<br>Contact your DALOY system administrator.</p><?php endif ?>
             </div>
             <footer class="auth-panel-footer">Department of Education<strong>Schools Division Office of Aurora</strong></footer>
         </section>
