@@ -583,8 +583,21 @@
       lastSnowfall = event.timeStamp;
       releaseSnow(event.clientX, event.clientY, 3);
     }, {passive:true});
-    signInForm.addEventListener('click', event => {
-      if (event.pointerType === 'touch') releaseSnow(event.clientX, event.clientY, 14);
+    let activeTap;
+    signInForm.addEventListener('touchstart', event => {
+      activeTap = event.touches.length === 1 ? event.changedTouches[0] : undefined;
+    }, {passive:true});
+    signInForm.addEventListener('touchcancel', () => {
+      activeTap = undefined;
+    }, {passive:true});
+    signInForm.addEventListener('touchend', event => {
+      const start = activeTap;
+      activeTap = undefined;
+      if (!start) return;
+      const end = Array.from(event.changedTouches).find(touch => touch.identifier === start.identifier);
+      if (end && Math.hypot(end.clientX - start.clientX, end.clientY - start.clientY) <= 12) {
+        releaseSnow(end.clientX, end.clientY, 14);
+      }
     }, {passive:true});
   }
   document.querySelector('.menu-toggle')?.addEventListener('click', event => {
