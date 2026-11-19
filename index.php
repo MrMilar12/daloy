@@ -26,7 +26,10 @@ if($_SERVER['REQUEST_METHOD']==='POST') {
             $requestedRole=(string)($_POST['requested_role']??'');
             if(!in_array($requestedRole,['nurse','head'],true)) throw new DomainException('Select a requested account type.',422);
             $requestId=$db->insert('registration_requests',['name'=>$name,'email'=>$email,'password_hash'=>password_hash($password,PASSWORD_DEFAULT),'requested_role'=>$requestedRole,'status'=>'pending','created_at'=>now()]);
-            foreach($db->all("SELECT id FROM users WHERE role='admin' AND active=1") as $admin) $db->insert('notifications',['user_id'=>$admin['id'],'title'=>'New registration request','message'=>$name.' requested access to DALOY. Review the pending request before creating an account.','link'=>'?page=users','created_at'=>now()]);
+            foreach($db->all("SELECT id FROM users WHERE role='admin' AND active=1") as $admin) {
+                $db->insert('notifications',['user_id'=>$admin['id'],'title'=>'New registration request','message'=>$name.' requested access to DALOY. Review the pending request before creating an account.','link'=>'?page=users','created_at'=>now()]);
+                WebPush::afterNotification($db,(int)$admin['id']);
+            }
             $_SESSION['flash']='Registration submitted. An administrator must activate your account before you can sign in.'; redirect('./');
         }
         if(!$user) throw new DomainException('Please sign in again.',401);

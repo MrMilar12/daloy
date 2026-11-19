@@ -268,6 +268,8 @@ try {
     $readDropdownData=json_decode($readDropdown['body'],true);
     check($readDropdown['status']===200 && $db->one('SELECT read_at FROM notifications WHERE id=?',[$dropdownNotification['id']])['read_at']!==null && (int)$readDropdownData['unread_count']===(int)$recentNotificationsData['unread_count']-1,'Opening a notification marks only that user’s item as read and refreshes the unread count');
     $foreignDropdownId=(int)$db->one('SELECT id FROM notifications WHERE user_id=? ORDER BY id DESC LIMIT 1',[$n1['id']])['id'];
+    $remainingDropdown=json_decode(request('admin','api.php?action=notifications_recent')['body'],true)['notifications'];
+    check(!in_array($dropdownNotification['id'],array_column($remainingDropdown,'id')) && !array_filter($remainingDropdown,fn($item)=>$item['read_at']!==null),'Header dropdown only shows unread notifications');
     check(request('admin','api.php?action=notification_read',['csrf'=>token($settingsPage),'id'=>$foreignDropdownId])['status']===404,'Header notification read endpoint cannot modify another user’s item');
     $updatePoll=request('admin','api.php?action=system_update_notifications&after=0');
     $updatePollData=json_decode($updatePoll['body'],true);

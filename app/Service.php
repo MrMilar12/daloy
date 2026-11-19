@@ -34,6 +34,7 @@ final class Service {
     }
     public function notify(int $id,string $title,string $message,string $link='?page=notifications'): void {
         $this->db->insert('notifications',['user_id'=>$id,'title'=>$title,'message'=>$message,'link'=>$link,'created_at'=>now()]);
+        WebPush::afterNotification($this->db,$id);
     }
     public function notifyActiveUsers(string $title,string $message,string $link='?page=notifications'): void {
         $this->db->transaction(function() use ($title,$message,$link): void {

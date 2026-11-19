@@ -139,6 +139,12 @@ Restore refuses to overwrite any existing tables and validates attachment checks
 - Do not ship demo datasets or temporary credentials into an official installation. Have the Nurse Head verify organizational records and scheduling conventions during user acceptance testing.
 - Static files are local and small; enable Apache compression/caching through the hosting configuration if desired. Dynamic authenticated pages are `no-store`.
 
+## Browser push notifications
+
+1. On the application server, run `php bin/push-notifications.php --init` once to create its signing key. On XAMPP, if PHP cannot generate the key, set `OPENSSL_CONF` to the path of XAMPP’s `openssl.cnf` and retry. Keep `storage/web-push.pem` private and back it up separately. Replacing it requires users to subscribe again.
+2. DALOY tries to deliver alerts when it creates an inbox notification. Schedule `php /absolute/path/to/daloy/bin/push-notifications.php` once per minute to retry failed deliveries and send any remaining alerts. The server needs OpenSSL, cURL, and outbound HTTPS. An optional `web_push_subject` in `config.local.php` can identify a valid contact URI.
+3. Serve DALOY over HTTPS in production. Open **Notifications → Browser notifications**, select **Enable**, and grant permission. Select **Send test alert** to check delivery. **Disable** stops alerts on that device for the signed-in account. Browser alerts are generic and open the DALOY inbox.
+
 ## Code map
 
 - `index.php`: session authentication, POST action dispatch, role-based pages.

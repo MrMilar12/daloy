@@ -213,6 +213,84 @@
   const notificationUnread=notificationMenu?.querySelector('[data-notification-unread]');
   const notificationStatus=notificationMenu?.querySelector('[data-notification-status]');
   const csrfToken=document.querySelector('meta[name="csrf-token"]')?.content||'';
+  const pushPanel = document.querySelector('[data-browser-push]');
+  if (pushPanel?.dataset.browserPush) {
+    const pushButton = pushPanel.querySelector('[data-browser-push-toggle]');
+    const pushStatus = pushPanel.querySelector('[data-browser-push-status]');
+    const pushTest = pushPanel.querySelector('[data-browser-push-test]');
+    if (!window.isSecureContext) {
+      pushStatus.textContent = 'Open DALOY over HTTPS to enable browser alerts.';
+    } else if (!('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window)) {
+      pushStatus.textContent = 'Browser alerts are unavailable here. On iPhone or iPad, open DALOY from the Home Screen.';
+    } else {
+      let registration, subscription, enabled = false;
+      const savePush = async (mode, endpoint) => {
+        const body = new URLSearchParams({csrf:csrfToken, mode, endpoint});
+        const response = await fetch('api.php?action=browser_push', {method:'POST', body});
+        const data = await response.json();
+        if (!response.ok) {
+          const error = new Error(data.error || 'Could not update browser notifications.');
+          error.status = response.status;
+          throw error;
+        }
+        return data.enabled;
+      };
+      const showPushState = () => {
+        pushButton.textContent = enabled ? 'Disable' : 'Enable';
+        pushTest.hidden = !enabled;
+        pushStatus.textContent = enabled ? 'Alerts are enabled on this device.' : 'Get alerts on this device when new updates arrive.';
+      };
+      (async () => {
+        try {
+          await navigator.serviceWorker.register('push-worker.js');
+          registration = await navigator.serviceWorker.ready;
+          subscription = await registration.pushManager.getSubscription();
+          enabled = subscription ? await savePush('status', subscription.endpoint) : false;
+          showPushState();
+          pushButton.hidden = false;
+          pushButton.disabled = false;
+        } catch {
+          pushStatus.textContent = 'Browser notifications are unavailable on this device.';
+        }
+      })();
+      pushButton.addEventListener('click', async () => {
+        pushButton.disabled = true;
+        try {
+          if (enabled) {
+            enabled = await savePush('disable', subscription.endpoint);
+          } else {
+            if (Notification.permission === 'denied') throw new Error('Allow notifications in your browser settings, then try again.');
+            subscription ||= await registration.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:pushPanel.dataset.browserPush});
+            enabled = await savePush('enable', subscription.endpoint);
+          }
+          showPushState();
+        } catch (error) {
+          pushStatus.textContent = Notification.permission === 'denied' ? 'Allow notifications in your browser settings, then try again.' : (error.message || 'Could not update browser notifications.');
+        } finally {
+          pushButton.disabled = false;
+        }
+      });
+      pushTest.addEventListener('click', async () => {
+        pushTest.disabled = true;
+        pushButton.disabled = true;
+        try {
+          await savePush('test', subscription.endpoint);
+          pushStatus.textContent = 'Test alert accepted for delivery. Check this device’s notification center.';
+        } catch (error) {
+          if (error.status === 410) {
+            try { await subscription.unsubscribe(); } catch (_) {}
+            subscription = null;
+            enabled = false;
+            showPushState();
+          }
+          pushStatus.textContent = error.message || 'Could not send the test alert.';
+        } finally {
+          pushTest.disabled = false;
+          pushButton.disabled = false;
+        }
+      });
+    }
+  }
   let loadingNotifications=false;
   let openingNotification=false;
   const closeNotificationMenu = (restoreFocus=false) => {
