@@ -285,7 +285,18 @@ final class Service {
     }
     public function settings(array $d): void {
         $this->requireRole(['admin']); $this->db->transaction(function() use($d) {
-            foreach(['organization','system_notice'] as $key) { $v=$this->text($d,$key,$key==='organization'?190:2000,$key==='organization'); $old=$this->db->one('SELECT * FROM system_settings WHERE setting_key=?',[$key]); $this->db->run('UPDATE system_settings SET setting_value=? WHERE setting_key=?',[$v,$key]); $this->audit('Settings updated','system_settings',null,$old,['setting_key'=>$key,'setting_value'=>$v]); }
+            $organization=$this->text($d,'organization',190,true);
+            $old=$this->db->one("SELECT * FROM system_settings WHERE setting_key='organization'");
+            $this->db->run("UPDATE system_settings SET setting_value=? WHERE setting_key='organization'",[$organization]);
+            $this->audit('Settings updated','system_settings',null,$old,['setting_key'=>'organization','setting_value'=>$organization]);
+        });
+    }
+    public function publishMemo(array $data,?string $attachment=null): void {
+        $this->requireRole(['admin']);
+        $memo=['title'=>$this->text($data,'title',190,true),'body'=>$this->text($data,'body',2000,true),'attachment'=>$attachment,'published_at'=>now()];
+        $this->db->transaction(function() use($memo) {
+            $id=$this->db->insert('workspace_memos',$memo);
+            $this->audit('Memo published','workspace_memos',$id,null,$memo);
         });
     }
     public function workforce(string $start,string $end): array {

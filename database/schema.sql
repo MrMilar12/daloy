@@ -109,6 +109,21 @@ CREATE TABLE IF NOT EXISTS login_attempts (
  id INTEGER PRIMARY KEY AUTO_INCREMENT, identity_hash VARCHAR(64) NOT NULL, ip_hash VARCHAR(64) NOT NULL,
  succeeded INTEGER NOT NULL DEFAULT 0, created_at DATETIME NOT NULL, INDEX login_identity (identity_hash, created_at), INDEX login_ip (ip_hash, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS workspace_memos (
+ id INTEGER PRIMARY KEY AUTO_INCREMENT,
+ title VARCHAR(190) NOT NULL,
+ body TEXT NOT NULL,
+ attachment VARCHAR(255) NULL,
+ published_at DATETIME NOT NULL
+);
+CREATE TABLE IF NOT EXISTS memo_acknowledgments (
+ memo_id INTEGER NOT NULL,
+ user_id INTEGER NOT NULL,
+ acknowledged_at DATETIME NOT NULL,
+ PRIMARY KEY (memo_id,user_id),
+ FOREIGN KEY (memo_id) REFERENCES workspace_memos(id) ON DELETE CASCADE,
+ FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 CREATE TABLE IF NOT EXISTS system_settings (
  setting_key VARCHAR(100) PRIMARY KEY, setting_value TEXT NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

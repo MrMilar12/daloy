@@ -20,9 +20,13 @@ if($page==='settings') {
             </div>
             <?php form_start('settings','?page=settings'); ?>
                 <?php input('organization','Organization name',$settings['organization']); ?>
-                <?php textarea('system_notice','Workspace notice',$settings['system_notice']); ?>
-                <p class="settings-form-hint">Use the notice for important updates that staff should see when they sign in.</p>
                 <?php form_end('?page=settings','Save settings'); ?>
+                <div class="memo-publisher" id="publish-memo">
+                    <h2>Publish a workspace memo</h2>
+                    <p>All users will see the memo before entering the workspace and must mark it as read.</p>
+                    <?php $memoFormReturn='?page=settings'; require __DIR__.'/../memo-publish-form.php'; ?>
+                    <a href="?page=memo-acknowledgments">View memo acknowledgments</a>
+                </div>
         </section>
         <?php if($user['role']==='admin'): ?>
             <section class="card settings-updater-panel github-updater" data-github-updater>

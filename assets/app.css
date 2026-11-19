@@ -238,6 +238,54 @@ dialog.record-modal::backdrop{background:#102235a8;backdrop-filter:blur(5px);-we
 .settings-page-intro{display:grid;grid-template-columns:54px minmax(0,1fr) auto;align-items:center;gap:17px;margin:18px 0;padding:22px 24px;border:1px solid color-mix(in srgb,var(--teal) 18%,var(--border));border-radius:17px;background:linear-gradient(112deg,color-mix(in srgb,var(--surface) 92%,var(--primary)),color-mix(in srgb,var(--surface) 93%,var(--teal)) 72%,var(--surface));box-shadow:0 8px 24px #18364b08}
 .settings-page-intro-mark,.settings-panel-mark{display:grid;place-items:center;flex:none;width:48px;height:48px;border:1px solid color-mix(in srgb,var(--teal) 22%,var(--border));border-radius:14px;background:var(--surface);color:var(--teal)}
 .settings-page-intro-mark svg,.settings-panel-mark svg{width:22px;height:22px}
+.memo-screen{height:100vh;height:100dvh;display:grid;grid-template-rows:minmax(0,1fr);justify-items:center;padding:clamp(12px,3vh,32px) clamp(16px,4vw,48px);background:radial-gradient(ellipse at top left,var(--soft),transparent 72%),var(--bg)}
+.memo-sheet{width:min(100%,1040px);min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;border:1px solid var(--border);border-radius:22px;background:var(--surface);overflow:hidden;box-shadow:0 22px 64px #102b4526}
+.memo-letterhead{display:flex;align-items:center;gap:14px;padding:14px clamp(20px,5vw,44px);background:linear-gradient(110deg,#153653,#17485a 75%,#1a6468);color:#fff;border-bottom:3px solid #58b9ae}
+.memo-letterhead-icon{display:grid;place-items:center;flex:none;width:42px;height:42px;border:1px solid #ffffff50;border-radius:12px;background:#ffffff12}
+.memo-letterhead strong,.memo-letterhead div>span{display:block;overflow-wrap:anywhere}
+.memo-letterhead strong{letter-spacing:2px;font-size:15px}
+.memo-letterhead div>span{margin-top:2px;color:#d7e7ef;font-size:12px}
+.memo-document{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;overflow-wrap:anywhere}
+.memo-document:focus-visible{outline:2px solid var(--teal);outline-offset:-3px}
+.memo-reading-column{max-width:760px;margin-inline:auto;padding:clamp(22px,5vw,56px) clamp(18px,5vw,44px)}
+.memo-heading{padding-bottom:22px;border-bottom:1px solid var(--border)}
+.memo-heading .eyebrow{margin-bottom:12px;font-size:10px}
+.memo-heading h1{font-size:clamp(27px,5vw,48px);line-height:1.12;margin-bottom:12px}
+.memo-heading time{color:var(--muted);font-size:12px}
+.memo-message{margin-top:24px;font-size:clamp(15px,2vw,17px);line-height:1.75;white-space:pre-wrap}
+.memo-attachment{margin-top:24px;color:var(--primary);max-width:100%;flex-wrap:wrap;white-space:normal}
+.memo-image-preview{margin:24px 0 0;padding:10px;background:var(--soft);border:1px solid var(--border);border-radius:12px}
+.memo-image-preview img{display:block;max-width:100%;height:auto;margin-inline:auto;border-radius:6px}
+dialog.memo-publish-modal,.memo-publish-modal>.record-modal-card{max-height:calc(100dvh - 18px)}
+.memo-file-field{padding:12px;border:1px dashed var(--border);border-radius:10px;background:var(--soft)}
+.memo-file-field input[type=file]{display:block;min-width:0;padding:6px;background:var(--surface)}
+.memo-file-field input::file-selector-button{margin-inline-end:8px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--soft);color:var(--primary);font:inherit;font-weight:650;cursor:pointer}
+.memo-report-message .section-heading{border-bottom:1px solid var(--border)}
+.memo-report-body{padding:20px 24px;overflow-wrap:anywhere}
+.memo-report-body .memo-message{margin:0;max-width:75ch}
+.memo-report-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(270px,340px);align-items:start;gap:20px}
+.memo-report-layout>.card{min-width:0;margin-bottom:0}
+.memo-report-readers .section-heading{flex-wrap:wrap;gap:8px;border-bottom:1px solid var(--border)}
+.memo-reader-list{margin:0;padding:0;list-style:none}
+.memo-reader-list li{display:flex;align-items:flex-start;gap:12px;padding:14px 24px;overflow-wrap:anywhere}
+.memo-reader-list li+li{border-top:1px solid var(--border)}
+.memo-reader-list li>span{flex:none}
+.memo-reader-list strong,.memo-reader-list time{display:block}
+.memo-reader-list time{margin-top:4px;color:var(--muted);font-size:11px}
+.memo-report-readers .pagination{flex-wrap:wrap;padding-inline:16px}
+@media(max-width:1000px){.memo-report-layout{grid-template-columns:minmax(0,1fr)}}
+.memo-reading-column>.alert{margin:20px 0 0}
+.memo-actions{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:12px clamp(18px,5vw,44px);background:var(--surface);border-top:1px solid var(--border)}
+.memo-actions button{min-height:44px}
+@media(max-width:600px){
+    .memo-screen{padding:0}
+    .memo-sheet{border:0;border-radius:0}
+    .memo-letterhead{padding-top:calc(10px + env(safe-area-inset-top));padding-bottom:10px}
+    .memo-actions{padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+}
+.memo-publisher{margin-top:24px;padding-top:20px;border-top:1px solid var(--border);scroll-margin-top:96px}
+.memo-publisher p{color:var(--muted);font-size:12px}
+.memo-publisher>a{display:inline-block;margin-top:14px;font-size:12px;font-weight:650}
 .settings-page-intro-copy{min-width:0}.settings-page-intro-copy .eyebrow,.settings-panel-heading .eyebrow{display:block;margin-bottom:4px;font-size:8px;letter-spacing:1px}
 .settings-page-intro-copy h2{margin:0 0 5px;font-size:18px;letter-spacing:-.4px}.settings-page-intro-copy p{margin:0;color:var(--muted);font-size:11px;line-height:1.55}
 .settings-page-intro-tag{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid var(--border);border-radius:12px;background:color-mix(in srgb,var(--surface) 82%,transparent)}

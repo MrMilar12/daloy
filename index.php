@@ -7,6 +7,7 @@ start_session();
 if(is_file(ROOT.'/storage/update-maintenance.json') && ($_GET['page']??'')!=='health') { http_response_code(503); ?><!doctype html><meta charset="utf-8"><title>System maintenance</title><style>body{font:16px system-ui;background:#f5f8fc;color:#17344a;display:grid;place-items:center;min-height:100vh}main{background:white;padding:40px;border-radius:18px;text-align:center;box-shadow:0 10px 30px #17344a18}h1{margin-top:0;color:#b91f36}</style><main><h1>System maintenance</h1><p>DALOY is applying an update. Please try again shortly.</p></main><?php exit; }
 try { $db=new Database($config); ensure_custom_destination_schema($db); $db->run("CREATE TABLE IF NOT EXISTS registration_requests (id INTEGER PRIMARY KEY AUTO_INCREMENT,name VARCHAR(120) NOT NULL,email VARCHAR(190) NOT NULL UNIQUE,password_hash VARCHAR(255) NOT NULL,requested_role VARCHAR(20) NOT NULL DEFAULT 'nurse',status VARCHAR(20) NOT NULL DEFAULT 'pending',reviewed_by INTEGER NULL,reviewed_at DATETIME NULL,created_at DATETIME NOT NULL)"); $installed=$db->one("SELECT setting_value FROM system_settings WHERE setting_key='organization'"); if(!$installed) throw new RuntimeException('Not installed'); }
 catch(Throwable $e) { http_response_code(503); require __DIR__.'/app/setup.php'; exit; }
+ensure_memo_schema($db);
 $auth=new Auth($db); $user=$auth->user(); $page=(string)($_GET['page']??'dashboard'); $error=null;
 if($_SERVER['REQUEST_METHOD']==='POST') {
     try {
@@ -45,6 +46,12 @@ if($_SERVER['REQUEST_METHOD']==='POST') {
         }
         if($action==='logout') { $service->audit('Logout','users',(int)$user['id'],null,null); $auth->logout(); redirect('./'); }
         if($user['must_change_password'] && !in_array($action,['activate','profile'],true)) throw new DomainException('Set your new password to finish account setup. Your workspace will then open.',403);
+        if($action==='acknowledge_memo') {
+            $memoId=filter_var($_POST['memo_id']??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);
+            if(!$memoId || !$db->one('SELECT id FROM workspace_memos WHERE id=?',[$memoId])) throw new DomainException('This memo is unavailable.',404);
+            $db->run('INSERT INTO memo_acknowledgments (memo_id,user_id,acknowledged_at) VALUES (?,?,?) ON DUPLICATE KEY UPDATE acknowledged_at=acknowledged_at',[$memoId,$user['id'],now()]);
+            redirect('?page=dashboard');
+        }
         require __DIR__.'/app/Upload.php'; $file=null;
         try {
             switch($action) {
@@ -60,6 +67,11 @@ if($_SERVER['REQUEST_METHOD']==='POST') {
                 case 'delete_user': $service->deleteUser($_POST); break;
                 case 'catalog': $service->catalog($_POST); break;
                 case 'settings': $service->settings($_POST); break;
+                case 'publish_memo':
+                    $service->requireRole(['admin']);
+                    $file=receive_upload('attachment');
+                    $service->publishMemo($_POST,$file);
+                    break;
                 case 'activate':
                     if(!$user['must_change_password']) throw new DomainException('Your account is already set up. Change your password from My profile.',409);
                     $service->profile(array_merge($_POST,['phone'=>$user['phone']]));
@@ -79,7 +91,7 @@ if($_SERVER['REQUEST_METHOD']==='POST') {
             }
         } catch(Throwable $e) { if($file && is_file(ROOT.'/storage/uploads/'.$file)) unlink(ROOT.'/storage/uploads/'.$file); throw $e; }
         $_SESSION['flash']=$action==='delete_user'?'Account deleted.':'Changes saved successfully.';
-        $return=(string)($_POST['return']??'?page='.$page); if(!preg_match('/^\?page=[a-z_]+(?:&[a-z_]+=[a-zA-Z0-9_-]+)*$/D',$return)) $return='?page=dashboard'; redirect($return);
+        $return=(string)($_POST['return']??'?page='.$page); if(!preg_match('/^\?page=[a-z_-]+(?:&[a-z_]+=[a-zA-Z0-9_-]+)*$/D',$return)) $return='?page=dashboard'; redirect($return);
     } catch(DomainException $e) { $error=$e->getMessage(); http_response_code(in_array($e->getCode(),[401,403,404,409,419,422,429])?$e->getCode():422); }
     catch(PDOException $e) { error_log((string)$e); $error=$e->getCode()==='23000'?'That email, employee number, or configuration name is already in use.':'The change could not be saved. Please try again.'; http_response_code(422); }
     catch(Throwable $e) { error_log((string)$e); $error='The change could not be saved. Check the server log or contact your administrator.'; http_response_code(500); }
@@ -94,9 +106,17 @@ if($user['must_change_password']) {
     exit;
 }
 if($page==='activate') redirect('?page=dashboard');
+$memo=$db->one('SELECT m.* FROM workspace_memos m LEFT JOIN memo_acknowledgments a ON a.memo_id=m.id AND a.user_id=? WHERE a.memo_id IS NULL ORDER BY m.id LIMIT 1',[$user['id']]);
+if($memo) {
+    if($page!=='memo' && $_SERVER['REQUEST_METHOD']==='GET') redirect('?page=memo');
+    require __DIR__.'/app/View.php';
+    require __DIR__.'/app/memo.php';
+    exit;
+}
+if($page==='memo') redirect('?page=dashboard');
 $allowed=['dashboard','schedule','calendar','availability','deployment','deployment-history','leave','notifications','profile'];
 if($service->manager()) $allowed=array_merge($allowed,['nurses','locations','activities','reports']);
-if($user['role']==='admin') $allowed=array_merge($allowed,['users','configuration','audit','settings','admin-guide']);
+if($user['role']==='admin') $allowed=array_merge($allowed,['users','configuration','audit','settings','memo-acknowledgments','admin-guide']);
 if(!in_array($page,$allowed,true)) { http_response_code(403); $error='You do not have access to that page.'; $page='dashboard'; }
 require __DIR__.'/app/View.php';
 try { ob_start(); require __DIR__.'/app/pages.php'; $content=prepare_page_views(ob_get_contents()); ob_end_clean(); }

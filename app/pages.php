@@ -14,6 +14,7 @@ switch($page) {
     case 'users': case 'nurses': require __DIR__.'/pages/users.php'; break;
     case 'locations': case 'configuration': case 'settings': require __DIR__.'/pages/configuration.php'; break;
     case 'notifications': require __DIR__.'/pages/notifications.php'; break;
+    case 'memo-acknowledgments': require __DIR__.'/pages/memo-acknowledgments.php'; break;
     case 'reports': case 'audit': require __DIR__.'/pages/reports.php'; break;
     case 'admin-guide': require __DIR__.'/pages/admin-guide.php'; break;
 }

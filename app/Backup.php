@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 final class Backup {
-    public const TABLES=['users','districts','municipalities','locations','duty_types','deployment_reasons','shifts','schedules','activities','deployments','leave_records','availability_records','notifications','audit_logs','login_attempts','system_settings','nurse_locations'];
+    public const TABLES=['users','districts','municipalities','locations','duty_types','deployment_reasons','shifts','schedules','activities','deployments','leave_records','availability_records','notifications','audit_logs','login_attempts','system_settings','nurse_locations','workspace_memos','memo_acknowledgments'];
     public static function create(Database $db,string $destination): void {
         if(is_file($destination)) throw new RuntimeException('Destination already exists. Choose a new backup filename.');
+        require_once ROOT.'/app/Schema.php';
+        ensure_memo_schema($db);
         $data=['version'=>1,'created_at'=>now(),'tables'=>[],'files'=>[]]; $files=[];
         $db->pdo->beginTransaction();
         try {
@@ -11,6 +13,7 @@ final class Backup {
             foreach(self::TABLES as $table) $data['tables'][$table]=$db->all("SELECT * FROM $table");
             foreach($data['tables']['users'] as $u) if($u['photo']) $files[$u['photo']]=true;
             foreach($data['tables']['leave_records'] as $r) if($r['attachment']) $files[$r['attachment']]=true;
+            foreach($data['tables']['workspace_memos'] as $memo) if($memo['attachment']) $files[$memo['attachment']]=true;
             $db->pdo->commit();
         } catch(Throwable $e) { $db->pdo->rollBack(); throw $e; }
         $zip=new ZipArchive(); if($zip->open($destination,ZipArchive::CREATE|ZipArchive::EXCL)!==true) throw new RuntimeException('Cannot create backup archive.');
@@ -29,7 +32,12 @@ final class Backup {
         try {
             $raw=$zip->getFromName('data.json'); if($raw===false || strlen($raw)>100*1024*1024) throw new RuntimeException('Invalid backup manifest.');
             $data=json_decode($raw,true,512,JSON_THROW_ON_ERROR);
-            if(($data['version']??0)===1 && array_keys($data['tables']??[])===array_slice(self::TABLES,0,-1)) $data['tables']['nurse_locations']=[];
+            if(($data['version']??0)===1) {
+                foreach(['nurse_locations','workspace_memos','memo_acknowledgments'] as $table) {
+                    $prefix=array_slice(self::TABLES,0,array_search($table,self::TABLES,true));
+                    if(array_keys($data['tables']??[])===$prefix) $data['tables'][$table]=[];
+                }
+            }
             if(($data['version']??0)!==1 || array_keys($data['tables']??[])!==self::TABLES) throw new RuntimeException('Unsupported backup format.');
             foreach($data['files']??[] as $file=>$hash) {
                 if(!preg_match('/^[a-f0-9]{48}\.(jpg|png|pdf)$/D',$file)) throw new RuntimeException('Unsafe upload filename in archive.');
