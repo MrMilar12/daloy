@@ -12,7 +12,7 @@ $navIcons=['deployment-history'=>'deployment','memo-acknowledgments'=>'reports']
 $navLink=static function(string $item) use($page,$labels,$unread,$navIcons): void {
     $current=$page===$item;
     ?>
-    <a href="?page=<?=e($item)?>" class="<?=$current?'active':''?>" <?=$current?'aria-current="page"':''?>>
+    <a href="?page=<?=e($item)?>" class="<?=$current?'active':''?>" <?php if(in_array($item,['dashboard','profile'],true)): ?>aria-label="<?=e($labels[$item])?>" title="<?=e($labels[$item])?>"<?php endif ?> <?=$current?'aria-current="page"':''?>>
         <?=icon($navIcons[$item]??$item)?><span><?=e($labels[$item])?></span>
         <?php if($item==='notifications' && $unread): ?><span class="count"><?=$unread?></span><?php endif ?>
     </a>
@@ -20,7 +20,7 @@ $navLink=static function(string $item) use($page,$labels,$unread,$navIcons): voi
 };
 ?>
 <aside class="sidebar" id="sidebar">
-    <a class="brand" href="./"><span class="brand-mark">D</span><span>DALOY<small>SDO AURORA</small></span></a>
+    <a class="brand" href="./" aria-label="DALOY home" title="DALOY home"><span class="brand-mark">D</span><span>DALOY<small>SDO AURORA</small></span></a>
     <nav class="sidebar-tree" aria-label="Main navigation">
         <?php $navLink('dashboard'); ?>
         <?php foreach($navGroups as [$groupLabel,$groupIcon,$items]):
@@ -29,7 +29,7 @@ $navLink=static function(string $item) use($page,$labels,$unread,$navIcons): voi
             $activeGroup=in_array($page,$items,true);
         ?>
             <details class="sidebar-branch<?=$activeGroup?' has-current':''?>" <?=$activeGroup?'open':''?>>
-                <summary><?=icon($groupIcon)?><span><?=e($groupLabel)?></span></summary>
+                <summary aria-label="<?=e($groupLabel)?>" title="<?=e($groupLabel)?>"><?=icon($groupIcon)?><span><?=e($groupLabel)?></span></summary>
                 <div class="sidebar-branch-links">
                     <?php foreach($items as $item) $navLink($item); ?>
                 </div>
@@ -37,7 +37,13 @@ $navLink=static function(string $item) use($page,$labels,$unread,$navIcons): voi
         <?php endforeach ?>
         <?php $navLink('profile'); ?>
     </nav>
-    <div class="sidebar-footer"><span class="live-dot"></span> Connected care, better flow.<small>Nursing Workforce Management</small></div>
+    <div class="sidebar-bottom">
+        <button class="sidebar-collapse-toggle" type="button" data-sidebar-collapse hidden aria-label="Collapse sidebar" title="Collapse sidebar" aria-controls="sidebar" aria-expanded="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16m7-11-3 3 3 3"/></svg>
+            <span aria-hidden="true">Collapse</span>
+        </button>
+        <div class="sidebar-footer"><span class="live-dot"></span> Connected care, better flow.<small>Nursing Workforce Management</small></div>
+    </div>
 </aside>
 <div class="app-shell">
 <header class="topbar">
