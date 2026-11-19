@@ -615,6 +615,40 @@
   }));
   document.querySelectorAll('form[data-confirm]').forEach(form => form.addEventListener('submit', event => { if (!confirm(form.dataset.confirm)) event.preventDefault(); }));
   document.querySelectorAll('form[data-validate]').forEach(form => {
+    const accountErrors = form.querySelector('[data-account-validation]');
+    if (accountErrors) {
+      const errorsList = accountErrors.querySelector('ul');
+      const showErrors = () => {
+        errorsList.replaceChildren();
+        Array.from(form.elements).forEach(field => {
+          if (!field.willValidate) return;
+          if (field.validity.valid) {
+            field.removeAttribute('aria-invalid');
+            return;
+          }
+          field.setAttribute('aria-invalid', 'true');
+          const label = field.labels?.[0]?.firstChild?.textContent.trim() || field.name;
+          const item = document.createElement('li');
+          item.textContent = label + ' — ' + field.validationMessage;
+          errorsList.append(item);
+        });
+        accountErrors.hidden = !errorsList.childElementCount;
+      };
+      let updateQueued = false;
+      form.addEventListener('invalid', event => {
+        event.preventDefault();
+        if (updateQueued) return;
+        updateQueued = true;
+        queueMicrotask(() => {
+          updateQueued = false;
+          showErrors();
+          if (!accountErrors.hidden) accountErrors.focus();
+        });
+      }, true);
+      form.addEventListener('input', () => {
+        if (!accountErrors.hidden) showErrors();
+      });
+    }
     const start = form.elements.starts_at, end = form.elements.ends_at;
     const validate = () => {
       if (start && end) end.setCustomValidity(start.value && end.value && end.value <= start.value ? 'End must be after start. For overnight duty, use the next date.' : '');

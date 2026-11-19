@@ -242,6 +242,15 @@ try {
     check(str_contains($memoReport['body'],"First line\nSecond line") && str_contains($memoReport['body'],'Download attachment'),'Administrators can reopen a published memo and its attachment');
     $db->run("UPDATE system_settings SET setting_value='' WHERE setting_key='system_notice'");
     $db->run('DELETE FROM workspace_memos WHERE id IN (?,?)',[$legacyId,$memoId]);
+    $addNurseUrl='?page=users&new=1';
+    $addNurseForm=request('admin',$addNurseUrl.'&view='.$n1['id']);
+    check($addNurseForm['status']===200 && substr_count($addNurseForm['body'],'data-record-modal')===1 && str_contains($addNurseForm['body'],'name="name"'),'Add Nurse opens one editable account dialog');
+    $newNurse=['csrf'=>token($addNurseForm),'action'=>'user','role'=>'nurse','active'=>1,'name'=>'New Form Nurse','email'=>'invalid-email','designation'=>'Nurse','employment_status'=>'Permanent','password'=>'Temporary-Nurse-123','return'=>'?page=users'];
+    $invalidNurse=request('admin',$addNurseUrl,$newNurse);
+    check($invalidNurse['status']===422 && str_contains($invalidNurse['body'],'data-focus-error>Enter a valid email address.') && str_contains($invalidNurse['body'],'value="New Form Nurse"'),'Add Nurse shows validation errors inside the dialog and keeps entered details');
+    $newNurse['email']='new.form.nurse@example.test';
+    $newNurse['csrf']=token($invalidNurse);
+    check(request('admin',$addNurseUrl,$newNurse)['status']===303 && $db->one("SELECT id FROM users WHERE email=? AND role='nurse'",[$newNurse['email']]),'A corrected Add Nurse form creates the account');
     check($settingsPage['status']===200 && str_contains($settingsPage['body'],'settings-page-intro') && str_contains($settingsPage['body'],'data-github-check') && str_contains($settingsPage['body'],'data-github-update-dialog') && str_contains($settingsPage['body'],'data-github-install') && str_contains($settingsPage['body'],'name="organization"') && str_contains($settingsPage['body'],'SESSION TIMEOUT') && str_contains($settingsPage['body'],'data-user-id="'.$admin['id'].'"') && str_contains($settingsPage['body'],'data-system-update-toasts'),'Workspace settings render the redesigned panels and update popup region');
     check(str_contains($settingsPage['body'],'data-notification-toggle') && str_contains($settingsPage['body'],'notification-dropdown'),'Header notifications render an accessible dropdown trigger and card');
     $as->notify((int)$admin['id'],'Dropdown read test','Clicking this update should mark it read.','?page=notifications');
