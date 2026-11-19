@@ -228,6 +228,8 @@ try {
     $memoDownload='download.php?type=memo&id='.$memoId;
     $download=request('memoReader',$memoDownload);
     check(str_contains($readerMemo['body'],'Download attachment') && $download['status']===200 && $download['body']===$attachmentBytes,'Signed-in users can download the attachment from the memo');
+    $pdfPreview=request('memoReader',$memoDownload.'&preview=1');
+    check(str_contains($readerMemo['body'],'Open PDF') && $pdfPreview['status']===200 && str_contains($pdfPreview['headers'],'Content-Disposition: inline;') && $pdfPreview['body']===$attachmentBytes,'Signed-in users can open the memo PDF in a browser tab');
     check(request('visitor',$memoDownload)['status']===403,'Memo attachments require authentication');
     check(request('memoReader','?page=memo',['action'=>'acknowledge_memo','memo_id'=>$memoId])['status']===419,'Memo acknowledgment requires CSRF');
     $acknowledgeMemo('memoReader',$readerMemo,$memoId);
