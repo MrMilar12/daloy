@@ -203,6 +203,12 @@ try {
     check(request('admin','',['action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===419,'Missing CSRF rejected');
     check(request('admin','',['csrf'=>token($login),'action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===303,'Administrator signs in');
     $settingsPage=request('admin','?page=settings');
+    check(str_contains($settingsPage['body'],'class="header-calendar"') && str_contains($settingsPage['body'],'aria-current="date"') && str_contains($settingsPage['body'],'?page=calendar&amp;view=day&amp;date='.date('Y-m-d')),'Header calendar highlights today and links to its day view');
+    $calendarFixture=$as->schedule(array_replace($base,['starts_at'=>date('Y-m-d').'T08:00','ends_at'=>date('Y-m-d').'T09:00']));
+    $calendarDropdown=request('admin','?page=settings');
+    check(str_contains($calendarDropdown['body'],'header-calendar-event-dot') && str_contains($calendarDropdown['body'],'data-calendar-agenda="'.date('Y-m-d').'"') && str_contains($calendarDropdown['body'],'8:00 AM · Test School'),'Header calendar marks scheduled dates and shows the day’s event details');
+    $db->run('DELETE FROM schedules WHERE id=?',[$calendarFixture]);
+    check(str_contains($settingsPage['body'],'data-header-profile') && str_contains($settingsPage['body'],'Quick profile for Test Admin') && str_contains($settingsPage['body'],e($admin['email'])),'Header renders the signed-in user’s quick profile card');
     $db->run("UPDATE system_settings SET setting_value='Existing workspace notice' WHERE setting_key='system_notice'");
     $legacyMemo=request('admin','?page=memo');
     $legacyId=(int)$db->one('SELECT id FROM workspace_memos')['id'];
@@ -282,7 +288,7 @@ try {
     $endedPage=request('admin','?page=activities&status=Ended');
     check($endedPage['status']===200 && str_contains($endedPage['body'],'Ended test requirement') && str_contains($endedPage['body'],'Ended. Create a new requirement to assign nurses.') && !str_contains($endedPage['body'],'?page=deployment&activity='.$endedActivity),'Ended requirements are labeled and cannot be reopened for assignment');
     check(!str_contains(request('admin','?page=activities')['body'],'Ended test requirement'),'Ended requirements do not appear in the open list');
-    $pageHeadings=['dashboard'=>'Your workforce, in flow.','schedule'=>'Master schedule','calendar'=>'Workforce calendar','availability'=>'Availability','deployment'=>'Deployment center','leave'=>'Leave & unavailability','notifications'=>'Notifications','profile'=>'My profile','users'=>'User accounts','nurses'=>'Nursing personnel','locations'=>'Schools & duty locations','activities'=>'Activities & events','reports'=>'Reports','audit'=>'Audit trail','settings'=>'Workspace settings','configuration'=>'Configuration','admin-guide'=>'How to use DALOY'];
+    $pageHeadings=['dashboard'=>'Your workforce, in flow.','schedule'=>'Master schedule','calendar'=>'Workforce calendar','availability'=>'Availability','deployment'=>'Deployment center','leave'=>'Leave & unavailability','notifications'=>'Notifications','profile'=>'My profile','users'=>'User accounts','nurses'=>'Nursing personnel','locations'=>'Destinations & venues','activities'=>'Activities & events','reports'=>'Reports','audit'=>'Audit trail','settings'=>'Workspace settings','configuration'=>'Configuration','admin-guide'=>'How to use DALOY'];
     foreach($pageHeadings as $page=>$heading) {
         $r=request('admin','?page='.$page); check($r['status']===200 && str_contains($r['body'],'data-page="'.$page.'"') && str_contains($r['body'],'<h1>'.e($heading).'</h1>'),'HTTP link opens its own page: '.$page);
     }
@@ -368,6 +374,7 @@ try {
     check(request('nurse','?page=profile',['csrf'=>$nurseCsrf,'action'=>'profile','phone'=>'09123456789','photo'=>new CURLFile($photoFixture,'image/png','profile.png'),'return'=>'?page=profile'])['status']===303,'Profile image is accepted and re-encoded');
     $photoName=$as->record('users',(int)$n1['id'])['photo']; if($photoName) $testFiles[]=ROOT.'/storage/uploads/'.$photoName;
     check(request('nurse','download.php?type=photo&id='.$n1['id'])['status']===200 && str_ends_with($photoName,'.jpg'),'Processed profile image is served to its owner');
+    check(str_contains(request('nurse','?page=dashboard')['body'],'class="avatar top-user-photo" src="download.php?type=photo&amp;id='.$n1['id'].'"'),'Workspace header displays the uploaded profile photo');
     check(request('nurse3','download.php?type=photo&id='.$n1['id'])['status']===403,'Another nurse cannot fetch the profile photo');
     $profile=request('nurse3','?page=profile');
     check($profile['status']===200 && str_contains($profile['body'],'Second Public School') && str_contains($profile['body'],'Third Public School') && str_contains($profile['body'],'Test School'),'Profile shows home school and all additional school assignments');
@@ -395,6 +402,8 @@ try {
         check($browser->evaluate('document.body.dataset.page === "dashboard"'),'Chrome password setup opens the dashboard');
         $browser->command('Emulation.setDeviceMetricsOverride',['width'=>1440,'height'=>1100,'deviceScaleFactor'=>1,'mobile'=>false]);
         foreach($pageHeadings as $page=>$heading) {
+            $closedBranch='.sidebar-branch:not([open]):has(a[href="?page='.$page.'"]) > summary';
+            if($browser->evaluate('!!document.querySelector('.json_encode($closedBranch).')')) $browser->click($closedBranch);
             $browser->click('.sidebar nav a[href="?page='.$page.'"]');
             $browser->wait('document.body.dataset.page === '.json_encode($page));
             check($browser->evaluate('document.querySelector("h1").textContent === '.json_encode($heading).' && document.querySelectorAll(".sidebar nav a.active").length === 1'),'Chrome navigation click opens '.$page);

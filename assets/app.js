@@ -326,11 +326,32 @@
     }
     location.assign(link.href);
   });
+  const headerDisclosures = document.querySelectorAll('[data-header-disclosure]');
+  const headerCalendar = document.querySelector('.header-calendar');
+  headerCalendar?.addEventListener('click', event => {
+    const day = event.target instanceof Element && event.target.closest('[data-calendar-day]');
+    if (!day || event.button!==0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    headerCalendar.querySelector('[data-calendar-day][data-selected]')?.removeAttribute('data-selected');
+    day.setAttribute('data-selected','');
+    headerCalendar.querySelectorAll('[data-calendar-agenda]').forEach(agenda => {
+      agenda.hidden = agenda.dataset.calendarAgenda !== day.dataset.calendarDay;
+    });
+  });
   document.addEventListener('click',event => {
     if (notificationDropdown&&!notificationDropdown.hidden&&!notificationMenu?.contains(event.target)) closeNotificationMenu();
+    headerDisclosures.forEach(disclosure => {
+      if (disclosure.open && !disclosure.contains(event.target)) disclosure.open = false;
+    });
   });
   document.addEventListener('keydown',event => {
-    if (event.key==='Escape'&&notificationDropdown&&!notificationDropdown.hidden) closeNotificationMenu(true);
+    if (event.key!=='Escape') return;
+    if (notificationDropdown&&!notificationDropdown.hidden) closeNotificationMenu(true);
+    headerDisclosures.forEach(disclosure => {
+      if (!disclosure.open) return;
+      disclosure.open = false;
+      disclosure.querySelector('summary').focus();
+    });
   });
   const updateNotificationUserId=document.body.dataset.userId;
   if (updateNotificationUserId) {

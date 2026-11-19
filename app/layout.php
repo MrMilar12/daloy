@@ -1,7 +1,44 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="csrf-token" content="<?=e(csrf_token())?>"><title><?=e(ucwords(str_replace('_',' ',$page)))?> · DALOY</title><link rel="stylesheet" href="<?=e(asset_url('app.css'))?>"><link rel="stylesheet" href="<?=e(asset_url('theme-transition.css'))?>"><script src="<?=e(asset_url('app.js'))?>" defer></script></head><body data-page="<?=e($page)?>" data-user-id="<?=(int)$user['id']?>">
 <?php $labels=['dashboard'=>$service->manager()?'Overview':'Home','schedule'=>$service->manager()?'Master schedule':'My schedule','calendar'=>'Calendar','nurses'=>'Nursing personnel','locations'=>'Schools & locations','deployment'=>'Deployment center','deployment-history'=>'Assignment history','activities'=>'Activities & events','availability'=>'Availability','leave'=>'Leave & unavailability','reports'=>'Reports','notifications'=>'Notifications','profile'=>'My profile','users'=>'User accounts','configuration'=>'Configuration','audit'=>'Audit trail','settings'=>'Settings','memo-acknowledgments'=>'Memo acknowledgments','admin-guide'=>'How to use DALOY']; $unread=$db->one('SELECT COUNT(*) n FROM notifications WHERE user_id=? AND read_at IS NULL',[$user['id']])['n']; ?>
-<aside class="sidebar" id="sidebar"><a class="brand" href="./"><span class="brand-mark">D</span><span>DALOY<small>SDO AURORA</small></span></a><div class="workspace-label">WORKSPACE</div><nav aria-label="Main navigation"><?php foreach(['dashboard','schedule','calendar','nurses','locations','deployment','deployment-history','activities','availability','leave','reports'] as $item): if(!in_array($item,$allowed)) continue; ?><a href="?page=<?=$item?>" class="<?=$page===$item?'active':''?>" <?=$page===$item?'aria-current="page"':''?>><?=icon($item==='deployment-history'?'deployment':$item)?><span><?=e($labels[$item])?></span><?php if($item==='deployment'): ?><span class="nav-dot"></span><?php endif ?></a><?php endforeach ?>
-<div class="workspace-label">MANAGEMENT</div><?php foreach(['notifications','users','configuration','audit','settings','memo-acknowledgments','admin-guide','profile'] as $item): if(!in_array($item,$allowed)) continue; ?><a href="?page=<?=$item?>" class="<?=$page===$item?'active':''?>"><?=icon($item==='memo-acknowledgments'?'reports':$item)?><span><?=e($labels[$item])?></span><?php if($item==='notifications' && $unread): ?><span class="count"><?=$unread?></span><?php endif ?></a><?php endforeach ?></nav><div class="sidebar-footer"><span class="live-dot"></span> Connected care, better flow.<small>Nursing Workforce Management</small></div></aside>
+<?php
+$navGroups=[
+    ['Scheduling & leave','calendar',['schedule','calendar','availability','leave']],
+    ['Deployments & events','deployment',['deployment','deployment-history','activities']],
+    ['People & locations','nurses',['nurses','locations','users']],
+    ['Communications','notifications',['notifications','memo-acknowledgments']],
+    ['Administration','settings',['reports','configuration','audit','settings','admin-guide']],
+];
+$navIcons=['deployment-history'=>'deployment','memo-acknowledgments'=>'reports'];
+$navLink=static function(string $item) use($page,$labels,$unread,$navIcons): void {
+    $current=$page===$item;
+    ?>
+    <a href="?page=<?=e($item)?>" class="<?=$current?'active':''?>" <?=$current?'aria-current="page"':''?>>
+        <?=icon($navIcons[$item]??$item)?><span><?=e($labels[$item])?></span>
+        <?php if($item==='notifications' && $unread): ?><span class="count"><?=$unread?></span><?php endif ?>
+    </a>
+    <?php
+};
+?>
+<aside class="sidebar" id="sidebar">
+    <a class="brand" href="./"><span class="brand-mark">D</span><span>DALOY<small>SDO AURORA</small></span></a>
+    <nav class="sidebar-tree" aria-label="Main navigation">
+        <?php $navLink('dashboard'); ?>
+        <?php foreach($navGroups as [$groupLabel,$groupIcon,$items]):
+            $items=array_intersect($items,$allowed);
+            if(!$items) continue;
+            $activeGroup=in_array($page,$items,true);
+        ?>
+            <details class="sidebar-branch<?=$activeGroup?' has-current':''?>" <?=$activeGroup?'open':''?>>
+                <summary><?=icon($groupIcon)?><span><?=e($groupLabel)?></span></summary>
+                <div class="sidebar-branch-links">
+                    <?php foreach($items as $item) $navLink($item); ?>
+                </div>
+            </details>
+        <?php endforeach ?>
+        <?php $navLink('profile'); ?>
+    </nav>
+    <div class="sidebar-footer"><span class="live-dot"></span> Connected care, better flow.<small>Nursing Workforce Management</small></div>
+</aside>
 <div class="app-shell">
 <header class="topbar">
     <div class="topbar-brandline">
@@ -13,7 +50,7 @@
         </nav>
     </div>
     <div class="top-actions">
-        <time class="today-label" datetime="<?=date('Y-m-d')?>"><?=icon('calendar')?> <span><?=date('D, M j, Y')?></span></time>
+        <?php require __DIR__.'/header-calendar.php'; ?>
         <span class="topbar-divider" aria-hidden="true"></span>
         <button class="theme-toggle icon-button" type="button" aria-label="Toggle color theme">◐</button>
         <div class="notification-menu" data-notification-menu>
@@ -30,10 +67,34 @@
                 <footer class="notification-dropdown-footer"><a href="?page=notifications">View all notifications <span aria-hidden="true">→</span></a></footer>
             </section>
         </div>
-        <div class="top-user">
-            <?=avatar($user['name'])?>
-            <span class="top-user-copy"><strong><?=e($user['name'])?></strong><small><?=e(['admin'=>'Administrator','head'=>'Nurse Head','nurse'=>'Nursing personnel'][$user['role']])?></small></span>
-        </div>
+        <?php $profileRole=['admin'=>'Administrator','head'=>'Nurse Head','nurse'=>'Nursing personnel'][$user['role']]; ?>
+        <details class="header-profile" data-header-profile data-header-disclosure>
+            <summary class="top-user" aria-label="Quick profile for <?=e($user['name'])?>">
+                <?php if($user['photo']): ?>
+                    <img class="avatar top-user-photo" src="download.php?type=photo&amp;id=<?=(int)$user['id']?>" alt="" width="39" height="39">
+                <?php else: ?>
+                    <?=avatar($user['name'])?>
+                <?php endif ?>
+                <span class="top-user-copy"><strong><?=e($user['name'])?></strong><small><?=e($profileRole)?></small></span>
+            </summary>
+            <section class="header-profile-card" aria-labelledby="header-profile-name">
+                <header>
+                    <span class="header-profile-portrait" aria-hidden="true">
+                        <?php if($user['photo']): ?>
+                            <img src="download.php?type=photo&amp;id=<?=(int)$user['id']?>" alt="" width="52" height="52" loading="lazy">
+                        <?php else: ?>
+                            <?=avatar($user['name'])?>
+                        <?php endif ?>
+                    </span>
+                    <div><h2 id="header-profile-name"><?=e($user['name'])?></h2><p><?=e($profileRole)?></p></div>
+                </header>
+                <dl>
+                    <?php if(!empty($user['designation'])): ?><div><dt>Designation</dt><dd><?=e($user['designation'])?></dd></div><?php endif ?>
+                    <div><dt>Email</dt><dd><?=e($user['email'])?></dd></div>
+                </dl>
+                <a href="?page=profile">My profile <?=icon('arrow')?></a>
+            </section>
+        </details>
         <form method="post" class="signout-form">
             <input type="hidden" name="csrf" value="<?=e(csrf_token())?>">
             <input type="hidden" name="action" value="logout">
