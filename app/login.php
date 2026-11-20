@@ -12,17 +12,14 @@
 </head>
 <body class="auth-page<?=$register?' auth-registration-page':''?>">
     <header class="auth-topbar">
-        <a class="auth-wordmark" href="./" aria-label="DALOY home">DALOY<span>+</span></a>
-        <div class="auth-topbar-right"><span>SDO AURORA</span><button class="theme-toggle" type="button" aria-label="Toggle color theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button></div>
+        <a class="auth-wordmark" href="./" aria-label="DALOY home">DALOY</a>
+        <div class="auth-topbar-right"><button class="theme-toggle" type="button" aria-label="Toggle color theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button></div>
     </header>
     <main class="auth-shell">
         <?php if(!$register): ?>
         <section class="auth-story" aria-labelledby="auth-story-title">
-            <div class="auth-story-waves" aria-hidden="true"></div>
             <div class="auth-story-kicker"><span></span> NURSING WORKFORCE MANAGEMENT</div>
-            <div class="auth-logo-frame"><img class="auth-logo" src="<?=e(asset_url('daloy-logo.png'))?>" alt="DALOY: Duty Allocation &amp; Logistics Operations for Your Workforce" width="1536" height="1024" fetchpriority="high"></div>
             <div class="auth-story-copy">
-                <span class="auth-story-label">DALOY · SDO AURORA</span>
                 <h1 id="auth-story-title">One team.<br><strong>Better care.</strong></h1>
                 <p>Plan nursing duties, coordinate school coverage, and keep every assignment in view.</p>
             </div>
@@ -34,12 +31,12 @@
             <div class="auth-panel-content">
                 <?php if($register): ?>
                 <h1 id="auth-title">Request access</h1>
-                <p class="auth-intro">An administrator will review your request before you can sign in.</p>
+                <p class="auth-intro">Request a DALOY account for the SDO Aurora nursing workforce. An administrator will review your request.</p>
                 <?php else: ?>
                 <div class="auth-welcome-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/></svg></div>
                 <span class="auth-kicker">YOUR WORKSPACE, CONNECTED</span>
                 <h2 id="auth-title">Welcome back</h2>
-                <p class="auth-intro">Sign in to manage your day with DALOY.</p>
+                <p class="auth-intro">Sign in with your DALOY account for the SDO Aurora nursing workforce.</p>
                 <?php endif ?>
                 <?php if($error): ?><div class="auth-alert" role="alert" tabindex="-1" data-focus-error><?=e($error)?></div><?php endif ?>
                 <?php if(isset($_SESSION['flash'])): ?><div class="auth-alert auth-success" role="status"><?=e($_SESSION['flash'])?></div><?php unset($_SESSION['flash']); endif ?>
@@ -62,9 +59,9 @@
                     </div>
                     <p class="auth-help" id="auth-role-help">Office supervisors can register without a school assignment.</p>
                     <?php endif ?>
-                    <div class="auth-password-label"><label for="auth-password"><?=$register?'Temporary password':'Password'?></label><button class="auth-password-toggle" type="button" data-password-toggle data-show-label="Show password" data-hide-label="Hide password" aria-pressed="false" aria-controls="auth-password">Show password</button></div>
+                    <div class="auth-password-label"><label for="auth-password"><?=$register?'Temporary DALOY password':'DALOY password'?></label><button class="auth-password-toggle" type="button" data-password-toggle data-show-label="Show password" data-hide-label="Hide password" aria-pressed="false" aria-controls="auth-password">Show password</button></div>
                     <input id="auth-password" name="password" type="password" required maxlength="72" <?=$register?'minlength="12" aria-describedby="auth-password-help"':''?> autocomplete="<?=$register?'new-password':'current-password'?>" placeholder="<?=$register?'Create a temporary password':'Enter your password'?>">
-                    <?php if($register): ?><p class="auth-help" id="auth-password-help">Use at least 12 characters, including an uppercase letter, a lowercase letter, and a number. You’ll set a new password at first sign-in.</p><?php endif ?>
+                    <?php if($register): ?><p class="auth-help" id="auth-password-help">Create a password unique to DALOY. Use at least 12 characters, including an uppercase letter, a lowercase letter, and a number. You’ll change it at first sign-in.</p><?php endif ?>
                     <button class="auth-submit" type="submit"><?=$register?'Submit access request':'Sign in to DALOY'?><span aria-hidden="true">&rarr;</span></button>
                 </form>
                 <div class="auth-register">
@@ -73,7 +70,6 @@
                 </div>
                 <?php if(!$register): ?><p class="auth-support">Need help signing in?<br>Contact your DALOY system administrator.</p><?php endif ?>
             </div>
-            <footer class="auth-panel-footer">Department of Education<strong>Schools Division Office of Aurora</strong></footer>
         </section>
     </main>
     <footer class="auth-footer">DALOY &middot; Duty Allocation &amp; Logistics Operations for Your Workforce</footer>
