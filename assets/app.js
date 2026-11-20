@@ -1,5 +1,14 @@
 (() => {
   'use strict';
+  document.querySelectorAll('[data-chart-background]').forEach(chart => {
+    chart.style.backgroundImage = chart.dataset.chartBackground;
+  });
+  document.querySelectorAll('[data-chart-swatch]').forEach(swatch => {
+    swatch.style.setProperty('--legend-color', swatch.dataset.chartSwatch);
+  });
+  document.querySelectorAll('[data-chart-width]').forEach(bar => {
+    bar.style.width = bar.dataset.chartWidth + '%';
+  });
   // Refresh only a previously installed DALOY push worker so it can unregister itself.
   if (window.isSecureContext && 'serviceWorker' in navigator) {
     const retiredWorker = new URL('push-worker.js', document.baseURI).href;

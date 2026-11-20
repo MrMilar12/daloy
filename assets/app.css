@@ -181,6 +181,11 @@ dialog.record-modal::backdrop{background:#102235a8;backdrop-filter:blur(5px);-we
 .record-view-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px;margin:0}.record-view-grid>div{padding:13px 2px;border-bottom:1px solid var(--border)}.record-view-grid dt{font-size:9px;font-weight:750;letter-spacing:.7px;text-transform:uppercase;color:var(--muted)}.record-view-grid dd{margin:4px 0 0;font-size:12px;overflow-wrap:anywhere}.record-modal-card>.form-actions{display:flex;justify-content:flex-end}
 [data-theme=dark] .record-modal-card{background:var(--surface)}[data-theme=dark] .record-modal-heading{background:linear-gradient(112deg,#18344a,#183b3c)}
 @media(max-width:760px){dialog.record-modal{width:calc(100vw - 18px);max-height:calc(100vh - 18px);border-radius:15px}.record-modal-card{max-height:calc(100vh - 18px);padding:20px 16px;border-radius:15px}.record-modal-heading{margin:-20px -16px 20px;padding:18px 54px 17px 16px;gap:11px}.record-modal-heading h2{font-size:18px}.record-modal-heading p{font-size:10px}.record-modal-mark{width:40px;height:40px}.record-modal-close{top:12px;right:11px;width:32px;height:32px}.record-modal-card .form-grid{grid-template-columns:1fr;gap:14px}.record-modal-card .span-2{grid-column:1}.record-view-grid{grid-template-columns:1fr}}
+.maintenance-page{width:min(100% - 32px,540px);margin:12vh auto 0;padding:clamp(20px,5vw,40px);border:1px solid var(--border);border-radius:18px;background:var(--surface);text-align:center;box-shadow:var(--shadow)}
+.maintenance-page p{margin-bottom:0}
+.activity-assignments-table{margin-top:16px}
+.activity-assignments-actions{margin-top:18px}
+.district-pie{background-color:var(--soft)}
 .sidebar{
     --sidebar-text:#edf6fb;
     --sidebar-muted:#b3c8d6;
