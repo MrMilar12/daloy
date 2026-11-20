@@ -23,13 +23,19 @@
   document.querySelectorAll('[data-chart-width]').forEach(bar => {
     bar.style.width = bar.dataset.chartWidth + '%';
   });
-  // Refresh only a previously installed DALOY push worker so it can unregister itself.
+  // Retire old DALOY browser push subscriptions and their service worker.
   if (window.isSecureContext && 'serviceWorker' in navigator) {
     const retiredWorker = new URL('push-worker.js', document.baseURI).href;
-    navigator.serviceWorker.getRegistration().then(registration => {
-      const workers = [registration?.active, registration?.waiting, registration?.installing];
-      if (workers.some(worker => worker?.scriptURL === retiredWorker)) return registration.update();
-    }).catch(() => {});
+    navigator.serviceWorker.getRegistrations().then(registrations => Promise.all(registrations.map(async registration => {
+      const workers = [registration.active, registration.waiting, registration.installing];
+      if (!workers.some(worker => worker?.scriptURL === retiredWorker)) return;
+      try {
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) await subscription.unsubscribe();
+      } finally {
+        await registration.unregister();
+      }
+    }))).catch(() => {});
   }
   const activityModal = document.querySelector('[data-activity-modal]');
   if (activityModal?.showModal) {

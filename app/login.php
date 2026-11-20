@@ -32,11 +32,13 @@
                 <?php if($register): ?>
                 <h1 id="auth-title">Request access</h1>
                 <p class="auth-intro">Request a DALOY account for the SDO Aurora nursing workforce. An administrator will review your request.</p>
+                <p class="auth-site-notice"><strong>About this sign-in</strong> This page is hosted at <code>sdohealth.page.gd</code>, a third-party domain. It uses DALOY accounts only and does not sign you in to DepEd or Google.</p>
                 <?php else: ?>
                 <div class="auth-welcome-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/></svg></div>
                 <span class="auth-kicker">YOUR WORKSPACE, CONNECTED</span>
                 <h2 id="auth-title">Welcome back</h2>
                 <p class="auth-intro">Sign in with your DALOY account for the SDO Aurora nursing workforce.</p>
+                <p class="auth-site-notice"><strong>About this sign-in</strong> This page is hosted at <code>sdohealth.page.gd</code>, a third-party domain. It uses DALOY accounts only and does not sign you in to DepEd or Google.</p>
                 <?php endif ?>
                 <?php if($error): ?><div class="auth-alert" role="alert" tabindex="-1" data-focus-error><?=e($error)?></div><?php endif ?>
                 <?php if(isset($_SESSION['flash'])): ?><div class="auth-alert auth-success" role="status"><?=e($_SESSION['flash'])?></div><?php unset($_SESSION['flash']); endif ?>

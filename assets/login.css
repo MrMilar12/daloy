@@ -52,6 +52,9 @@ button { cursor: pointer; }
 .auth-kicker { display: block; color: var(--auth-accent); font-size: 10px; font-weight: 700; letter-spacing: 1.6px; margin-bottom: 12px; }
 .auth-panel h1, .auth-panel h2 { margin: 0; font-size: 32px; letter-spacing: -.9px; line-height: 1.2; font-weight: 650; }
 .auth-intro { font-size: 14px; color: var(--auth-muted); line-height: 1.65; margin: 10px 0 30px; }
+.auth-site-notice { margin: -16px 0 22px; padding: 12px 14px; border: 1px solid var(--auth-line); border-left: 3px solid var(--auth-accent); border-radius: 9px; background: var(--auth-input); color: var(--auth-muted); font-size: 12px; line-height: 1.6; }
+.auth-site-notice strong { display: block; margin-bottom: 3px; color: var(--auth-text); font-size: 12px; }
+.auth-site-notice code { color: var(--auth-text); font-family: inherit; font-weight: 650; }
 .auth-panel form { display: flex; flex-direction: column; }
 .auth-panel label { display: block; font-size: 13px; font-weight: 600; margin: 0 0 9px; }
 .auth-panel :is(input:not([type=hidden]), select) { width: 100%; min-width: 0; min-height: 48px; padding: 12px 14px; background: var(--auth-input); color: var(--auth-text); border: 1px solid var(--auth-line); border-radius: 10px; font-size: 14px; margin: 0 0 20px; transition: border-color .15s, box-shadow .15s; }
@@ -115,6 +118,7 @@ button { cursor: pointer; }
     .auth-kicker { margin-bottom: 8px; font-size: 9px; letter-spacing: 1.2px; }
     .auth-welcome-icon { display: none; }
     .auth-intro { margin: 8px 0 20px; font-size: 13px; }
+    .auth-site-notice { margin: -10px 0 18px; }
     .auth-panel-content { max-width: none; }
     .auth-panel input:not([type=hidden]) { font-size: 16px; margin-bottom: 16px; scroll-margin-block: 24px; }
     .auth-password-label { align-items: center; flex-wrap: wrap; gap: 0 8px; margin-bottom: 8px; }
@@ -142,6 +146,7 @@ button { cursor: pointer; }
 }
 .auth-registration-page .auth-panel-content { max-width: none; }
 .auth-registration-page .auth-intro { margin-bottom: 22px; }
+.auth-registration-page .auth-site-notice { margin-top: -8px; }
 .auth-role-select {
     position: relative;
     margin-bottom: 20px;
