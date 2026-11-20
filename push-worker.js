@@ -1,15 +1,14 @@
-self.addEventListener('push', event => {
-  event.waitUntil(self.registration.showNotification('DALOY', {
-    body: 'You have a new workspace notification.',
-    tag: 'daloy-inbox'
-  }));
+self.addEventListener('install', event => {
+  event.waitUntil(self.skipWaiting());
 });
 
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-  const inbox = new URL('?page=notifications', self.registration.scope).href;
-  event.waitUntil(self.clients.matchAll({type:'window'}).then(windows => {
-    const existing = windows.find(window => window.url === inbox);
-    return existing ? existing.focus() : self.clients.openWindow(inbox);
-  }));
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    try {
+      const subscription = await self.registration.pushManager.getSubscription();
+      if (subscription) await subscription.unsubscribe();
+    } finally {
+      await self.registration.unregister();
+    }
+  })());
 });

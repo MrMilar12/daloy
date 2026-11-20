@@ -6,46 +6,6 @@ try {
     if($user['must_change_password']) throw new DomainException('Change your temporary password first.',403);
     $service=new Service($db,$user);
     switch($_GET['action']??'') {
-        case 'browser_push':
-            if($_SERVER['REQUEST_METHOD']!=='POST') throw new DomainException('POST required.',405);
-            csrf_check();
-            $pushKeys=WebPush::keys();
-            if(!$pushKeys) throw new DomainException('Browser notifications are unavailable.',503);
-            $endpoint=$_POST['endpoint']??null;
-            if(!is_string($endpoint) || !WebPush::origin($endpoint)) throw new DomainException('This browser’s push provider is unsupported.',422);
-            WebPush::ensureSchema($db);
-            $hash=hash('sha256',$endpoint);
-            $mode=$_POST['mode']??'';
-            if($mode==='enable') {
-                $db->transaction(function() use($db,$user,$hash,$endpoint) {
-                    $existing=$db->one('SELECT user_id FROM browser_push_subscriptions WHERE endpoint_hash=?',[$hash]);
-                    if($existing) {
-                        if((int)$existing['user_id']!==(int)$user['id']) throw new DomainException('This browser is already registered to another account. Disable its alerts from that account first.',409);
-                        return;
-                    }
-                    $devices=(int)$db->one('SELECT COUNT(*) AS total FROM browser_push_subscriptions WHERE user_id=?',[$user['id']])['total'];
-                    if($devices>=10) throw new DomainException('This account has reached its browser notification limit.',429);
-                    $latest=(int)$db->one('SELECT COALESCE(MAX(id),0) AS latest FROM notifications WHERE user_id=?',[$user['id']])['latest'];
-                    $db->run('INSERT INTO browser_push_subscriptions (endpoint_hash,endpoint,user_id,last_notification_id) VALUES (?,?,?,?)',[$hash,$endpoint,$user['id'],$latest]);
-                });
-            } elseif($mode==='disable') {
-                $db->run('DELETE FROM browser_push_subscriptions WHERE endpoint_hash=? AND user_id=?',[$hash,$user['id']]);
-            } elseif($mode==='test') {
-                $subscription=$db->one('SELECT endpoint FROM browser_push_subscriptions WHERE endpoint_hash=? AND user_id=?',[$hash,$user['id']]);
-                if(!$subscription) throw new DomainException('Enable alerts on this device first.',403);
-                $testAt=now();
-                $allowed=$db->run('INSERT INTO browser_push_test_limits (user_id,last_test_at) VALUES (?,?)
-                    ON DUPLICATE KEY UPDATE last_test_at=IF(last_test_at<=?,VALUES(last_test_at),last_test_at)',[$user['id'],$testAt,date('Y-m-d H:i:s',time()-30)]);
-                if(!$allowed) throw new DomainException('Wait 30 seconds before sending another test alert.',429);
-                session_write_close();
-                $status=WebPush::send($subscription['endpoint'],$pushKeys,$config['web_push_subject']??'');
-                if(in_array($status,[404,410],true)) {
-                    $db->run('DELETE FROM browser_push_subscriptions WHERE endpoint_hash=? AND user_id=?',[$hash,$user['id']]);
-                    throw new DomainException('This device subscription expired. Select Enable to subscribe again.',410);
-                }
-                if($status<200 || $status>=300) throw new DomainException('The server could not deliver the test alert to the browser provider.',502);
-            } elseif($mode!=='status') throw new DomainException('Invalid browser notification action.',422);
-            json_out(['enabled'=>(bool)$db->one('SELECT endpoint_hash FROM browser_push_subscriptions WHERE endpoint_hash=? AND user_id=?',[$hash,$user['id']])]);
         case 'github_updates':
             $service->requireRole(['admin']);
             require_once __DIR__.'/app/GitHubUpdater.php';

@@ -6,15 +6,7 @@ $condition=match($status) {'unread'=>' AND read_at IS NULL','read'=>' AND read_a
 $rows=$db->all("SELECT * FROM notifications WHERE user_id=? $condition ORDER BY created_at DESC,id DESC LIMIT 26 OFFSET $offset",[$user['id']]);
 $return='?page=notifications&status='.$status;
 page_heading('YOUR WORKSPACE','Notifications','Stay up to date with your duties, assignments, and team updates.');
-require_once __DIR__.'/../WebPush.php';
-$pushKeys=WebPush::keys();
 ?>
-<section class="card browser-push-panel" data-browser-push="<?=e($pushKeys['public']??'')?>">
-    <span class="browser-push-icon" aria-hidden="true"><?=icon('notifications')?></span>
-    <div><h2>Browser notifications</h2><p data-browser-push-status role="status"><?=$pushKeys?'Checking support on this device…':'Browser notifications haven’t been configured on this server.'?></p></div>
-    <button type="button" data-browser-push-toggle hidden disabled>Enable</button>
-    <button type="button" data-browser-push-test hidden>Send test alert</button>
-</section>
 <section class="inbox-summary" aria-label="Notification overview">
     <div class="inbox-summary-icon" aria-hidden="true"><?=icon('notifications')?></div>
     <div class="inbox-summary-copy"><span class="eyebrow">YOU’RE IN THE LOOP</span><h2><?=$unreadCount?number_format($unreadCount).' unread update'.($unreadCount===1?'':'s'):'You’re all caught up'?></h2><p><?=$unreadCount?'Take a moment to review what’s new.':'New updates will appear here when there’s something to share.'?></p></div>

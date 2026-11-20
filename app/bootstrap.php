@@ -9,7 +9,6 @@ $config = is_file($configPath) ? require $configPath : require ROOT . '/config.e
 date_default_timezone_set($config['timezone'] ?? 'Asia/Manila');
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/Service.php';
-require_once __DIR__ . '/WebPush.php';
 function e($value): string { return htmlspecialchars((string)($value ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
 function now(): string { return date('Y-m-d H:i:s'); }
 function asset_url(string $file): string { return 'assets/'.$file.'?v='.filemtime(ROOT.'/assets/'.$file); }

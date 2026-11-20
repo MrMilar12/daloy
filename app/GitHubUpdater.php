@@ -37,7 +37,6 @@ final class GitHubUpdater {
             $message='A verified DALOY update is ready to install ('.substr($sha,0,12).'). Review it in Workspace settings.';
             foreach($this->db->all("SELECT id FROM users WHERE role='admin' AND active=1") as $admin) {
                 $this->db->insert('notifications',['user_id'=>$admin['id'],'title'=>'New system update available','message'=>$message,'link'=>'?page=settings','created_at'=>now()]);
-                WebPush::afterNotification($this->db,(int)$admin['id']);
             }
             $upsert=$this->db->pdo->getAttribute(PDO::ATTR_DRIVER_NAME)==='sqlite'
                 ? "INSERT INTO system_settings(setting_key,setting_value) VALUES('github_update_notified_sha',?) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value"
