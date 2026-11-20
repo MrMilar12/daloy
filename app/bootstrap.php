@@ -11,6 +11,10 @@ require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/Service.php';
 function e($value): string { return htmlspecialchars((string)($value ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
 function now(): string { return date('Y-m-d H:i:s'); }
+function notification_link(?string $link): string {
+    return preg_match('/^\?page=[a-z_-]+(?:&[a-z_]+=[a-zA-Z0-9_-]+)*$/D', $link ?? '')
+        ? $link : '?page=notifications';
+}
 function asset_url(string $file): string { return 'assets/'.$file.'?v='.filemtime(ROOT.'/assets/'.$file); }
 function json_out(array $data, int $status = 200): never {
     http_response_code($status); header('Content-Type: application/json'); echo json_encode($data, JSON_UNESCAPED_UNICODE); exit;
@@ -31,6 +35,11 @@ function start_session(): void {
     if(!session_start()) throw new RuntimeException('The session storage directory must be writable.');
     header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'");
     header('Cache-Control: no-store'); header('X-Content-Type-Options: nosniff'); header('Referrer-Policy: same-origin');
+    header('X-Frame-Options: DENY');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+    if(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        header('Strict-Transport-Security: max-age=31536000');
+    }
     if (isset($_SESSION['last_active']) && time() - $_SESSION['last_active'] > $config['session_timeout']) {
         $_SESSION = []; session_regenerate_id(true);
     }

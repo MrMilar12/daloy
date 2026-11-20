@@ -30,6 +30,8 @@
       const workers = [registration.active, registration.waiting, registration.installing];
       if (!workers.some(worker => worker?.scriptURL === retiredWorker)) return;
       try {
+        const notifications = await registration.getNotifications();
+        notifications.forEach(notification => notification.close());
         const subscription = await registration.pushManager.getSubscription();
         if (subscription) await subscription.unsubscribe();
       } finally {

@@ -16,6 +16,8 @@ try {
     $allowed=$type==='photo'?['image/jpeg','image/png']:['application/pdf','image/jpeg','image/png'];
     if(!in_array($mime,$allowed,true)) throw new DomainException('File format is unavailable.',404);
     $inline=$type==='photo' || ($type==='memo' && ($_GET['preview']??'')==='1' && in_array($mime,['application/pdf','image/jpeg','image/png'],true));
+    // Uploaded documents must not run scripts with the application's origin.
+    header("Content-Security-Policy: sandbox; default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
     header('Content-Type: '.$mime); header('Content-Length: '.filesize($path)); header('Content-Disposition: '.($inline?'inline':'attachment').'; filename="daloy-'.$type.'-'.(int)$r['id'].'.'.pathinfo($name,PATHINFO_EXTENSION).'"'); readfile($path);
 } catch(DomainException $e) { http_response_code($e->getCode()?:403); echo e($e->getMessage()); }
 catch(Throwable $e) { error_log((string)$e); http_response_code(500); echo 'Unable to retrieve file.'; }

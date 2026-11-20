@@ -382,6 +382,14 @@ try {
     $badFixture=ROOT.'/storage/'.$name.'-unsafe.txt'; file_put_contents($badFixture,'<?php echo "unsafe";'); $testFiles[]=$badFixture;
     $uploadData['attachment']=new CURLFile($badFixture,'application/pdf','pretend.pdf'); check(request('nurse','?page=leave&new=1',$uploadData)['status']===422,'Disguised executable upload is rejected by MIME validation');
     $photoFixture=ROOT.'/storage/'.$name.'-photo.png'; $photo=imagecreatetruecolor(30,30); imagepng($photo,$photoFixture); imagedestroy($photo); $testFiles[]=$photoFixture;
+    file_put_contents($photoFixture,'<?php echo "appended-upload-payload"; ?>',FILE_APPEND);
+    $uploadData['starts_at']='2038-03-10T00:00'; $uploadData['ends_at']='2038-03-11T00:00';
+    $uploadData['attachment']=new CURLFile($photoFixture,'image/png','support.png');
+    check(request('nurse','?page=leave&new=1',$uploadData)['status']===303,'Valid PNG attachment with appended bytes is decoded safely');
+    $imageLeave=$db->one('SELECT * FROM leave_records ORDER BY id DESC LIMIT 1');
+    $imagePath=ROOT.'/storage/uploads/'.$imageLeave['attachment']; $testFiles[]=$imagePath;
+    $imageSize=getimagesize($imagePath);
+    check($imageSize && $imageSize[0]===30 && $imageSize[1]===30 && $imageSize['mime']==='image/png' && !str_contains(file_get_contents($imagePath),'appended-upload-payload'),'Image attachment preserves dimensions and format while removing appended payload');
     check(request('nurse','?page=profile',['csrf'=>$nurseCsrf,'action'=>'profile','phone'=>'09123456789','photo'=>new CURLFile($photoFixture,'image/png','profile.png'),'return'=>'?page=profile'])['status']===303,'Profile image is accepted and re-encoded');
     $photoName=$as->record('users',(int)$n1['id'])['photo']; if($photoName) $testFiles[]=ROOT.'/storage/uploads/'.$photoName;
     check(request('nurse','download.php?type=photo&id='.$n1['id'])['status']===200 && str_ends_with($photoName,'.jpg'),'Processed profile image is served to its owner');

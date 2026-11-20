@@ -30,8 +30,10 @@ final class Backup {
         if($db->all('SHOW TABLES')) throw new RuntimeException('Restore requires a completely empty database. Existing data will never be overwritten.');
         $zip=new ZipArchive(); if($zip->open($source)!==true) throw new RuntimeException('Cannot read backup archive.');
         try {
-            $raw=$zip->getFromName('data.json'); if($raw===false || strlen($raw)>100*1024*1024) throw new RuntimeException('Invalid backup manifest.');
+            $manifestLimit = 100 * 1024 * 1024;
+            $raw=$zip->getFromName('data.json', $manifestLimit + 1); if($raw===false || strlen($raw)>$manifestLimit) throw new RuntimeException('Invalid backup manifest.');
             $data=json_decode($raw,true,512,JSON_THROW_ON_ERROR);
+            unset($raw);
             if(($data['version']??0)===1) {
                 foreach(['nurse_locations','workspace_memos','memo_acknowledgments'] as $table) {
                     $prefix=array_slice(self::TABLES,0,array_search($table,self::TABLES,true));
@@ -39,9 +41,12 @@ final class Backup {
                 }
             }
             if(($data['version']??0)!==1 || array_keys($data['tables']??[])!==self::TABLES) throw new RuntimeException('Unsupported backup format.');
+            $uploadLimit = 5 * 1024 * 1024;
             foreach($data['files']??[] as $file=>$hash) {
                 if(!preg_match('/^[a-f0-9]{48}\.(jpg|png|pdf)$/D',$file)) throw new RuntimeException('Unsafe upload filename in archive.');
-                $bytes=$zip->getFromName('uploads/'.$file); if($bytes===false || !hash_equals($hash,hash('sha256',$bytes))) throw new RuntimeException('Attachment checksum mismatch.');
+                $bytes=$zip->getFromName('uploads/'.$file, $uploadLimit + 1);
+                if($bytes===false || strlen($bytes)>$uploadLimit) throw new RuntimeException('Invalid attachment size in backup.');
+                if(!is_string($hash) || !hash_equals($hash,hash('sha256',$bytes))) throw new RuntimeException('Attachment checksum mismatch.');
             }
             foreach(explode(';',file_get_contents(ROOT.'/database/schema.sql')) as $sql) if(trim($sql)!=='') $db->pdo->exec($sql);
             $db->pdo->beginTransaction();
@@ -57,7 +62,7 @@ final class Backup {
                 foreach($data['files']??[] as $file=>$hash) {
                     $path=$uploadDir.'/'.$file;
                     if(is_file($path)) { if(!hash_equals($hash,hash_file('sha256',$path))) throw new RuntimeException('An existing attachment conflicts with this backup.'); continue; }
-                    if(file_put_contents($path,$zip->getFromName('uploads/'.$file))===false) throw new RuntimeException('Cannot restore attachment.');
+                    if(file_put_contents($path,$zip->getFromName('uploads/'.$file, $uploadLimit + 1))===false) throw new RuntimeException('Cannot restore attachment.');
                 }
                 $db->pdo->commit();
             } catch(Throwable $e) { $db->pdo->rollBack(); throw $e; }

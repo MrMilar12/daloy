@@ -108,7 +108,7 @@ final class Service {
     }
     public function candidates(int $activityId): array {
         $this->requireRole(['admin','head']); $a=$this->record('activities',$activityId); $list=[];
-        foreach($this->db->all("SELECT u.*,d.name district_name,l.name location_name FROM users u LEFT JOIN districts d ON d.id=u.district_id LEFT JOIN locations l ON l.id=u.location_id WHERE u.role='nurse' ORDER BY u.name") as $u) {
+        foreach($this->db->all("SELECT u.id,u.name,u.active,u.specialization,u.skills,d.name district_name,l.name location_name FROM users u LEFT JOIN districts d ON d.id=u.district_id LEFT JOIN locations l ON l.id=u.location_id WHERE u.role='nurse' ORDER BY u.name") as $u) {
             $reasons=[]; if(!$u['active']) $reasons[]='Inactive account';
             if($a['status']==='Cancelled') $reasons[]='Requirement cancelled';
             if(!empty($a['location_id']) && !$this->record('locations',(int)$a['location_id'])['active']) $reasons[]='Destination is inactive';
@@ -116,7 +116,7 @@ final class Service {
             if($a['required_skill']!=='' && !$this->hasCompetency($u,$a['required_skill'])) $reasons[]='Missing required competency: '.$a['required_skill'];
             $conflicts=$this->conflicts((int)$u['id'],$a['starts_at'],$a['ends_at']);
             foreach($conflicts as $c) $reasons[]=$c['label'].' ('.$c['starts_at'].' – '.$c['ends_at'].')';
-            unset($u['password_hash']); $list[]=$u+['eligible'=>!$reasons,'unavailable'=>(bool)$conflicts,'reasons'=>$reasons];
+            $list[]=$u+['eligible'=>!$reasons,'unavailable'=>(bool)$conflicts,'reasons'=>$reasons];
         } return $list;
     }
     private function hasCompetency(array $nurse,string $required): bool {

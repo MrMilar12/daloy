@@ -44,6 +44,7 @@ try {
         case 'notifications_recent':
             $notifications=$db->all('SELECT id,title,message,link,created_at,read_at FROM notifications WHERE user_id=? AND read_at IS NULL ORDER BY created_at DESC,id DESC LIMIT 8',[$user['id']]);
             foreach($notifications as &$notification) {
+                $notification['link'] = notification_link($notification['link']);
                 $notification['created_at']=date(DATE_ATOM,strtotime($notification['created_at']));
             }
             unset($notification);

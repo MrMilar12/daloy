@@ -80,7 +80,7 @@ For a **separate demonstration installation**, point the configuration at a new 
 - Notifications are **in-app**. No email or SMS integration is required or configured.
 - Reports cap each source at 5,000 rows; narrow the date interval for larger histories. The interface paginates display rows. Excel preserves Unicode and stores user content as strings, preventing formula execution. The portable direct PDF export transliterates characters supported by its standard font; use Excel or browser Print → Save as PDF for full Unicode fidelity.
 - Failed conflicting writes are rejected and are not retained as duty records. The conflict report detects any overlapping records already present (for example, following an external import).
-- Supporting uploads accept PDF/JPEG/PNG up to 5 MB; profile photos accept JPEG/PNG and are re-encoded to a maximum 512px width. Attachments require an authenticated owner or manager. Uploads and session files are denied direct HTTP access.
+- Supporting uploads accept PDF/JPEG/PNG up to 5 MB. All uploaded images are decoded and re-encoded to remove metadata and appended bytes, with a 20 megapixel limit. Image attachments retain their dimensions and JPEG/PNG format; profile photos become JPEG at a maximum 512px width. This does not scan PDFs for malware. Attachments require an authenticated owner or manager. Uploads and session files are denied direct HTTP access.
 
 ## Tests
 
@@ -128,6 +128,23 @@ To restore:
 Restore refuses to overwrite any existing tables and validates attachment checksums before importing. A failed restore can leave empty schema tables or unreferenced attachment files; use a newly created empty recovery database for the next attempt. The test suite verifies restore against every table and confirms overwrite refusal.
 
 ## Apache / cPanel deployment
+
+### Safe Browsing remediation
+
+Browser push is retired. Deploy `push-worker.js` as well as the updated `assets/app.js`: the worker retires older installations, and page visits remove matching DALOY subscriptions and visible notifications. Keep this retirement endpoint available for returning browsers. The CLI push job is disabled; in-app notifications remain available. Browser notification permission itself is controlled by the visitor; application code cannot reset it.
+
+The production host `sdohealth.page.gd` redirects HTTP requests to HTTPS using a fixed destination in `.htaccess`. Localhost HTTP remains available. HTTPS responses from PHP send HSTS for this host only (no `includeSubDomains` or preload). If TLS terminates at a proxy, configure Apache's HTTPS detection with the host provider; the application deliberately does not trust arbitrary forwarded headers. Confirm the redirect does not loop before rollout. Update the fixed host rule if the production domain changes.
+
+The public `?about=1` page explains DALOY accounts and application data use without requiring a sign-in. Have the responsible administrator verify this description and provide an approved operator identity, support contact, and applicable retention/privacy policy before public use. Do not imply government endorsement unless authorized.
+
+After deploying security fixes:
+
+1. Inspect the actual hosting account, including all sibling sites, redirects, scheduled tasks, and files absent from this repository. Compare deployed source against a trusted copy. Remove confirmed injected content, patch the entry point, and rotate affected hosting/application credentials if compromised. Local source checks cannot establish that hosting is clean.
+2. Verify HTTPS, the HTTP redirect, and direct-access denials described below. Check desktop and mobile responses for unexpected ads, scripts, and redirects. Browser client hints and user-agent overrides are not evidence of the reason for a phishing classification.
+3. Verify ownership of `https://sdohealth.page.gd/` in Google Search Console. Inspect **Security & Manual Actions → Security issues** and address each reported example URL and issue before requesting a review. Include only verified remediation details in the review request.
+4. If the site is clean and the classification is incorrect, report it at <https://safebrowsing.google.com/safebrowsing/report_error/>. Reviews can take several days; code changes cannot clear Google's classification directly or guarantee that a site will never be flagged.
+
+Google's guidance: <https://developers.google.com/search/docs/monitor-debug/security/social-engineering>.
 
 - Deploy the project under Apache with `.htaccess` enabled (`AllowOverride All`). It blocks private application directories, configuration, storage, SQL, and hidden files. Do not use PHP's built-in server for public hosting; it is used only by isolated local tests.
 - Use HTTPS and set `secure_cookies` to `true` in `config.local.php`.

@@ -74,6 +74,6 @@
             </div>
         </section>
     </main>
-    <footer class="auth-footer">DALOY &middot; Duty Allocation &amp; Logistics Operations for Your Workforce</footer>
+    <footer class="auth-footer">DALOY &middot; Duty Allocation &amp; Logistics Operations for Your Workforce &middot; <a href="?about=1">About &amp; privacy</a></footer>
 </body>
 </html>

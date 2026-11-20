@@ -9,20 +9,24 @@ function receive_upload(string $field,bool $photo=false): ?string {
     if(!isset($allowed[$mime])) throw new DomainException($photo?'Use a JPEG or PNG profile photo.':'Use a PDF, JPEG, or PNG attachment.',422);
     $directory=ROOT.'/storage/uploads'; if(!is_dir($directory)) mkdir($directory,0700,true);
     $name=bin2hex(random_bytes(24)).'.'.$allowed[$mime];
-    if($photo) {
+    // Decode every uploaded image, including attachments, instead of retaining
+    // metadata or arbitrary bytes appended to an otherwise valid image.
+    if(in_array($mime,['image/jpeg','image/png'],true)) {
         $size=getimagesize($f['tmp_name']); if(!$size || $size[0]*$size[1]>20000000) throw new DomainException('The photo is too large. Use an image below 20 megapixels.',422);
         $source=$mime==='image/jpeg'?imagecreatefromjpeg($f['tmp_name']):imagecreatefrompng($f['tmp_name']);
         if(!$source) throw new DomainException('The image could not be read.',422);
-        $thumb=imagescale($source,min(512,$size[0]));
-        imagedestroy($source);
+        $thumb=$photo?imagescale($source,min(512,$size[0])):$source;
+        if($photo) imagedestroy($source);
         if(!$thumb) throw new RuntimeException('Could not resize the profile photo.');
-        $name=bin2hex(random_bytes(24)).'.jpg';
+        $asPng=!$photo && $mime==='image/png';
+        $name=bin2hex(random_bytes(24)).($asPng?'.png':'.jpg');
         $path=$directory.'/'.$name;
-        $saved=imagejpeg($thumb,$path,85);
+        if($asPng) imagesavealpha($thumb,true);
+        $saved=$asPng?imagepng($thumb,$path):imagejpeg($thumb,$path,85);
         imagedestroy($thumb);
         if(!$saved || !is_file($path) || !filesize($path)) {
             if(is_file($path)) unlink($path);
-            throw new RuntimeException('Could not save the profile photo.');
+            throw new RuntimeException('Could not save the image.');
         }
     } elseif(!move_uploaded_file($f['tmp_name'],$directory.'/'.$name)) throw new RuntimeException('Could not save the attachment.');
     return $name;

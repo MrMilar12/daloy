@@ -4,6 +4,10 @@ require __DIR__.'/app/bootstrap.php';
 require __DIR__.'/app/Auth.php';
 require __DIR__.'/app/Schema.php';
 start_session();
+if($_SERVER['REQUEST_METHOD']==='GET' && isset($_GET['about'])) {
+    require __DIR__.'/app/about.php';
+    exit;
+}
 if(is_file(ROOT.'/storage/update-maintenance.json') && ($_GET['page']??'')!=='health') { http_response_code(503); ?><!doctype html><meta charset="utf-8"><title>System maintenance</title><link rel="icon" href="favicon.ico"><link rel="stylesheet" href="<?=e(asset_url('app.css'))?>"><main class="maintenance-page"><h1>System maintenance</h1><p>DALOY is applying an update. Please try again shortly.</p></main><?php exit; }
 try { $db=new Database($config); ensure_custom_destination_schema($db); $db->run("CREATE TABLE IF NOT EXISTS registration_requests (id INTEGER PRIMARY KEY AUTO_INCREMENT,name VARCHAR(120) NOT NULL,email VARCHAR(190) NOT NULL UNIQUE,password_hash VARCHAR(255) NOT NULL,requested_role VARCHAR(20) NOT NULL DEFAULT 'nurse',status VARCHAR(20) NOT NULL DEFAULT 'pending',reviewed_by INTEGER NULL,reviewed_at DATETIME NULL,created_at DATETIME NOT NULL)"); $installed=$db->one("SELECT setting_value FROM system_settings WHERE setting_key='organization'"); if(!$installed) throw new RuntimeException('Not installed'); }
 catch(Throwable $e) { http_response_code(503); require __DIR__.'/app/setup.php'; exit; }

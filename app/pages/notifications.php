@@ -22,6 +22,7 @@ page_heading('YOUR WORKSPACE','Notifications','Stay up to date with your duties,
         if($day!==$previousDay): $previousDay=$day; $group=$day===date('Y-m-d')?'Today':($day===date('Y-m-d',strtotime('-1 day'))?'Yesterday':date('F j, Y',strtotime($day))); ?>
             <h2 class="inbox-date"><?=e($group)?></h2>
         <?php endif;
+        $r['link'] = notification_link($r['link']);
         $target=[]; parse_str(ltrim($r['link'],'?'),$target);
         [$category,$glyph]=match($target['page']??'') {'schedule'=>['Duty schedule','calendar'],'deployment'=>['Deployment','deployment'],'leave'=>['Leave update','leave'],'activities'=>['Team activity','activities'],default=>['Workspace update','notifications']};
         ?>
