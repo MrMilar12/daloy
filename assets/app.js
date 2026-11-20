@@ -1,5 +1,19 @@
 (() => {
   'use strict';
+  const readApiResponse = async response => {
+    const type = response.headers.get('Content-Type') || '';
+    if (!/^application\/json(?:\s*;|$)/i.test(type)) {
+      throw new Error(`DALOY expected JSON but the server returned ${type.split(';')[0] || 'an unknown format'} (HTTP ${response.status}).`);
+    }
+    try {
+      const data = await response.json();
+      if (data === null || typeof data !== 'object' || Array.isArray(data)) throw new Error();
+      return data;
+    } catch (error) {
+      if (error.name === 'AbortError') throw error;
+      throw new Error(`DALOY received an invalid API response (HTTP ${response.status}).`);
+    }
+  };
   document.querySelectorAll('[data-chart-background]').forEach(chart => {
     chart.style.backgroundImage = chart.dataset.chartBackground;
   });
@@ -83,7 +97,7 @@
       const csrf=document.querySelector('meta[name="csrf-token"]')?.content||'';
       const form=new URLSearchParams({csrf,password,latest});
       const response=await fetch('api.php?action=github_update_apply',{method:'POST',credentials:'same-origin',headers:{Accept:'application/json'},body:form});
-      const answer=await response.json();
+      const answer=await readApiResponse(response);
       if (!response.ok||answer.error) throw new Error(answer.error||'Update failed.');
       alert(answer.message+' The system will reload after maintenance.');
       location.reload();
@@ -301,7 +315,7 @@
     notificationStatus.textContent='Loading notifications…';
     try {
       const response=await fetch('api.php?action=notifications_recent',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
-      const data=await response.json();
+      const data=await readApiResponse(response);
       if (!response.ok||!Array.isArray(data.notifications)||!Number.isInteger(data.unread_count)) throw new Error(data.error||'Unable to load notifications.');
       renderRecentNotifications(data.notifications);
       notificationUnread.textContent=data.unread_count?`${data.unread_count} unread`:'All caught up';
@@ -316,7 +330,7 @@
   const markNotificationRead = async notificationId => {
     const body=new URLSearchParams({csrf:csrfToken,id:notificationId});
     const response=await fetch('api.php?action=notification_read',{method:'POST',credentials:'same-origin',headers:{Accept:'application/json','Content-Type':'application/x-www-form-urlencoded'},body});
-    const data=await response.json();
+    const data=await readApiResponse(response);
     if (!response.ok||!Number.isInteger(data.unread_count)) throw new Error(data.error||'Unable to mark this notification as read.');
     syncNotificationBadges(data.unread_count);
   };
@@ -381,6 +395,8 @@
       console.warn('System update notifications could not be remembered in this browser.',error);
     }
     let polling=false;
+    let nextPollAt=0;
+    let pollFailureReported=false;
     const showSystemUpdateToast = notification => {
       const region=document.querySelector('[data-system-update-toasts]');
       if (!region) return;
@@ -420,13 +436,15 @@
       close.addEventListener('click',() => { window.clearTimeout(timer); toast.remove(); });
     };
     const pollSystemUpdateNotifications = async () => {
-      if (polling) return;
+      if (polling || Date.now()<nextPollAt) return;
       polling=true;
       try {
         const params=new URLSearchParams({action:'system_update_notifications',after:String(updateCursor)});
         const response=await fetch('api.php?'+params,{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
-        const data=await response.json();
+        const data=await readApiResponse(response);
         if (!response.ok||!Array.isArray(data.notifications)||!Number.isInteger(data.unread_count)) throw new Error(data.error||'Unable to check system update notifications.');
+        pollFailureReported=false;
+        nextPollAt=0;
         syncNotificationBadges(data.unread_count);
         let nextCursor=updateCursor;
         data.notifications.forEach(notification => {
@@ -441,7 +459,11 @@
           catch (error) { console.warn('System update notifications will repeat after a page reload.',error); }
         }
       } catch (error) {
-        console.error(error instanceof Error?error.message:'Unable to check system update notifications.');
+        nextPollAt=Date.now()+5*60*1000;
+        if (!pollFailureReported) {
+          console.warn('System update notifications paused for five minutes.',error.message);
+          pollFailureReported=true;
+        }
       } finally {
         polling=false;
       }
@@ -463,7 +485,7 @@
     result.textContent='Contacting MrMilar12/daloy on GitHub.';
     try {
       const response=await fetch('api.php?action=github_updates',{method:'POST',credentials:'same-origin',headers:{Accept:'application/json','X-CSRF-Token':csrfToken}});
-      const data=await response.json();
+      const data=await readApiResponse(response);
       if (!response.ok||data.error) throw new Error(data.error||'Unable to check GitHub updates.');
       if (typeof data.latest!=='string'||!data.latest) throw new Error('GitHub returned an invalid update response.');
       latestUpdate=data.latest;
@@ -730,7 +752,7 @@
       preview.className = 'span-2 conflict-preview loading'; preview.textContent = 'Checking recorded commitments';
       try {
         const response = await fetch('api.php?' + params, { signal: controller.signal, credentials: 'same-origin', headers: { Accept: 'application/json' } });
-        const data = await response.json();
+        const data = await readApiResponse(response);
         if (!response.ok) throw new Error(data.error || 'Unable to check conflicts.');
         preview.className = 'span-2 conflict-preview alert ' + (data.conflicts.length ? 'danger' : 'success');
         preview.textContent = data.conflicts.length ? data.conflicts.map(c => `${c.label}: ${c.starts_at} to ${c.ends_at}`).join('; ') : 'No recorded conflicts for this interval. Availability will be checked again when saving.';

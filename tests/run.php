@@ -199,6 +199,8 @@ try {
     }
     function token(array $r): string { if(!preg_match('/name="csrf" value="([a-f0-9]+)"/',$r['body'],$m)) throw new RuntimeException('CSRF token not found: '.substr($r['body'],0,200)); return $m[1]; }
     $login=request('admin'); check($login['status']===200 && str_contains($login['body'],'Welcome back'),'Login page renders');
+    $siteIcon=request('admin','favicon.ico');
+    check(str_contains($login['body'],'rel="icon" href="favicon.ico"') && $siteIcon['status']===200 && $siteIcon['body']===file_get_contents(ROOT.'/favicon.ico'),'Login uses a favicon served from the same origin');
     check(str_contains($login['headers'],'Content-Security-Policy:') && str_contains(strtolower($login['headers']),'httponly'),'CSP and HttpOnly session cookie present');
     check(request('admin','',['action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===419,'Missing CSRF rejected');
     check(request('admin','',['csrf'=>token($login),'action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===303,'Administrator signs in');

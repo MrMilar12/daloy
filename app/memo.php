@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Workspace memo &middot; DALOY</title>
+    <link rel="icon" href="favicon.ico">
     <link rel="stylesheet" href="<?=e(asset_url('app.css'))?>">
     <script src="<?=e(asset_url('app.js'))?>" defer></script>
 </head>
