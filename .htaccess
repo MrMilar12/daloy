@@ -3,7 +3,7 @@ Options -Indexes
   RewriteEngine On
   RewriteRule (^|/)\. - [F,L]
 </IfModule>
-<FilesMatch "^(config.*\.php|README\.md|.*\.sql|.*\.log)$">
+<FilesMatch "^(config.*\.php|web-push-key\.php|README\.md|.*\.sql|.*\.log|.*\.pem)$">
   Require all denied
 </FilesMatch>
 <IfModule mod_headers.c>

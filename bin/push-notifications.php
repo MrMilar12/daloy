@@ -4,19 +4,24 @@ if(PHP_SAPI!=='cli') exit;
 require dirname(__DIR__).'/app/bootstrap.php';
 
 try {
+    if(in_array('--protect-key',$argv,true)) {
+        $legacy=WebPush::legacyKeyPath();
+        if(!is_file($legacy)) throw new RuntimeException('There is no legacy push key to migrate.');
+        $pem=file_get_contents($legacy);
+        $oldKey=$pem?openssl_pkey_get_private($pem):false;
+        if(!$oldKey) throw new RuntimeException('The legacy push key is invalid.');
+        if(!is_file(WebPush::keyPath())) WebPush::saveKey($pem);
+        $newKeys=WebPush::keys();
+        if(openssl_pkey_get_details($oldKey)['key']!==openssl_pkey_get_details($newKeys['private'])['key']) throw new RuntimeException('The protected key does not match the legacy key.');
+        if(!unlink($legacy)) throw new RuntimeException('Could not remove the legacy key from storage.');
+        echo "Browser push key protected. Existing subscriptions can continue using it.\n";
+        exit;
+    }
     if(in_array('--init',$argv,true)) {
-        $path=WebPush::keyPath();
+        if(is_file(WebPush::legacyKeyPath())) throw new RuntimeException('Run --protect-key to migrate the existing signing key.');
         $key=openssl_pkey_new(['private_key_type'=>OPENSSL_KEYTYPE_EC,'curve_name'=>'prime256v1']);
         if(!$key || !openssl_pkey_export($key,$pem)) throw new RuntimeException('Could not generate the browser push signing key.');
-        umask(0077);
-        $file=@fopen($path,'xb');
-        if(!$file) throw new RuntimeException('The push key already exists or storage is unavailable.');
-        if(fwrite($file,$pem)!==strlen($pem)) {
-            fclose($file);
-            unlink($path);
-            throw new RuntimeException('Could not save the browser push signing key.');
-        }
-        fclose($file);
+        WebPush::saveKey($pem);
         echo "Browser push key created.\n";
         exit;
     }

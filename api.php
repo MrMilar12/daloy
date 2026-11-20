@@ -9,7 +9,6 @@ try {
         case 'browser_push':
             if($_SERVER['REQUEST_METHOD']!=='POST') throw new DomainException('POST required.',405);
             csrf_check();
-            require_once __DIR__.'/app/WebPush.php';
             $pushKeys=WebPush::keys();
             if(!$pushKeys) throw new DomainException('Browser notifications are unavailable.',503);
             $endpoint=$_POST['endpoint']??null;
@@ -18,17 +17,28 @@ try {
             $hash=hash('sha256',$endpoint);
             $mode=$_POST['mode']??'';
             if($mode==='enable') {
-                $latest=(int)$db->one('SELECT COALESCE(MAX(id),0) AS latest FROM notifications WHERE user_id=?',[$user['id']])['latest'];
-                $db->run('INSERT INTO browser_push_subscriptions (endpoint_hash,endpoint,user_id,last_notification_id) VALUES (?,?,?,?)
-                    ON DUPLICATE KEY UPDATE last_notification_id=IF(user_id=VALUES(user_id),last_notification_id,VALUES(last_notification_id)),retry_at=NULL,user_id=VALUES(user_id)',[$hash,$endpoint,$user['id'],$latest]);
+                $db->transaction(function() use($db,$user,$hash,$endpoint) {
+                    $existing=$db->one('SELECT user_id FROM browser_push_subscriptions WHERE endpoint_hash=?',[$hash]);
+                    if($existing) {
+                        if((int)$existing['user_id']!==(int)$user['id']) throw new DomainException('This browser is already registered to another account. Disable its alerts from that account first.',409);
+                        return;
+                    }
+                    $devices=(int)$db->one('SELECT COUNT(*) AS total FROM browser_push_subscriptions WHERE user_id=?',[$user['id']])['total'];
+                    if($devices>=10) throw new DomainException('This account has reached its browser notification limit.',429);
+                    $latest=(int)$db->one('SELECT COALESCE(MAX(id),0) AS latest FROM notifications WHERE user_id=?',[$user['id']])['latest'];
+                    $db->run('INSERT INTO browser_push_subscriptions (endpoint_hash,endpoint,user_id,last_notification_id) VALUES (?,?,?,?)',[$hash,$endpoint,$user['id'],$latest]);
+                });
             } elseif($mode==='disable') {
                 $db->run('DELETE FROM browser_push_subscriptions WHERE endpoint_hash=? AND user_id=?',[$hash,$user['id']]);
             } elseif($mode==='test') {
-                if(!$db->one('SELECT endpoint_hash FROM browser_push_subscriptions WHERE endpoint_hash=? AND user_id=?',[$hash,$user['id']])) throw new DomainException('Enable alerts on this device first.',403);
-                if(($_SESSION['last_push_test']??0)>time()-30) throw new DomainException('Wait 30 seconds before sending another test alert.',429);
-                $_SESSION['last_push_test']=time();
+                $subscription=$db->one('SELECT endpoint FROM browser_push_subscriptions WHERE endpoint_hash=? AND user_id=?',[$hash,$user['id']]);
+                if(!$subscription) throw new DomainException('Enable alerts on this device first.',403);
+                $testAt=now();
+                $allowed=$db->run('INSERT INTO browser_push_test_limits (user_id,last_test_at) VALUES (?,?)
+                    ON DUPLICATE KEY UPDATE last_test_at=IF(last_test_at<=?,VALUES(last_test_at),last_test_at)',[$user['id'],$testAt,date('Y-m-d H:i:s',time()-30)]);
+                if(!$allowed) throw new DomainException('Wait 30 seconds before sending another test alert.',429);
                 session_write_close();
-                $status=WebPush::send($endpoint,$pushKeys,$config['web_push_subject']??'');
+                $status=WebPush::send($subscription['endpoint'],$pushKeys,$config['web_push_subject']??'');
                 if(in_array($status,[404,410],true)) {
                     $db->run('DELETE FROM browser_push_subscriptions WHERE endpoint_hash=? AND user_id=?',[$hash,$user['id']]);
                     throw new DomainException('This device subscription expired. Select Enable to subscribe again.',410);

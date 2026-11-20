@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 final class WebPush {
     private static array $recipients=[];
+    private const KEY_GUARD="<?php http_response_code(404); exit; __halt_compiler();\n";
 
     public static function afterNotification(Database $db,int $userId): void {
-        if(PHP_SAPI==='cli' || !is_file(self::keyPath())) return;
+        if(PHP_SAPI==='cli' || (!is_file(self::keyPath()) && !is_file(self::legacyKeyPath()))) return;
         if(!self::$recipients) {
             register_shutdown_function(static function() use($db) {
                 global $config;
@@ -51,15 +52,36 @@ final class WebPush {
         }
     }
 
-    public static function keyPath(): string { return ROOT.'/storage/web-push.pem'; }
+    public static function keyPath(): string { return ROOT.'/storage/web-push-key.php'; }
+    public static function legacyKeyPath(): string { return ROOT.'/storage/web-push.pem'; }
+
+    public static function saveKey(string $pem): void {
+        $path=self::keyPath();
+        $contents=self::KEY_GUARD.$pem;
+        umask(0077);
+        $file=@fopen($path,'xb');
+        if(!$file) throw new RuntimeException('The push key already exists or storage is unavailable.');
+        $written=fwrite($file,$contents);
+        fclose($file);
+        if($written!==strlen($contents)) {
+            unlink($path);
+            throw new RuntimeException('Could not save the browser push signing key.');
+        }
+    }
 
     public static function encode(string $bytes): string {
         return rtrim(strtr(base64_encode($bytes),'+/','-_'),'=');
     }
 
     public static function keys(): ?array {
-        if(!is_file(self::keyPath())) return null;
-        $private=openssl_pkey_get_private('file://'.self::keyPath());
+        if(is_file(self::keyPath())) {
+            $contents=file_get_contents(self::keyPath());
+            if($contents===false || !str_starts_with($contents,self::KEY_GUARD)) throw new RuntimeException('The browser push signing key is invalid.');
+            $pem=substr($contents,strlen(self::KEY_GUARD));
+        } elseif(is_file(self::legacyKeyPath())) {
+            $pem=file_get_contents(self::legacyKeyPath());
+        } else return null;
+        $private=$pem?openssl_pkey_get_private($pem):false;
         $details=$private?openssl_pkey_get_details($private):false;
         if(($details['ec']['curve_name']??'')!=='prime256v1') throw new RuntimeException('The browser push signing key is invalid.');
         $point="\x04".str_pad($details['ec']['x'],32,"\0",STR_PAD_LEFT).str_pad($details['ec']['y'],32,"\0",STR_PAD_LEFT);
@@ -81,13 +103,18 @@ final class WebPush {
     }
 
     public static function ensureSchema(Database $db): void {
-        if($db->all("SHOW TABLES LIKE 'browser_push_subscriptions'")) return;
+        if($db->all("SHOW TABLES LIKE 'browser_push_subscriptions'") && $db->all("SHOW TABLES LIKE 'browser_push_test_limits'")) return;
         $db->pdo->exec('CREATE TABLE IF NOT EXISTS browser_push_subscriptions (
             endpoint_hash CHAR(64) PRIMARY KEY,
             endpoint VARCHAR(2048) NOT NULL,
             user_id INTEGER NOT NULL,
             last_notification_id INTEGER NOT NULL,
             retry_at DATETIME NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )');
+        $db->pdo->exec('CREATE TABLE IF NOT EXISTS browser_push_test_limits (
+            user_id INTEGER PRIMARY KEY,
+            last_test_at DATETIME NOT NULL,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )');
     }
@@ -113,14 +140,40 @@ final class WebPush {
     public static function send(string $endpoint,array $keys,string $subject): int {
         $origin=self::origin($endpoint);
         if(!$origin) return 410;
+        $host=parse_url($origin,PHP_URL_HOST);
+        $address=null;
+        foreach(dns_get_record($host,DNS_A|DNS_AAAA)?:[] as $record) {
+            $candidate=$record['ip']??$record['ipv6']??'';
+            if(self::isPublicAddress($candidate)) { $address=$candidate; break; }
+        }
+        if(!$address) return 0;
+        $pinnedAddress=str_contains($address,':')?'['.$address.']':$address;
         $request=curl_init($endpoint);
         curl_setopt_array($request,[
             CURLOPT_POST=>true, CURLOPT_POSTFIELDS=>'', CURLOPT_PROTOCOLS=>CURLPROTO_HTTPS,
             CURLOPT_FOLLOWLOCATION=>false, CURLOPT_RETURNTRANSFER=>true,
+            CURLOPT_PROXY=>'', CURLOPT_RESOLVE=>[$host.':443:'.$pinnedAddress],
+            CURLOPT_SSL_VERIFYPEER=>true, CURLOPT_SSL_VERIFYHOST=>2,
             CURLOPT_CONNECTTIMEOUT=>3, CURLOPT_TIMEOUT=>6,
             CURLOPT_HTTPHEADER=>['Authorization: '.self::authorization($origin,$keys,$subject),'TTL: 3600','Topic: daloy-inbox'],
         ]);
         curl_exec($request);
         return (int)curl_getinfo($request,CURLINFO_RESPONSE_CODE);
+    }
+
+    public static function isPublicAddress(string $address): bool {
+        if(defined('FILTER_FLAG_GLOBAL_RANGE')) {
+            if(!filter_var($address,FILTER_VALIDATE_IP,FILTER_FLAG_GLOBAL_RANGE)) return false;
+            $packed=inet_pton($address);
+            if(strlen($packed)===4) return ord($packed[0])<224;
+            return (ord($packed[0])&0xe0)===0x20 && !str_starts_with($packed,"\x20\x02");
+        }
+        if(!filter_var($address,FILTER_VALIDATE_IP,FILTER_FLAG_IPV4|FILTER_FLAG_NO_PRIV_RANGE|FILTER_FLAG_NO_RES_RANGE)) return false;
+        [$first,$second,$third]=array_map('intval',explode('.',$address));
+        return $first<224
+            && !($first===100 && $second>=64 && $second<=127)
+            && !($first===192 && $second===0)
+            && !($first===198 && (in_array($second,[18,19],true) || ($second===51 && $third===100)))
+            && !($first===203 && $second===0 && $third===113);
     }
 }

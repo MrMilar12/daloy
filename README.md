@@ -141,7 +141,7 @@ Restore refuses to overwrite any existing tables and validates attachment checks
 
 ## Browser push notifications
 
-1. On the application server, run `php bin/push-notifications.php --init` once to create its signing key. On XAMPP, if PHP cannot generate the key, set `OPENSSL_CONF` to the path of XAMPP’s `openssl.cnf` and retry. Keep `storage/web-push.pem` private and back it up separately. Replacing it requires users to subscribe again.
+1. On the application server, run `php bin/push-notifications.php --init` once to create its signing key. If an existing installation has `storage/web-push.pem`, run `php bin/push-notifications.php --protect-key` to migrate the existing key and preserve subscriptions. On XAMPP, if PHP cannot generate a new key, set `OPENSSL_CONF` to XAMPP’s `openssl.cnf` and retry. Keep `storage/web-push-key.php` private and back it up separately.
 2. DALOY tries to deliver alerts when it creates an inbox notification. Schedule `php /absolute/path/to/daloy/bin/push-notifications.php` once per minute to retry failed deliveries and send any remaining alerts. The server needs OpenSSL, cURL, and outbound HTTPS. An optional `web_push_subject` in `config.local.php` can identify a valid contact URI.
 3. Serve DALOY over HTTPS in production. Open **Notifications → Browser notifications**, select **Enable**, and grant permission. Select **Send test alert** to check delivery. **Disable** stops alerts on that device for the signed-in account. Browser alerts are generic and open the DALOY inbox.
 
