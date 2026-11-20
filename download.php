@@ -13,6 +13,8 @@ try {
     else throw new DomainException('Unknown file type.',404);
     if(!$name || !preg_match('/^[a-f0-9]{48}\.(jpg|png|pdf)$/D',$name) || !is_file(ROOT.'/storage/uploads/'.$name)) throw new DomainException('File not found.',404);
     $path=ROOT.'/storage/uploads/'.$name; $mime=(new finfo(FILEINFO_MIME_TYPE))->file($path);
+    $allowed=$type==='photo'?['image/jpeg','image/png']:['application/pdf','image/jpeg','image/png'];
+    if(!in_array($mime,$allowed,true)) throw new DomainException('File format is unavailable.',404);
     $inline=$type==='photo' || ($type==='memo' && ($_GET['preview']??'')==='1' && in_array($mime,['application/pdf','image/jpeg','image/png'],true));
     header('Content-Type: '.$mime); header('Content-Length: '.filesize($path)); header('Content-Disposition: '.($inline?'inline':'attachment').'; filename="daloy-'.$type.'-'.(int)$r['id'].'.'.pathinfo($name,PATHINFO_EXTENSION).'"'); readfile($path);
 } catch(DomainException $e) { http_response_code($e->getCode()?:403); echo e($e->getMessage()); }

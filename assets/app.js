@@ -462,7 +462,7 @@
     result.hidden=false;
     result.textContent='Contacting MrMilar12/daloy on GitHub.';
     try {
-      const response=await fetch('api.php?action=github_updates',{credentials:'same-origin',headers:{Accept:'application/json'}});
+      const response=await fetch('api.php?action=github_updates',{method:'POST',credentials:'same-origin',headers:{Accept:'application/json','X-CSRF-Token':csrfToken}});
       const data=await response.json();
       if (!response.ok||data.error) throw new Error(data.error||'Unable to check GitHub updates.');
       if (typeof data.latest!=='string'||!data.latest) throw new Error('GitHub returned an invalid update response.');

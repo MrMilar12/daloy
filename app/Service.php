@@ -256,7 +256,10 @@ final class Service {
     public function assignedLocations(int $nurseId): array {
         return $this->db->all('SELECT l.* FROM locations l WHERE l.id=(SELECT location_id FROM users WHERE id=?) OR EXISTS (SELECT 1 FROM nurse_locations nl WHERE nl.nurse_id=? AND nl.location_id=l.id) ORDER BY l.name,l.id',[$nurseId,$nurseId]);
     }
-    public function password(mixed $raw): string { $p=(string)$raw; if(strlen($p)<12 || strlen($p)>72) throw new DomainException('Use a password between 12 and 72 bytes.',422); return $p; }
+    public function password(mixed $raw): string {
+        if(!is_string($raw) || strlen($raw)<12 || strlen($raw)>72 || str_contains($raw,"\0")) throw new DomainException('Use a password between 12 and 72 bytes.',422);
+        return $raw;
+    }
     public function profile(array $d,?string $photo=null): void {
         $this->db->transaction(function() use($d,$photo) {
             $old=$this->record('users',(int)$this->actor['id']); $data=[]; if(trim((string)($d['phone']??''))!=='') $data['phone']=$this->text($d,'phone',40,false);

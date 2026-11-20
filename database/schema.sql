@@ -109,6 +109,10 @@ CREATE TABLE IF NOT EXISTS login_attempts (
  id INTEGER PRIMARY KEY AUTO_INCREMENT, identity_hash VARCHAR(64) NOT NULL, ip_hash VARCHAR(64) NOT NULL,
  succeeded INTEGER NOT NULL DEFAULT 0, created_at DATETIME NOT NULL, INDEX login_identity (identity_hash, created_at), INDEX login_ip (ip_hash, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS registration_attempts (
+ ip_hash CHAR(64) PRIMARY KEY, expires_at DATETIME NOT NULL, attempts INTEGER NOT NULL,
+ INDEX registration_attempt_expiry (expires_at)
+);
 CREATE TABLE IF NOT EXISTS workspace_memos (
  id INTEGER PRIMARY KEY AUTO_INCREMENT,
  title VARCHAR(190) NOT NULL,

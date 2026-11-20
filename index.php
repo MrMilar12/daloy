@@ -18,36 +18,42 @@ if($_SERVER['REQUEST_METHOD']==='POST') {
         }
         if($action==='register') {
             if($user) redirect('?page=dashboard');
+            $auth->limitRegistration($_SERVER['REMOTE_ADDR']??'unknown');
             $name=trim((string)($_POST['name']??'')); $email=strtolower(trim((string)($_POST['email']??''))); $password=(string)($_POST['password']??'');
             if(mb_strlen($name)<3 || mb_strlen($name)>120) throw new DomainException('Enter your full name.',422);
-            if(!filter_var($email,FILTER_VALIDATE_EMAIL)) throw new DomainException('Enter a valid email address.',422);
-            if(strlen($password)<12 || !preg_match('/[A-Z]/',$password) || !preg_match('/[a-z]/',$password) || !preg_match('/\d/',$password)) throw new DomainException('Password must be at least 12 characters and include uppercase, lowercase, and a number.',422);
-            if($db->one('SELECT id FROM users WHERE email=?',[$email])) throw new DomainException('An account with this email already exists.',409);
+            if(strlen($email)>190 || !filter_var($email,FILTER_VALIDATE_EMAIL)) throw new DomainException('Enter a valid email address.',422);
+            if(strlen($password)<12 || strlen($password)>72 || str_contains($password,"\0") || !preg_match('/[A-Z]/',$password) || !preg_match('/[a-z]/',$password) || !preg_match('/\d/',$password)) throw new DomainException('Use a password between 12 and 72 bytes with uppercase, lowercase, and a number.',422);
             $requestedRole=(string)($_POST['requested_role']??'');
             if(!in_array($requestedRole,['nurse','head'],true)) throw new DomainException('Select a requested account type.',422);
-            $requestId=$db->insert('registration_requests',['name'=>$name,'email'=>$email,'password_hash'=>password_hash($password,PASSWORD_DEFAULT),'requested_role'=>$requestedRole,'status'=>'pending','created_at'=>now()]);
-            foreach($db->all("SELECT id FROM users WHERE role='admin' AND active=1") as $admin) {
-                $db->insert('notifications',['user_id'=>$admin['id'],'title'=>'New registration request','message'=>$name.' requested access to DALOY. Review the pending request before creating an account.','link'=>'?page=users','created_at'=>now()]);
-            }
-            $_SESSION['flash']='Registration submitted. An administrator must activate your account before you can sign in.'; redirect('./');
+            $passwordHash=password_hash($password,PASSWORD_DEFAULT);
+            $db->transaction(function() use($db,$name,$email,$passwordHash,$requestedRole) {
+                if($db->one('SELECT id FROM users WHERE email=?',[$email]) || $db->one('SELECT id FROM registration_requests WHERE email=?',[$email])) return;
+                $db->insert('registration_requests',['name'=>$name,'email'=>$email,'password_hash'=>$passwordHash,'requested_role'=>$requestedRole,'status'=>'pending','created_at'=>now()]);
+                foreach($db->all("SELECT id FROM users WHERE role='admin' AND active=1") as $admin) {
+                    $db->insert('notifications',['user_id'=>$admin['id'],'title'=>'New registration request','message'=>$name.' requested access to DALOY. Review the pending request before creating an account.','link'=>'?page=users','created_at'=>now()]);
+                }
+            });
+            $_SESSION['flash']='If this email is eligible, an administrator will review your access request.'; redirect('./');
         }
         if(!$user) throw new DomainException('Please sign in again.',401);
         $service=new Service($db,$user);
+        if($user['must_change_password'] && !in_array($action,['activate','profile','logout'],true)) throw new DomainException('Set your new password to finish account setup. Your workspace will then open.',403);
         if($action==='register_review') {
             $service->requireRole(['admin']);
-            $request=$db->one("SELECT * FROM registration_requests WHERE id=? AND status='pending'",[(int)($_POST['request_id']??0)]);
-            if(!$request) throw new DomainException('Registration request is no longer pending.',404);
-            if(($_POST['decision']??'')==='approve') {
-                $role=$service->choice($_POST,'role',['nurse','head']);
-                $db->insert('users',['name'=>$request['name'],'email'=>$request['email'],'password_hash'=>$request['password_hash'],'role'=>$role,'active'=>1,'must_change_password'=>1,'designation'=>$role==='head'?'Nurse Head / Supervisor':'Nurse','employment_status'=>'Permanent','created_at'=>now()]);
-                $db->run('DELETE FROM registration_requests WHERE id=?',[(int)$request['id']]);
-            } elseif(($_POST['decision']??'')==='reject') {
-                $db->update('registration_requests',(int)$request['id'],['status'=>'rejected','reviewed_by'=>$user['id'],'reviewed_at'=>now()]);
-            } else throw new DomainException('Select whether to approve or reject the request.',422);
+            $db->transaction(function() use($db,$user,$service) {
+                $request=$db->one("SELECT * FROM registration_requests WHERE id=? AND status='pending' FOR UPDATE",[(int)($_POST['request_id']??0)]);
+                if(!$request) throw new DomainException('Registration request is no longer pending.',404);
+                if(($_POST['decision']??'')==='approve') {
+                    $role=$service->choice($_POST,'role',['nurse','head']);
+                    $db->insert('users',['name'=>$request['name'],'email'=>$request['email'],'password_hash'=>$request['password_hash'],'role'=>$role,'active'=>1,'must_change_password'=>1,'designation'=>$role==='head'?'Nurse Head / Supervisor':'Nurse','employment_status'=>'Permanent','created_at'=>now()]);
+                    $db->run('DELETE FROM registration_requests WHERE id=?',[(int)$request['id']]);
+                } elseif(($_POST['decision']??'')==='reject') {
+                    $db->update('registration_requests',(int)$request['id'],['status'=>'rejected','reviewed_by'=>$user['id'],'reviewed_at'=>now()]);
+                } else throw new DomainException('Select whether to approve or reject the request.',422);
+            });
             $_SESSION['flash']=($_POST['decision']??'')==='approve'?'Registration approved. The requester may now sign in with the temporary password.':'Registration request rejected.'; redirect('?page=users');
         }
         if($action==='logout') { $service->audit('Logout','users',(int)$user['id'],null,null); $auth->logout(); redirect('./'); }
-        if($user['must_change_password'] && !in_array($action,['activate','profile'],true)) throw new DomainException('Set your new password to finish account setup. Your workspace will then open.',403);
         if($action==='acknowledge_memo') {
             $memoId=filter_var($_POST['memo_id']??null,FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);
             if(!$memoId || !$db->one('SELECT id FROM workspace_memos WHERE id=?',[$memoId])) throw new DomainException('This memo is unavailable.',404);

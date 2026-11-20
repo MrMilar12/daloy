@@ -203,6 +203,7 @@ try {
     check(request('admin','',['action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===419,'Missing CSRF rejected');
     check(request('admin','',['csrf'=>token($login),'action'=>'login','email'=>$admin['email'],'password'=>$password])['status']===303,'Administrator signs in');
     $settingsPage=request('admin','?page=settings');
+    check(request('admin','api.php?action=github_updates')['status']===405 && request('admin','api.php?action=github_updates',['csrf'=>'invalid'])['status']===419,'GitHub update checks require a CSRF-protected POST');
     check(str_contains($settingsPage['body'],'class="header-calendar"') && str_contains($settingsPage['body'],'aria-current="date"') && str_contains($settingsPage['body'],'?page=calendar&amp;view=day&amp;date='.date('Y-m-d')),'Header calendar highlights today and links to its day view');
     $calendarFixture=$as->schedule(array_replace($base,['starts_at'=>date('Y-m-d').'T08:00','ends_at'=>date('Y-m-d').'T09:00']));
     $calendarDropdown=request('admin','?page=settings');
@@ -297,6 +298,12 @@ try {
     $userForm=request('admin','?page=users&new=1');
     check(str_contains($userForm['body'],'No school or office assignment') && str_contains($userForm['body'],'data-nurse-school-assignments'),'Internal account form makes school assignment optional');
     $registration=request('publicRegistration','?register=1');
+    $longRegistration=request('publicRegistration','?register=1',['csrf'=>token($registration),'action'=>'register','name'=>'Password Limit Test','email'=>'password-limit@example.test','requested_role'=>'head','password'=>'Aa1'.str_repeat('x',70)]);
+    check($longRegistration['status']===422 && str_contains($longRegistration['body'],'12 and 72 bytes'),'Public registration enforces the server password length limit');
+    $registrationIp=hash('sha256','127.0.0.1');
+    $db->run('UPDATE registration_attempts SET attempts=10 WHERE ip_hash=?',[$registrationIp]);
+    check(request('publicRegistration','?register=1',['csrf'=>token($registration),'action'=>'register'])['status']===429,'Public registration throttles repeated requests');
+    $db->run('DELETE FROM registration_attempts WHERE ip_hash=?',[$registrationIp]);
     check(str_contains($registration['body'],'name="requested_role"') && str_contains($registration['body'],'value="head"'),'Public registration can request an office-head account');
     $registrationPost=request('publicRegistration','?register=1',['csrf'=>token($registration),'action'=>'register','name'=>'External Office Head','email'=>'external.officehead@example.test','requested_role'=>'head','password'=>'Strong-Registration-123']);
     check($registrationPost['status']===303 && $db->one('SELECT id FROM registration_requests WHERE email=? AND requested_role=?',['external.officehead@example.test','head']),'Public office-head registration is recorded as a role request');

@@ -8,6 +8,8 @@ try {
     switch($_GET['action']??'') {
         case 'github_updates':
             $service->requireRole(['admin']);
+            if($_SERVER['REQUEST_METHOD']!=='POST') throw new DomainException('POST required.',405);
+            csrf_check();
             require_once __DIR__.'/app/GitHubUpdater.php';
             $updater=new GitHubUpdater($db,ROOT);
             try { $check=$updater->check(); }
