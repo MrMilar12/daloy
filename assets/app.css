@@ -197,7 +197,7 @@ body[data-display=list] .school-assignment-options{grid-template-columns:1fr}bod
 .district-card-stats dt{color:var(--muted);font-size:.875rem}
 .district-card-stats dd{margin:1px 0 0;font-size:1.55rem;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums}
 .district-card-track{height:8px;overflow:hidden;border-radius:999px;background:var(--border)}
-.district-card-track span{display:block;height:100%;border-radius:inherit;background:var(--district-accent)}
+.district-card-track svg{display:block;width:100%;height:100%;fill:var(--district-accent)}
 .district-workforce-card .district-card-action{justify-self:start;min-height:36px;padding:6px 10px;color:var(--primary);font-size:.875rem}
 .district-workforce-card .district-card-action:hover{border-color:var(--district-accent)}
 .workforce-chart{padding:clamp(15px,2.4vw,26px)}
@@ -280,9 +280,8 @@ body:not(.activation-body) .notification.unread{border-left:3px solid var(--teal
 .district-share-chart p{margin:0;color:var(--muted);font-size:.875rem}
 .district-share-content{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:clamp(18px,3vw,34px)}
 .district-share-pie{
-  width:clamp(150px,19vw,215px);aspect-ratio:1;
+  display:block;width:clamp(150px,19vw,215px);height:auto;aspect-ratio:1;
   border:4px solid var(--surface);border-radius:50%;
-  background:var(--share-pie);
   box-shadow:0 0 0 1px var(--border),0 8px 19px #162b441a;
 }
 .district-share-total{display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:var(--soft);color:var(--muted);font-size:.875rem}
@@ -293,7 +292,7 @@ body:not(.activation-body) .notification.unread{border-left:3px solid var(--teal
   min-height:35px;padding:5px 0;border-bottom:1px solid var(--border);
   font-size:.9rem;line-height:1.25;
 }
-.district-share-swatch{width:9px;height:9px;border-radius:50%;background:var(--district-color)}
+.district-share-swatch{width:9px;height:9px}
 .district-share-name{overflow-wrap:anywhere}
 .district-share-legend strong{color:var(--primary);font-variant-numeric:tabular-nums}
 @media(max-width:600px){

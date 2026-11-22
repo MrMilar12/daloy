@@ -37,17 +37,21 @@ page_heading('WORKFORCE AT A GLANCE',($service->manager()?'Your workforce, in fl
     $districtTotal=$districtNurseTotal+$unassignedDistrictNurses;
     $shareColors=['#2a7bb7','#24a18d','#8970c5','#dd7065','#4460a8','#6d9d54','#c668a0','#4ea1c8','#7c6c56','#a49b3b','#5266aa','#21766d'];
     $shareSegments=[];
-    $shareStops=[];
     $shareCursor=0;
     foreach ($districtCards as $district) {
         $nurses=(int)$district['nurse_count'];
         if ($nurses===0) continue;
         $share=$nurses / $districtTotal * 100;
         $color=$district['id']===null ? '#d6943b' : $shareColors[count($shareSegments) % count($shareColors)];
-        $end=min(100, $shareCursor + $share);
-        $shareStops[]=$color.' '.round($shareCursor, 6).'% '.round($end, 6).'%';
-        $shareSegments[]=['name'=>$district['name'],'color'=>$color,'share'=>$share];
-        $shareCursor=$end;
+        $startAngle=2 * M_PI * $shareCursor / $districtTotal;
+        $shareCursor+=$nurses;
+        $endAngle=2 * M_PI * $shareCursor / $districtTotal;
+        $path=sprintf(
+            'M 50 50 L %.5F %.5F A 50 50 0 %d 1 %.5F %.5F Z',
+            50 + 50*sin($startAngle), 50 - 50*cos($startAngle),
+            (int)($share > 50), 50 + 50*sin($endAngle), 50 - 50*cos($endAngle)
+        );
+        $shareSegments[]=['name'=>$district['name'],'color'=>$color,'share'=>$share,'path'=>$path];
     }
 ?>
 <section class="card district-overview" aria-labelledby="district-overview-title">
@@ -65,14 +69,22 @@ page_heading('WORKFORCE AT A GLANCE',($service->manager()?'Your workforce, in fl
         </header>
         <?php if ($shareSegments): ?>
             <div class="district-share-content">
-                <div class="district-share-pie" style="--share-pie:conic-gradient(<?=e(implode(',', $shareStops))?>)" aria-hidden="true"></div>
+                <svg class="district-share-pie" viewBox="0 0 100 100" aria-hidden="true">
+                    <?php if (count($shareSegments) === 1): ?>
+                        <circle cx="50" cy="50" r="50" fill="<?=$shareSegments[0]['color']?>"></circle>
+                    <?php else: ?>
+                        <?php foreach ($shareSegments as $segment): ?>
+                            <path d="<?=e($segment['path'])?>" fill="<?=$segment['color']?>"></path>
+                        <?php endforeach ?>
+                    <?php endif ?>
+                </svg>
                 <ul class="district-share-legend" role="list">
                     <?php foreach ($shareSegments as $segment):
                         $name=$segment['name'];
                         $label=mb_strtoupper($name)===$name ? mb_convert_case($name, MB_CASE_TITLE) : $name;
                     ?>
                         <li>
-                            <span class="district-share-swatch" style="--district-color:<?=$segment['color']?>" aria-hidden="true"></span>
+                            <svg class="district-share-swatch" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="5" fill="<?=$segment['color']?>"></circle></svg>
                             <span class="district-share-name"><?=e($label)?></span>
                             <strong><?=number_format($segment['share'], 1)?>%</strong>
                         </li>
@@ -102,7 +114,7 @@ page_heading('WORKFORCE AT A GLANCE',($service->manager()?'Your workforce, in fl
                     <?php endif ?>
                 </dl>
                 <div class="district-card-track" role="meter" aria-label="Active nurses compared with the largest group" aria-valuemin="0" aria-valuemax="<?=$districtMax?>" aria-valuenow="<?=$nurses?>">
-                    <span style="width:<?=$barWidth?>%"></span>
+                    <svg aria-hidden="true"><rect width="<?=$barWidth?>%" height="100%" rx="4"></rect></svg>
                 </div>
                 <a class="button district-card-action" href="?page=nurses<?=$districtId===null?'':'&amp;district_id='.(int)$districtId?>" aria-label="<?=e($districtId===null?'View all nursing personnel':'View nurses in '.$district['name'])?>"><?=$districtId===null?'View personnel':'View nurses'?></a>
             </article>
