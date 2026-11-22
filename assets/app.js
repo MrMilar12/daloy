@@ -105,6 +105,23 @@
     const open = document.body.classList.toggle('nav-open');
     event.currentTarget.setAttribute('aria-expanded', String(open));
   });
+  const topDropdowns = [...document.querySelectorAll('.top-dropdown')];
+  document.addEventListener('click', event => {
+    topDropdowns.forEach(dropdown => {
+      if (!dropdown.contains(event.target)) dropdown.open = false;
+    });
+  });
+  document.addEventListener('focusin', event => {
+    topDropdowns.forEach(dropdown => {
+      if (!dropdown.contains(event.target)) dropdown.open = false;
+    });
+  });
+  document.querySelector('.topbar')?.addEventListener('keydown', event => {
+    const dropdown = event.target.closest('.top-dropdown[open]');
+    if (event.key !== 'Escape' || !dropdown) return;
+    dropdown.open = false;
+    dropdown.querySelector('summary').focus();
+  });
   document.addEventListener('keydown', event => { if (event.key === 'Escape') { document.body.classList.remove('nav-open'); document.querySelector('.menu-toggle')?.setAttribute('aria-expanded', 'false'); } });
   document.querySelector('.print-button')?.addEventListener('click', () => window.print());
   document.querySelector('[data-focus-error]')?.focus();
