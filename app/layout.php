@@ -73,7 +73,7 @@ $labels['memo-acknowledgments'] = 'Memo acknowledgments';
                                 <a class="top-dropdown-action top-notification" href="<?=e($notification['link'] ?: '?page=notifications')?>">
                                     <strong><?=e($notification['title'])?></strong>
                                     <?php if ($notification['read_at'] === null): ?><span class="top-notification-unread">Unread</span><?php endif ?>
-                                    <span class="top-notification-message"><?=e($notification['message'])?></span>
+                                    <span class="top-notification-message"><?=e(notification_message($notification['message']))?></span>
                                 </a>
                             </li>
                         <?php endforeach ?>

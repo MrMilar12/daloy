@@ -8,6 +8,10 @@ function icon(string $name): string {
 function badge(string $text): string { return '<span class="badge '.e(strtolower(str_replace(' ','-',$text))).'"><span class="dot"></span>'.e($text).'</span>'; }
 function initials(string $name): string { $parts=explode(' ',preg_replace('/^Demo /','',$name)); return mb_substr($parts[0],0,1).mb_substr(end($parts),0,1); }
 function avatar(string $name): string { return '<span class="avatar">'.e(initials($name)).'</span>'; }
+function notification_message(string $message): string {
+    // Older notifications stored these separators with one or two encoding errors.
+    return strtr($message, [' Ã‚Â· ' => ' · ', ' Â· ' => ' · ']);
+}
 function dt(string $date): string { return date('M j, Y · g:i A',strtotime($date)); }
 function range_label(array $r): string { return e(date('M j, Y',strtotime($r['starts_at']))).'<small>'.e(date('g:i A',strtotime($r['starts_at'])).' – '.(substr($r['starts_at'],0,10)!==substr($r['ends_at'],0,10)?date('M j, ',strtotime($r['ends_at'])):'').date('g:i A',strtotime($r['ends_at']))).'</small>'; }
 function options(string $table,string $where='active=1'): array { global $db; return array_column($db->all("SELECT id,name FROM $table WHERE $where ORDER BY name"),'name','id'); }
