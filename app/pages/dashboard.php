@@ -34,17 +34,55 @@ page_heading('WORKFORCE AT A GLANCE',($service->manager()?'Your workforce, in fl
     }
     $districtNurseTotal=array_sum(array_map(fn($d)=>(int)$d['nurse_count'],$districtOverview));
     $districtSchoolTotal=array_sum(array_map(fn($d)=>(int)$d['school_count'],$districtOverview));
-    $districtPieTotal=$districtNurseTotal+$unassignedDistrictNurses; $districtPieColors=['#1876a3','#15958f','#5586c9','#8b71ba','#d18953','#3d9b70','#bc6574','#71859a','#a18a44','#5574a8']; $districtPieStops=[]; $districtPieLegend=[]; $districtPieCursor=0; $districtPieIndex=0;
-    foreach($districtOverview as $district) { $value=(int)$district['nurse_count']; if(!$value) continue; $end=$districtPieCursor+$value/$districtPieTotal*100; $color=$districtPieColors[$districtPieIndex++%count($districtPieColors)]; $districtPieStops[]=$color.' '.$districtPieCursor.'% '.$end.'%'; $districtPieLegend[]=['name'=>$district['name'],'value'=>$value,'share'=>$value/$districtPieTotal*100,'color'=>$color]; $districtPieCursor=$end; }
-    if($unassignedDistrictNurses) { $end=$districtPieCursor+$unassignedDistrictNurses/$districtPieTotal*100; $color='#c58b46'; $districtPieStops[]=$color.' '.$districtPieCursor.'% '.$end.'%'; $districtPieLegend[]=['name'=>'Unassigned district','value'=>$unassignedDistrictNurses,'share'=>$unassignedDistrictNurses/$districtPieTotal*100,'color'=>$color]; }
-    $districtPieStyle=$districtPieStops?'conic-gradient('.implode(',',$districtPieStops).')':'conic-gradient(var(--soft) 0% 100%)';
+    $districtTotal=$districtNurseTotal+$unassignedDistrictNurses;
+    $shareColors=['#2a7bb7','#24a18d','#8970c5','#dd7065','#4460a8','#6d9d54','#c668a0','#4ea1c8','#7c6c56','#a49b3b','#5266aa','#21766d'];
+    $shareSegments=[];
+    $shareStops=[];
+    $shareCursor=0;
+    foreach ($districtCards as $district) {
+        $nurses=(int)$district['nurse_count'];
+        if ($nurses===0) continue;
+        $share=$nurses / $districtTotal * 100;
+        $color=$district['id']===null ? '#d6943b' : $shareColors[count($shareSegments) % count($shareColors)];
+        $end=min(100, $shareCursor + $share);
+        $shareStops[]=$color.' '.round($shareCursor, 6).'% '.round($end, 6).'%';
+        $shareSegments[]=['name'=>$district['name'],'color'=>$color,'share'=>$share];
+        $shareCursor=$end;
+    }
 ?>
 <section class="card district-overview" aria-labelledby="district-overview-title">
     <div class="section-heading"><div><span class="eyebrow">DISTRICT DISTRIBUTION</span><h2 id="district-overview-title">Nursing workforce by district</h2><p>Active nurses and public schools assigned to each active district.</p></div><a href="?page=locations">Districts &amp; schools <?=icon('arrow')?></a></div>
     <div class="district-overview-stats"><div><strong><?=count($districtOverview)?></strong><span>Active districts</span></div><div><strong><?=number_format($districtNurseTotal+$unassignedDistrictNurses)?></strong><span>Active nurses</span></div><div><strong><?=number_format($districtSchoolTotal)?></strong><span>Active schools</span></div></div>
     <?php if(!$districtCards): ?><div class="district-chart-empty"><h3>No active districts yet</h3><p>Add district records to see workforce distribution.</p><a class="button small" href="?page=configuration&tab=districts">Manage districts</a></div><?php else: ?>
     <div class="district-chart-layout">
-      <div class="district-pie-panel"><div><strong>Workforce share</strong><small>Active nurses by district</small></div><div class="district-pie" style="background:<?=$districtPieStyle?>" role="img" aria-label="Pie chart showing <?=$districtPieTotal?> active nurses by district"><span><strong><?=number_format($districtPieTotal)?></strong><small>nurses</small></span></div><?php if ($districtPieLegend): ?><ul class="district-pie-legend"><?php foreach($districtPieLegend as $slice): ?><li><span class="district-legend-swatch" style="--legend-color:<?=$slice['color']?>"></span><span><?=e($slice['name'])?></span><strong><?=number_format($slice['value'])?> <small><?=number_format($slice['share'],1)?>%</small></strong></li><?php endforeach ?></ul><?php else: ?><p class="district-pie-empty">No active nurses assigned to districts.</p><?php endif ?></div>
+      <section class="district-share-chart" aria-labelledby="district-share-title">
+        <header>
+            <div>
+                <h3 id="district-share-title">Workforce share</h3>
+                <p>Percentage of active nurses by district</p>
+            </div>
+            <div class="district-share-total"><strong><?=number_format($districtTotal)?></strong><span>Active nurses</span></div>
+        </header>
+        <?php if ($shareSegments): ?>
+            <div class="district-share-content">
+                <div class="district-share-pie" style="--share-pie:conic-gradient(<?=e(implode(',', $shareStops))?>)" aria-hidden="true"></div>
+                <ul class="district-share-legend" role="list">
+                    <?php foreach ($shareSegments as $segment):
+                        $name=$segment['name'];
+                        $label=mb_strtoupper($name)===$name ? mb_convert_case($name, MB_CASE_TITLE) : $name;
+                    ?>
+                        <li>
+                            <span class="district-share-swatch" style="--district-color:<?=$segment['color']?>" aria-hidden="true"></span>
+                            <span class="district-share-name"><?=e($label)?></span>
+                            <strong><?=number_format($segment['share'], 1)?>%</strong>
+                        </li>
+                    <?php endforeach ?>
+                </ul>
+            </div>
+        <?php else: ?>
+            <p>No active nurses assigned to districts.</p>
+        <?php endif ?>
+      </section>
       <div class="district-card-grid">
         <?php foreach ($districtCards as $district):
             $districtId = $district['id'];
