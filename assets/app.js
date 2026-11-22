@@ -23,22 +23,79 @@
   });
   const githubUpdater = document.querySelector('[data-github-updater]');
   githubUpdater?.querySelector('[data-github-check]')?.addEventListener('click', async event => {
-    const button=event.currentTarget, status=githubUpdater.querySelector('[data-github-status]'), result=githubUpdater.querySelector('[data-github-result]');
-    button.disabled=true; status.textContent='Checking GitHub'; result.hidden=false; result.textContent='Contacting MrMilar12/daloy on GitHub.';
-    try { const response=await fetch('api.php?action=github_updates',{credentials:'same-origin',headers:{Accept:'application/json'}}); const data=await response.json(); if(!response.ok||data.error) throw new Error(data.error||'Unable to check GitHub updates.'); status.textContent=data.available?'Update available':'Up to date'; result.innerHTML=`<div class="github-update-summary"><span class="github-update-icon">${data.available?'':''}</span><div><strong>${data.available?'New system update found':'Your system is up to date'}</strong><small>${data.available?'A verified DALOY update is ready to install.':'No newer commit is available on the configured branch.'}</small></div></div><div class="github-update-commit"><span>Latest commit</span><code>${data.latest.slice(0,12)}</code><p>${data.message||'No commit message available.'}</p></div>${data.available?'<button type="button" class="primary github-install" data-github-install>Install update</button>':''}`; result.classList.toggle('has-update',data.available); result.querySelector('[data-github-install]')?.addEventListener('click',async()=>{const password=await new Promise(resolve=>{const dialog=document.createElement('dialog');dialog.className='update-password-dialog';dialog.innerHTML='<form method=dialog><h3>Authorize system update</h3><p>Enter your administrator password to continue.</p><input type=password name=password autocomplete=current-password required placeholder=Password><div class=dialog-actions><button value=cancel>Cancel</button><button class=primary value=confirm>Install update</button></div></form>';document.body.appendChild(dialog);dialog.addEventListener('close',()=>{const value=dialog.returnValue==='confirm'?dialog.querySelector('input').value:'';dialog.remove();resolve(value);},{once:true});dialog.showModal();});if(!password)return;const csrf=document.querySelector('meta[name="csrf-token"]')?.content||'';const form=new URLSearchParams({csrf,password,latest:data.latest});const install=await fetch('api.php?action=github_update_apply',{method:'POST',credentials:'same-origin',headers:{Accept:'application/json'},body:form});const answer=await install.json();if(!install.ok||answer.error){alert(answer.error||'Update failed.');return;}alert(answer.message+' The system will reload after maintenance.');location.reload();}); } catch(error) { status.textContent='Check failed'; result.textContent=error.message; } finally { button.disabled=false; }
-  });
-  const updateProgress = document.querySelector('[data-update-progress]');
-  const updateBar = document.querySelector('[data-update-progress-bar]');
-  const updateLabel = document.querySelector('[data-update-progress-label]');
-  const updatePercent = document.querySelector('[data-update-progress-percent]');
-  document.addEventListener('click', event => {
-    if (!event.target.closest('[data-github-install]') || !updateProgress) return;
-    updateProgress.hidden = false;
-    const stages = [[12,'Preparing update'],[30,'Enabling maintenance mode'],[56,'Downloading DALOY files'],[78,'Installing system files'],[94,'Finalizing update']];
-    let index = 0;
-    const advance = () => { const [percent,label]=stages[Math.min(index++,stages.length-1)]; updateBar.style.width=percent+'%'; updatePercent.textContent=percent+'%'; updateLabel.textContent=label; };
-    advance();
-    const timer=setInterval(() => { if(index<stages.length) advance(); else clearInterval(timer); }, 900);
+    const button = event.currentTarget;
+    const status = githubUpdater.querySelector('[data-github-status]');
+    const result = githubUpdater.querySelector('[data-github-result]');
+    const progress = githubUpdater.querySelector('[data-update-progress]');
+    button.disabled = true;
+    status.textContent = 'Checking GitHub';
+    result.hidden = true;
+    try {
+      const response = await fetch('api.php?action=github_updates', {
+        credentials: 'same-origin', headers: { Accept: 'application/json' }
+      });
+      const data = await response.json();
+      if (!response.ok || data.error) throw new Error(data.error || 'Unable to check GitHub updates.');
+
+      result.innerHTML = '<div class="github-update-summary"><div><strong></strong><small></small></div></div>'
+        + '<div class="github-update-commit"><span>Latest commit</span><code></code><p></p></div>'
+        + '<button type="button" class="primary github-install" hidden>Install update</button>';
+      result.querySelector('strong').textContent = data.available ? 'New system update found' : 'Your system is up to date';
+      result.querySelector('small').textContent = data.available ? 'A verified DALOY update is ready to install.' : 'No newer commit is available on the configured branch.';
+      result.querySelector('code').textContent = data.latest.slice(0, 12);
+      result.querySelector('p').textContent = data.message || 'No commit message available.';
+      result.classList.toggle('has-update', data.available);
+      result.hidden = false;
+      status.textContent = data.available ? 'Update available' : 'Up to date';
+
+      const installButton = result.querySelector('.github-install');
+      installButton.hidden = !data.available;
+      installButton.addEventListener('click', async () => {
+        const dialog = document.createElement('dialog');
+        dialog.className = 'update-password-dialog';
+        dialog.setAttribute('aria-labelledby', 'update-password-title');
+        dialog.innerHTML = '<form method="dialog"><h3 id="update-password-title">Authorize system update</h3>'
+          + '<label>Administrator password<input type="password" name="password" autocomplete="current-password" required></label>'
+          + '<div class="dialog-actions"><button value="cancel" formnovalidate>Cancel</button><button class="primary" value="confirm">Install update</button></div></form>';
+        document.body.appendChild(dialog);
+        const password = await new Promise(resolve => {
+          dialog.addEventListener('close', () => {
+            resolve(dialog.returnValue === 'confirm' ? dialog.querySelector('input').value : '');
+            dialog.remove();
+            installButton.focus();
+          }, { once: true });
+          dialog.showModal();
+        });
+        if (!password) return;
+
+        button.disabled = installButton.disabled = true;
+        progress.hidden = false;
+        try {
+          const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+          const body = new URLSearchParams({ csrf, password, latest: data.latest });
+          const install = await fetch('api.php?action=github_update_apply', {
+            method: 'POST', credentials: 'same-origin', headers: { Accept: 'application/json' }, body
+          });
+          const answer = await install.json();
+          if (!install.ok || answer.error) throw new Error(answer.error || 'Update failed.');
+          alert(answer.message + ' The system will reload after maintenance.');
+          location.reload();
+        } catch (error) {
+          alert(error.message);
+        } finally {
+          progress.hidden = true;
+          button.disabled = installButton.disabled = false;
+          installButton.focus();
+        }
+      });
+    } catch (error) {
+      status.textContent = 'Check failed';
+      result.classList.remove('has-update');
+      result.textContent = error.message;
+      result.hidden = false;
+    } finally {
+      button.disabled = false;
+    }
   });
   const displayChoices = [...document.querySelectorAll('[data-display-choice]')];
   const setDisplay = display => {

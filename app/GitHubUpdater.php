@@ -7,6 +7,29 @@ final class GitHubUpdater {
         return $this->root.'/storage/update-maintenance.json';
     }
 
+    private function installedCommit(string $latest): string {
+        $recorded = trim((string)($this->db->one(
+            "SELECT setting_value FROM system_settings WHERE setting_key='github_update_sha'"
+        )['setting_value'] ?? ''));
+        if ($recorded === $latest) return $recorded;
+
+        // A Git deployment can advance HEAD without going through the web installer.
+        $git = $this->root.'/.git';
+        $head = trim((string)@file_get_contents($git.'/HEAD'));
+        if ($head === $latest) return $latest;
+
+        if (preg_match('~^ref: (refs/heads/[A-Za-z0-9._/-]+)$~D', $head, $match) && !str_contains($match[1], '..')) {
+            $ref = $match[1];
+            $loose = trim((string)@file_get_contents($git.'/'.$ref));
+            if ($loose === $latest) return $latest;
+            if ($loose === '') {
+                $packed = (string)@file_get_contents($git.'/packed-refs');
+                if (preg_match('~^'.preg_quote($latest.' '.$ref, '~').'\r?$~m', $packed)) return $latest;
+            }
+        }
+        return $recorded;
+    }
+
     public function check(string $repository='MrMilar12/daloy', string $branch='main'): array {
         if(!preg_match('~^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$~',$repository) || !preg_match('~^[A-Za-z0-9._/-]+$~',$branch)) {
             throw new InvalidArgumentException('Invalid GitHub repository or branch.');
@@ -39,7 +62,7 @@ final class GitHubUpdater {
             $commitUrl=(string)($c['html_url']??'https://github.com/'.$repository.'/commit/'.$sha);
         }
         if(!preg_match('/^[a-f0-9]{40}$/',$sha)) throw new RuntimeException('GitHub returned an invalid commit.');
-        $current=(string)($this->db->one("SELECT setting_value FROM system_settings WHERE setting_key='github_update_sha'")['setting_value']??'');
+        $current=$this->installedCommit($sha);
         return [
             'repository'=>$repository,
             'branch'=>$branch,

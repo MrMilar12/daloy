@@ -99,6 +99,8 @@ body[data-display=list] .school-assignment-options{grid-template-columns:1fr}bod
 .sidebar-branch-trigger:has(.sidebar-branch-unread)::after{margin-inline-start:0}
 .sidebar-branch[open]>.sidebar-branch-trigger::after{margin-inline-start:auto}
 .sidebar-branch[open] .sidebar-branch-unread{display:none}
+.sidebar nav>.sidebar-leaf:last-child{margin-top:7px;border-top:1px solid var(--sidebar-line);border-top-left-radius:0;border-top-right-radius:0}
+.sidebar-branch.current-branch[open]{box-shadow:inset 0 0 0 1px #8ee8d655}
 .sidebar-tree :focus-visible{outline-color:var(--sidebar-accent);outline-offset:-2px}
 @media (761px <= width <= 1250px){
   .sidebar{width:232px}
@@ -244,4 +246,41 @@ dialog.record-modal::backdrop{background:#102235a8;backdrop-filter:blur(5px);-we
 .personnel-record-grid>div{padding:11px 13px;border:1px solid var(--border);border-radius:10px;background:var(--soft)}
 .personnel-record-grid>div:last-child{grid-column:1/-1}
 .personnel-record-grid dd{font-size:.875rem}
+.workspace-settings{display:grid;gap:20px;max-width:1150px}
+.workspace-settings .card{margin:0}
+.settings-updates-banner{display:flex;align-items:center;gap:16px;padding:26px clamp(17px,3vw,30px);background:linear-gradient(115deg,#102640,#1b4057 72%,#1b555a);color:#edf6fc}
+.settings-panel-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border-radius:12px;background:var(--soft);color:var(--teal)}
+.settings-updates-banner .settings-panel-icon{width:48px;height:48px;flex-basis:48px;background:#ffffff19;color:#8ee8d6;border:1px solid #ffffff35}
+.settings-panel-kicker{display:block;margin-bottom:4px;color:#9ce7d9;font-size:.8125rem;font-weight:650}
+.settings-updates-banner h2{margin:0 0 4px;font-size:1.6rem;line-height:1.2}
+.settings-updates-banner p{margin:0;color:#c4d7e7;font-size:.9375rem}
+.settings-updates-body{padding:18px clamp(17px,3vw,30px) 21px}
+.settings-update-toolbar,.settings-update-buttons{display:flex;align-items:center;flex-wrap:wrap;gap:9px}
+.settings-update-toolbar{justify-content:space-between}
+.workspace-settings .button,.workspace-settings button{min-height:41px;font-size:.9375rem}
+.settings-update-status:not(:empty){border-radius:999px;padding:5px 10px;color:var(--primary);background:var(--soft);font-size:.875rem;font-weight:650}
+.settings-updates [hidden]{display:none}
+.settings-updates .update-progress{display:grid;gap:6px;font-size:.875rem}
+.settings-updates .update-progress[hidden]{display:none}
+.settings-updates progress{width:100%;height:8px;accent-color:var(--teal)}
+.settings-updates .github-updater-result{padding:16px;border-radius:13px;font-size:.9375rem}
+.settings-updates .github-updater-result.has-update{border-color:var(--border);border-inline-start:3px solid var(--teal)}
+.settings-updates .github-update-summary strong{font-size:1rem}
+.settings-updates .github-update-summary small,.settings-updates .github-update-commit p{font-size:.875rem}
+.settings-updates .github-update-commit p{white-space:pre-line;overflow-wrap:anywhere}
+.settings-updates .github-install{justify-self:start;margin-top:10px}
+.settings-panels{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);align-items:start;gap:20px}
+.settings-panel{padding:clamp(17px,2.5vw,25px)}
+.settings-panel-heading{display:flex;align-items:center;gap:11px;margin-bottom:19px}
+.settings-panel-heading h2{margin:0;font-size:1.15rem}
+.settings-panel .form-grid{grid-template-columns:minmax(0,1fr);gap:15px}
+.settings-panel .form-grid .span-2{grid-column:1}
+.settings-panel .form-grid label,.settings-panel p,.settings-panel input,.settings-panel textarea{font-size:.9375rem}
+.settings-panel .form-actions{margin-top:1px;padding-top:13px;border-top:1px solid var(--border)}
+.settings-panel p:last-child{margin-bottom:0}
+.settings-server-facts{display:grid;gap:1px;margin:0 0 14px;overflow:hidden;border:1px solid var(--border);border-radius:10px;background:var(--border)}
+.settings-server-facts div{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;padding:8px 10px;background:var(--bg);font-size:.875rem}
+.settings-server-facts dt{color:var(--muted)}
+.settings-server-facts dd{margin:0;font-weight:650}
+@media(max-width:1050px){.settings-panels{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:760px){dialog.record-modal{width:calc(100vw - 18px);max-height:calc(100vh - 18px);border-radius:15px}.record-modal-card{max-height:calc(100vh - 18px);padding:20px 16px;border-radius:15px}.record-modal-heading{margin:-20px -16px 20px;padding:18px 54px 17px 16px;gap:11px}.record-modal-heading h2{font-size:18px}.record-modal-heading p{font-size:10px}.record-modal-mark{width:40px;height:40px}.record-modal-close{top:12px;right:11px;width:32px;height:32px}.record-modal-card .form-grid{grid-template-columns:1fr;gap:14px}.record-modal-card .span-2{grid-column:1}.record-view-grid{grid-template-columns:1fr}}

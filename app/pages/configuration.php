@@ -1,11 +1,61 @@
 <?php
-if($page==='settings') {
-    page_heading('SYSTEM ADMINISTRATION','Workspace settings','Manage the information shown across the workspace.');
-    $settings=array_column($db->all('SELECT * FROM system_settings'),'setting_value','setting_key');
-    if($user['role']==='admin') {
-        ?><section class="card settings-combined github-updater" data-github-updater><div class="settings-hero"><div><span class="eyebrow">DEVELOPER CENTER</span><h2>Keep DALOY current</h2><p>Review and install approved updates from the official DALOY repository.</p></div><div class="settings-hero-mark">↻</div></div><div class="updater-head"><div class="updater-title"><span class="updater-icon">↻</span><div><span class="eyebrow">SYSTEM UPDATER</span><h2>DALOY GitHub updates</h2></div></div><span class="github-updater-status" data-github-status>Ready</span></div><div class="updater-repo"><span class="repo-dot"></span><div><strong>MrMilar12/daloy</strong><small>Official repository · main branch</small></div></div><div class="github-updater-actions"><button type="button" class="primary" data-github-check>Check for updates</button><a href="https://github.com/MrMilar12/daloy" target="_blank" rel="noopener">Open repository <span>↗</span></a></div><div class="update-progress" data-update-progress hidden><div class="progress-track"><span data-update-progress-bar></span></div><div class="progress-meta"><strong data-update-progress-label>Preparing update…</strong><span data-update-progress-percent>0%</span></div></div><div class="github-updater-result" data-github-result hidden></div></section><?php
-    }
-    ?><section class="card editor"><?php form_start('settings','?page=settings'); input('organization','Organization name',$settings['organization']); textarea('system_notice','Workspace notice',$settings['system_notice']); form_end('?page=settings'); ?></section><section class="card inset"><h2>Server configuration & backups</h2><p>Database credentials, secure cookies, and session timeout are configured in <code>config.local.php</code>. Back up the database and protected uploads together using the procedure in README.md.</p><p class="muted">Timezone: Asia/Manila · Session timeout: <?=round($config['session_timeout']/60)?> minutes</p></section><?php return;
+if ($page==='settings') {
+    page_heading('System administration','Workspace settings','Manage the information shown across the workspace.');
+    $settings = array_column($db->all('SELECT * FROM system_settings'),'setting_value','setting_key');
+    ?>
+    <div class="workspace-settings">
+        <?php if ($user['role']==='admin'): ?>
+            <section class="card settings-updates" data-github-updater aria-labelledby="settings-updates-title">
+                <div class="settings-updates-banner">
+                    <span class="settings-panel-icon"><?=icon('settings')?></span>
+                    <div>
+                        <span class="settings-panel-kicker">Developer center</span>
+                        <h2 id="settings-updates-title">Keep DALOY current</h2>
+                        <p>Review and install approved updates from the official DALOY repository.</p>
+                    </div>
+                </div>
+                <div class="settings-updates-body">
+                    <div class="settings-update-toolbar">
+                        <div class="settings-update-buttons">
+                            <button type="button" class="primary" data-github-check>Check for updates</button>
+                            <a class="button" href="https://github.com/MrMilar12/daloy" target="_blank" rel="noopener">Open repository</a>
+                        </div>
+                        <span class="settings-update-status" data-github-status role="status"></span>
+                    </div>
+                    <div class="update-progress" data-update-progress hidden>
+                        <label for="settings-install-progress">Installing update…</label>
+                        <progress id="settings-install-progress"></progress>
+                    </div>
+                    <div class="github-updater-result" data-github-result hidden></div>
+                </div>
+            </section>
+        <?php endif ?>
+        <div class="settings-panels">
+            <section class="card editor settings-panel" aria-labelledby="settings-organization-title">
+                <div class="settings-panel-heading">
+                    <span class="settings-panel-icon"><?=icon('nurses')?></span>
+                    <h2 id="settings-organization-title">Organization details</h2>
+                </div>
+                <?php form_start('settings','?page=settings'); ?>
+                <?php input('organization','Organization name',$settings['organization']); ?>
+                <?php textarea('system_notice','Workspace notice',$settings['system_notice']); ?>
+                <?php form_end('?page=settings'); ?>
+            </section>
+            <section class="card settings-panel" aria-labelledby="settings-server-title">
+                <div class="settings-panel-heading">
+                    <span class="settings-panel-icon"><?=icon('reports')?></span>
+                    <h2 id="settings-server-title">Server configuration &amp; backups</h2>
+                </div>
+                <dl class="settings-server-facts">
+                    <div><dt>Timezone</dt><dd><?=e($config['timezone'] ?? 'Asia/Manila')?></dd></div>
+                    <div><dt>Session timeout</dt><dd><?=round($config['session_timeout']/60)?> minutes</dd></div>
+                </dl>
+                <p>Manage database credentials, secure cookies, and the session timeout in <code>config.local.php</code>.</p>
+                <p>Follow the backup procedure in <code>README.md</code> to back up the database and protected uploads together.</p>
+            </section>
+        </div>
+    </div>
+    <?php return;
 }
 $tables=['districts'=>'Districts / areas','municipalities'=>'Municipalities','duty_types'=>'Duty types','deployment_reasons'=>'Deployment reasons','shifts'=>'Duty shifts'];
 $table=$page==='locations'?'locations':(string)($_GET['tab']??'districts');
