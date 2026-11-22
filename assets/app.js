@@ -1,5 +1,12 @@
 (() => {
   'use strict';
+  const accountPhoto = document.querySelector('.top-account-photo');
+  if (accountPhoto) {
+    const showLoadedPhoto = () => { accountPhoto.hidden = accountPhoto.naturalWidth === 0; };
+    accountPhoto.addEventListener('load', showLoadedPhoto);
+    accountPhoto.addEventListener('error', showLoadedPhoto);
+    if (accountPhoto.complete) showLoadedPhoto();
+  }
   const activityModal = document.querySelector('[data-activity-modal]');
   if (activityModal?.showModal) {
     activityModal.showModal();

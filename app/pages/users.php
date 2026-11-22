@@ -2,9 +2,44 @@
 page_heading('PEOPLE & ACCESS',$page==='users'?'User accounts':'Nursing personnel',$page==='users'?'Manage secure access and official personnel records.':'Your nursing team, home assignments, and recorded competencies.',$user['role']==='admin'?add_link('?page=users&new=1','Add account'):'');
 if($page==='users' && $user['role']==='admin') { $registrationRequests=$db->all("SELECT id,name,email,created_at FROM registration_requests WHERE status='pending' ORDER BY created_at DESC"); if($registrationRequests): ?><section class="card registration-requests"><div class="section-heading"><div><span class="eyebrow">ACCOUNT REQUESTS</span><h2>Pending registrations</h2><p>Review access requests before creating user accounts.</p></div><span class="badge submitted"><?=count($registrationRequests)?> pending</span></div><div class="registration-request-list"><?php foreach($registrationRequests as $request): ?><div class="registration-request"><div><strong><?=e($request['name'])?></strong><small><?=e($request['email'])?></small></div><span><?=e(date('M j, Y',strtotime($request['created_at'])))?></span><a class="button small" href="?page=users&request=<?=$request['id']?>">Review request</a></div><?php endforeach ?></div></section><?php endif; }
 if($page==='users' && $user['role']==='admin' && isset($_GET['request'])) { $request=$db->one("SELECT * FROM registration_requests WHERE id=? AND status='pending'",[(int)$_GET['request']]); if($request): ?><section class="card editor request-review"><div class="section-heading"><div><span class="eyebrow">ACCOUNT REQUEST</span><h2>Review registration</h2><a class="modal-close" href="?page=users" aria-label="Close review">ï¿½</a><p>Approve to create a nurse account, or reject this request.</p></div></div><div class="request-review-details"><strong><?=e($request['name'])?></strong><span><?=e($request['email'])?></span><small>Submitted <?=e(date('M j, Y g:i A',strtotime($request['created_at'])))?></small></div><div class="form-actions"><form method="post"><input type="hidden" name="csrf" value="<?=e(csrf_token())?>"><input type="hidden" name="action" value="register_review"><input type="hidden" name="request_id" value="<?=$request['id']?>"><input type="hidden" name="decision" value="reject"><button class="danger-button">Reject request</button></form><form method="post"><input type="hidden" name="csrf" value="<?=e(csrf_token())?>"><input type="hidden" name="action" value="register_review"><input type="hidden" name="request_id" value="<?=$request['id']?>"><input type="hidden" name="decision" value="approve"><button class="primary">Approve & create account</button></form></div></section><?php endif; }
-if($page==='users' && isset($_GET['view'])) {
+if(isset($_GET['view'])) {
     $person=$service->record('users',(int)$_GET['view']);
-    ?><dialog class="record-modal" data-record-modal aria-labelledby="record-view-title"><section class="card editor record-modal-card"><a class="record-modal-close" href="?page=users" aria-label="Close personnel details">×</a><div class="record-modal-heading"><span class="record-modal-mark"><?=icon('users')?></span><div><span class="eyebrow">PERSONNEL RECORD</span><h2 id="record-view-title"><?=e($person['name'])?></h2><p><?=e($person['designation'])?> · <?=e(ucfirst($person['role']))?></p></div></div><dl class="record-view-grid"><?php foreach(['Employee number'=>$person['employee_number']?:'—','Email'=>$person['email'],'Phone'=>$person['phone']?:'—','Status'=>$person['active']?'Active':'Inactive','Employment'=>$person['employment_status']?:'—','Specialization'=>$person['specialization']?:'—','Skills'=>$person['skills']?:'—'] as $label=>$value): ?><div><dt><?=e($label)?></dt><dd><?=e($value)?></dd></div><?php endforeach ?><div><dt>Assigned schools / office</dt><dd><?=e(implode('; ',array_column($service->assignedLocations((int)$person['id']),'name'))?:'Unassigned')?></dd></div></dl><?php if($user['role']==='admin'): ?><div class="form-actions"><a class="button primary" href="?page=users&edit=<?=$person['id']?>">Edit account</a></div><?php endif ?></section></dialog><?php
+    if ($page==='nurses' && $person['role']!=='nurse') {
+        throw new DomainException('Personnel record not found.',404);
+    }
+    ?>
+    <dialog class="record-modal personnel-dialog" data-record-modal aria-labelledby="record-view-title">
+        <section class="card editor record-modal-card">
+            <a class="record-modal-close" href="?<?=e(http_build_query(array_diff_key($_GET, ['view' => true]) + ['page' => $page]))?>" aria-label="Close personnel details">×</a>
+            <div class="record-modal-heading personnel-record-heading">
+                <?=avatar($person['name'])?>
+                <div>
+                    <h2 id="record-view-title"><?=e($person['name'])?></h2>
+                    <p><?=e($person['designation'])?> · <?=e(ucfirst($person['role']))?></p>
+                    <?=badge($person['active']?'Active':'Inactive')?>
+                </div>
+            </div>
+            <dl class="record-view-grid personnel-record-grid">
+                <?php foreach ([
+                    'Employee number' => $person['employee_number'],
+                    'Email' => $person['email'],
+                    'Phone' => $person['phone'],
+                    'Employment' => $person['employment_status'],
+                    'Specialization' => $person['specialization'],
+                    'Skills' => $person['skills'],
+                    'Assigned schools / office' => implode('; ', array_column($service->assignedLocations((int)$person['id']), 'name')) ?: 'Unassigned',
+                ] as $label => $value): ?>
+                    <div><dt><?=e($label)?></dt><dd><?=e($value ?: '—')?></dd></div>
+                <?php endforeach ?>
+            </dl>
+            <?php if ($user['role']==='admin'): ?>
+                <div class="form-actions">
+                    <a class="button primary" href="?page=users&amp;edit=<?=(int)$person['id']?>"><?=icon('settings')?> Edit account</a>
+                </div>
+            <?php endif ?>
+        </section>
+    </dialog>
+    <?php
 }
 if($page==='users' && (isset($_GET['new'])||isset($_GET['edit']))) {
     $r=isset($_GET['edit'])?$service->record('users',(int)$_GET['edit']):[]; if($error && ($_POST['action']??'')==='user') $r=array_merge($r,$_POST);
@@ -14,4 +49,4 @@ $q=trim((string)($_GET['q']??'')); $params=[]; $where=$page==='nurses'?"u.role='
 $district=(int)($_GET['district_id']??0); if($district) { $where.=' AND u.district_id=?'; $params[]=$district; }
 ?><form class="filters" method="get"><input type="hidden" name="page" value="<?=e($page)?>"><?php input('q','Search people',$q,'search',false,'placeholder="Name, email or employee number"'); select_field('district_id','District / area',options('districts','1=1'),$district,false); ?><button>Search</button><a href="?page=<?=e($page)?>">Reset</a></form><?php
 $rows=$db->all("SELECT u.id,u.name,u.email,u.employee_number,u.phone,u.designation,u.role,u.active,u.specialization,u.skills,u.employment_status,d.name district_name,l.name location_name FROM users u LEFT JOIN districts d ON d.id=u.district_id LEFT JOIN locations l ON l.id=u.location_id WHERE $where ORDER BY u.name LIMIT 26 OFFSET $offset",$params);
-?><section class="card"><?php if(!$rows): empty_state('No personnel found','Create accounts or adjust your search filters.'); else: ?><div class="table-wrap"><table><thead><tr><th>Personnel</th><th>Assigned schools / office</th><th>Competencies</th><th>Status</th><th>Details</th></tr></thead><tbody><?php foreach(array_slice($rows,0,25) as $r): ?><tr><td><div class="person"><?=avatar($r['name'])?><div><strong><?=e($r['name'])?></strong><small><?=e($r['designation'])?> Â· <?=e($r['employee_number']?:'No employee number')?></small></div></div></td><td><?=e(implode('; ',array_column($service->assignedLocations((int)$r['id']),'name'))?:'Unassigned')?><small><?=e($r['district_name'])?></small></td><td><?=e($r['specialization']?:'â€”')?><small><?=e($r['skills'])?></small></td><td><?=badge($r['active']?'Active':'Inactive')?><small><?=e(ucfirst($r['role']))?></small></td><td><a href="?page=users&view=<?=$r["id"]?>">View details</a><details><summary>Contact & details</summary><p><?=e($r['email'])?><br><?=e($r['phone'])?><br><?=e($r['employment_status'])?></p></details><?php if($user['role']==='admin'): ?><a href="?page=users&edit=<?=$r['id']?>">Edit account</a><?php endif ?></td></tr><?php endforeach ?></tbody></table></div><?php endif ?></section><?php pagination(count($rows),$pageNum);
+?><section class="card"><?php if(!$rows): empty_state('No personnel found','Create accounts or adjust your search filters.'); else: ?><div class="table-wrap"><table><thead><tr><th>Personnel</th><th>Assigned schools / office</th><th>Competencies</th><th>Status</th><th>Actions</th></tr></thead><tbody><?php foreach(array_slice($rows,0,25) as $r): ?><tr><td><div class="person"><?=avatar($r['name'])?><div><strong><?=e($r['name'])?></strong><small><?=e($r['designation'])?> Â· <?=e($r['employee_number']?:'No employee number')?></small></div></div></td><td><?=e(implode('; ',array_column($service->assignedLocations((int)$r['id']),'name'))?:'Unassigned')?><small><?=e($r['district_name'])?></small></td><td><?=e($r['specialization']?:'â€”')?><small><?=e($r['skills'])?></small></td><td><?=badge($r['active']?'Active':'Inactive')?><small><?=e(ucfirst($r['role']))?></small></td><td><div class="personnel-actions"><a class="button personnel-view" href="?<?=e(http_build_query(['page'=>$page,'view'=>(int)$r['id']] + $_GET))?>"><?=icon('reports')?> View details</a><?php if($user['role']==='admin'): ?><a class="button personnel-edit" href="?page=users&amp;edit=<?=(int)$r['id']?>"><?=icon('settings')?> Edit account</a><?php endif ?></div><details class="personnel-contact"><summary>Contact & details</summary><p><?=e($r['email'])?><br><?=e($r['phone'])?><br><?=e($r['employment_status'])?></p></details></td></tr><?php endforeach ?></tbody></table></div><?php endif ?></section><?php pagination(count($rows),$pageNum);
