@@ -27,7 +27,11 @@ page_heading('WORKFORCE AT A GLANCE',($service->manager()?'Your workforce, in fl
 <section class="overview-banner"><div><span class="eyebrow">SCHOOLS DIVISION OFFICE OF AURORA</span><h2>Every assignment connects to better care.</h2><p><?=e(date('l, F j, Y',strtotime($date)))?> <span>•</span> <?=count($roster)?> assignment<?=count($roster)===1?'':'s'?> on the roster</p></div><form method="get" class="date-switch"><input type="hidden" name="page" value="dashboard"><label class="sr-only" for="dashboard-date">Workforce date</label><input id="dashboard-date" type="date" name="date" value="<?=e($date)?>" required><button>View day</button></form></section>
 <section class="stats-grid" aria-label="Workforce summary"><?php foreach([['Active nurses',$active,'nurses','blue','In your '.($service->manager()?'workforce':'profile')],['On duty / scheduled',($counts['On Duty']??0)+($counts['Scheduled']??0),'calendar','teal','Duty during selected day'],['Potentially available',$available,'availability','green','No conflicts during the day'],['Deployed / on leave',($counts['Deployed']??0)+($counts['On Leave']??0),'deployment','violet',($counts['Deployed']??0).' deployed · '.($counts['On Leave']??0).' on leave']] as [$label,$value,$ico,$color,$note]): ?><article class="stat-card"><div><span><?=e($label)?></span><div class="stat-icon <?=$color?>"><?=icon($ico)?></div></div><strong class="stat-value"><?=$value?></strong><small><?=e($note)?></small></article><?php endforeach ?></section>
 <?php if($service->manager()):
-    $districtMax=max(1,...array_map(fn($d)=>(int)$d['nurse_count'],$districtOverview));
+    $districtMax=max(1,$unassignedDistrictNurses,...array_map(fn($d)=>(int)$d['nurse_count'],$districtOverview));
+    $districtCards=$districtOverview;
+    if ($unassignedDistrictNurses) {
+        $districtCards[]=['id'=>null,'name'=>'Unassigned district','nurse_count'=>$unassignedDistrictNurses,'school_count'=>null];
+    }
     $districtNurseTotal=array_sum(array_map(fn($d)=>(int)$d['nurse_count'],$districtOverview));
     $districtSchoolTotal=array_sum(array_map(fn($d)=>(int)$d['school_count'],$districtOverview));
     $districtPieTotal=$districtNurseTotal+$unassignedDistrictNurses; $districtPieColors=['#1876a3','#15958f','#5586c9','#8b71ba','#d18953','#3d9b70','#bc6574','#71859a','#a18a44','#5574a8']; $districtPieStops=[]; $districtPieLegend=[]; $districtPieCursor=0; $districtPieIndex=0;
@@ -38,19 +42,67 @@ page_heading('WORKFORCE AT A GLANCE',($service->manager()?'Your workforce, in fl
 <section class="card district-overview" aria-labelledby="district-overview-title">
     <div class="section-heading"><div><span class="eyebrow">DISTRICT DISTRIBUTION</span><h2 id="district-overview-title">Nursing workforce by district</h2><p>Active nurses and public schools assigned to each active district.</p></div><a href="?page=locations">Districts &amp; schools <?=icon('arrow')?></a></div>
     <div class="district-overview-stats"><div><strong><?=count($districtOverview)?></strong><span>Active districts</span></div><div><strong><?=number_format($districtNurseTotal+$unassignedDistrictNurses)?></strong><span>Active nurses</span></div><div><strong><?=number_format($districtSchoolTotal)?></strong><span>Active schools</span></div></div>
-    <?php if(!$districtOverview): ?><div class="district-chart-empty"><h3>No active districts yet</h3><p>Add district records to see workforce distribution.</p><a class="button small" href="?page=configuration&tab=districts">Manage districts</a></div><?php else: ?>
+    <?php if(!$districtCards): ?><div class="district-chart-empty"><h3>No active districts yet</h3><p>Add district records to see workforce distribution.</p><a class="button small" href="?page=configuration&tab=districts">Manage districts</a></div><?php else: ?>
     <div class="district-chart-layout">
-      <div class="district-pie-panel"><div><strong>Workforce share</strong><small>Active nurses by district</small></div><div class="district-pie" style="background:<?=$districtPieStyle?>" role="img" aria-label="Pie chart showing <?=$districtPieTotal?> active nurses by district"><span><strong><?=number_format($districtPieTotal)?></strong><small>nurses</small></span></div><ul class="district-pie-legend"><?php foreach($districtPieLegend as $slice): ?><li><span class="district-legend-swatch" style="--legend-color:<?=$slice['color']?>"></span><span><?=e($slice['name'])?></span><strong><?=number_format($slice['value'])?> <small><?=number_format($slice['share'],1)?>%</small></strong></li><?php endforeach ?></ul></div>
-      <div class="district-chart-list" role="list" aria-label="Active nurses and schools per district">
-        <?php foreach($districtOverview as $district): $nurses=(int)$district['nurse_count']; $barWidth=round($nurses/$districtMax*100); ?>
-        <div class="district-chart-row" role="listitem"><div class="district-chart-name"><strong><?=e($district['name'])?></strong><small><?=number_format((int)$district['school_count'])?> active school<?=((int)$district['school_count']===1?'':'s')?></small></div><div class="district-chart-track" role="img" aria-label="<?=number_format($nurses)?> active nurses"><span style="width:<?=$barWidth?>%"></span></div><strong class="district-chart-value"><?=number_format($nurses)?><small>nurse<?=($nurses===1?'':'s')?></small></strong><a class="district-chart-link" href="?page=nurses&district_id=<?=$district['id']?>" aria-label="View nurses in <?=e($district['name'])?>">View</a></div>
+      <div class="district-pie-panel"><div><strong>Workforce share</strong><small>Active nurses by district</small></div><div class="district-pie" style="background:<?=$districtPieStyle?>" role="img" aria-label="Pie chart showing <?=$districtPieTotal?> active nurses by district"><span><strong><?=number_format($districtPieTotal)?></strong><small>nurses</small></span></div><?php if ($districtPieLegend): ?><ul class="district-pie-legend"><?php foreach($districtPieLegend as $slice): ?><li><span class="district-legend-swatch" style="--legend-color:<?=$slice['color']?>"></span><span><?=e($slice['name'])?></span><strong><?=number_format($slice['value'])?> <small><?=number_format($slice['share'],1)?>%</small></strong></li><?php endforeach ?></ul><?php else: ?><p class="district-pie-empty">No active nurses assigned to districts.</p><?php endif ?></div>
+      <div class="district-card-grid">
+        <?php foreach ($districtCards as $district):
+            $districtId = $district['id'];
+            $nurses = (int)$district['nurse_count'];
+            $schools = $district['school_count'];
+            $barWidth = round($nurses / $districtMax * 100, 2);
+        ?>
+            <article class="district-workforce-card<?=$districtId===null?' district-workforce-unassigned':''?>">
+                <header>
+                    <span class="district-card-icon"><?=icon('locations')?></span>
+                    <h3><?=e($district['name'])?></h3>
+                </header>
+                <dl class="district-card-stats">
+                    <div><dt>Active nurses</dt><dd><?=number_format($nurses)?></dd></div>
+                    <?php if ($schools !== null): ?>
+                        <div><dt>Active schools</dt><dd><?=number_format((int)$schools)?></dd></div>
+                    <?php endif ?>
+                </dl>
+                <div class="district-card-track" role="meter" aria-label="Active nurses compared with the largest group" aria-valuemin="0" aria-valuemax="<?=$districtMax?>" aria-valuenow="<?=$nurses?>">
+                    <span style="width:<?=$barWidth?>%"></span>
+                </div>
+                <a class="button district-card-action" href="?page=nurses<?=$districtId===null?'':'&amp;district_id='.(int)$districtId?>" aria-label="<?=e($districtId===null?'View all nursing personnel':'View nurses in '.$district['name'])?>"><?=$districtId===null?'View personnel':'View nurses'?></a>
+            </article>
         <?php endforeach ?>
-        <?php if($unassignedDistrictNurses): ?><div class="district-chart-row district-chart-unassigned" role="listitem"><div class="district-chart-name"><strong>Unassigned district</strong><small>District record needed</small></div><div class="district-chart-track" role="img" aria-label="<?=number_format($unassignedDistrictNurses)?> active nurses"><span style="width:<?=round($unassignedDistrictNurses/$districtMax*100)?>%"></span></div><strong class="district-chart-value"><?=number_format($unassignedDistrictNurses)?><small>nurse<?=($unassignedDistrictNurses===1?'':'s')?></small></strong><a class="district-chart-link" href="?page=nurses">View</a></div><?php endif ?>
       </div>
     </div><?php endif ?>
 </section>
 <?php endif ?>
-<section class="card overview-graph"><div class="section-heading"><div><span class="eyebrow">WORKFORCE OVERVIEW</span><h2>Daily workforce status</h2><p>Current distribution for the selected day.</p></div></div><div class="overview-graph-bars"><?php $graph=[['Available',$available,'green'],['Scheduled',$counts['Scheduled']??0,'blue'],['On duty',$counts['On Duty']??0,'teal'],['Deployed / leave',($counts['Deployed']??0)+($counts['On Leave']??0),'violet']]; $graphMax=max(1,...array_column($graph,1)); foreach($graph as [$label,$value,$color]): ?><div class="overview-graph-item"><div class="overview-graph-label"><span><?=e($label)?></span><strong><?=$value?></strong></div><div class="overview-graph-track"><span class="<?=$color?>" style="width:<?=round($value/$graphMax*100)?>%"></span></div></div><?php endforeach ?></div></section><?php if($service->manager()) require __DIR__.'/monthly-nurse-chart.php'; ?>
+<?php
+$statusSeries = [
+    ['Available', $available, 'available'],
+    ['Scheduled', $counts['Scheduled'] ?? 0, 'scheduled'],
+    ['On duty', $counts['On Duty'] ?? 0, 'on-duty'],
+    ['Deployed / leave', ($counts['Deployed'] ?? 0) + ($counts['On Leave'] ?? 0), 'deployed'],
+];
+$statusScale = max(1, max(array_column($statusSeries, 1)));
+?>
+<section class="card workforce-chart" aria-labelledby="workforce-chart-title">
+    <header class="workforce-chart-header">
+        <div>
+            <h2 id="workforce-chart-title">Daily workforce status</h2>
+            <p>Active nurses by status</p>
+        </div>
+        <time datetime="<?=e($date)?>"><?=icon('calendar')?> <?=e(date('M j, Y', strtotime($date)))?></time>
+    </header>
+    <div class="workforce-status-grid">
+        <?php foreach ($statusSeries as [$label, $value, $status]): ?>
+            <article class="workforce-status-card workforce-status-<?=$status?>">
+                <h3><?=e($label)?></h3>
+                <strong><?=number_format($value)?></strong>
+                <div class="workforce-status-track" aria-hidden="true">
+                    <span style="width:<?=round($value / $statusScale * 100, 4)?>%"></span>
+                </div>
+            </article>
+        <?php endforeach ?>
+    </div>
+</section>
+<?php if ($service->manager()) require __DIR__.'/monthly-nurse-chart.php'; ?>
 <div class="dashboard-columns"><div><section class="card roster-card"><div class="section-heading"><div><span class="eyebrow">DAILY OPERATIONS</span><h2><?= $service->manager()? 'Duty roster':'My assignments' ?></h2></div><a href="?page=schedule">View schedule <?=icon('arrow')?></a></div><?php roster_table(array_slice($roster,0,6)); ?><div class="card-foot"><span class="live-dot"></span> Based on recorded schedules and approved assignments</div></section>
 <?php if($service->manager()): ?><section class="card"><div class="section-heading"><div><span class="eyebrow">LOCATION COVERAGE</span><h2>Care where it’s needed</h2></div><a href="?page=locations">All locations →</a></div><p class="muted inset">Distinct nurses assigned during this day; partial-day assignments may leave time gaps.</p><?php $locations=$db->all('SELECT * FROM locations WHERE active=1 AND required_nurses>0 ORDER BY name LIMIT 6'); if(!$locations) empty_state('Set your coverage targets','Add a required nurse count to your schools and duty locations.'); foreach($locations as $l): $ids=[]; foreach($roster as $r) if($r['location_id']==$l['id']) $ids[$r['nurse_id']]=true; $covered=count($ids); ?><div class="coverage-row"><div class="location-icon"><?=icon('locations')?></div><div><strong><?=e($l['name'])?></strong><small><?=$covered?> / <?=$l['required_nurses']?> nurses assigned</small></div><?=badge($covered>=$l['required_nurses']?'Covered':'Needs '.($l['required_nurses']-$covered))?></div><?php endforeach ?></section><?php endif ?></div>
 <div><section class="card"><div class="section-heading"><div><span class="eyebrow">COMING UP</span><h2>Activities & staffing</h2></div><?=icon('activities')?></div><?php if(!$activities) empty_state('No upcoming activities','New personnel requirements will appear here.'); foreach($activities as $a): ?><article class="activity-preview"><div class="activity-date"><strong><?=date('d',strtotime($a['starts_at']))?></strong><span><?=date('M',strtotime($a['starts_at']))?></span></div><div><h3><?=e($a['title'])?></h3><p><?=e($a['location_name'])?></p><?=badge($a['assigned'] >= $a['required_nurses']?'Fully staffed':'Needs '.($a['required_nurses']-$a['assigned']).' nurses')?><?php if($service->manager()): ?><a href="?page=deployment&activity=<?=$a['id']?>">Review candidates →</a><?php endif ?></div></article><?php endforeach ?></section>
