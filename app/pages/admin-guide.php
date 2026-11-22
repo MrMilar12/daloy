@@ -24,9 +24,9 @@ page_heading('ADMINISTRATOR GUIDE','How to use DALOY','Follow these steps to pre
 <section class="card inset">
     <h2>3. Create and review user accounts</h2>
     <ol>
-        <li>Open <a href="?page=users">User accounts</a> to create administrator, Nurse Head, and nurse accounts. Home school / office assignment is optional; use “No school or office assignment” for office-based staff. Additional school assignments are only for nurses.</li>
+        <li>Open <a href="?page=users">User accounts</a> to create administrator, Nurse Head, and nurse accounts. Add each nurse's employee details, home assignment, additional schools, and relevant skills or competencies.</li>
         <li>Provide temporary passwords through an approved private channel. Users must change them at first sign-in.</li>
-        <li>Review the requested account type on each pending registration. Approve the person as a nurse or Nurse Head / Office Supervisor; office supervisors can remain unassigned to a school.</li>
+        <li>Review pending registration requests in User accounts before approving them. An approved request creates a nurse account.</li>
         <li>Deactivate accounts when access should end. Do not delete or repurpose an account with workforce history; its records are retained.</li>
     </ol>
 </section>
@@ -52,7 +52,7 @@ page_heading('ADMINISTRATOR GUIDE','How to use DALOY','Follow these steps to pre
     <h2>6. Monitor activity and report results</h2>
     <ol>
         <li>Use <a href="?page=dashboard">Overview</a> to review the selected day's workforce and open staffing needs.</li>
-        <li>Check <a href="?page=notifications">Notifications</a> for account and workflow updates. Active users receive an in-app popup and inbox notification when a system update completes; DALOY does not send email or SMS.</li>
+        <li>Check <a href="?page=notifications">Notifications</a> for account and workflow updates. Notifications are in-app; DALOY does not send email or SMS.</li>
         <li>Open <a href="?page=reports">Reports</a> to filter rosters, assignment history, availability, leave, and conflicts, then export or print the results. Narrow the date range for large histories.</li>
         <li>Use <a href="?page=audit">Audit trail</a> to review recorded administrative and workforce changes.</li>
     </ol>

@@ -2,23 +2,8 @@ Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteRule (^|/)\. - [F,L]
-  # Keep private directories protected even if a child .htaccess is omitted.
-  RewriteRule ^(?:app|bin|database|tests|storage)(?:/|$) - [F,L,NC]
-  # Use a fixed destination: never build security redirects from an untrusted Host.
-  # Local XAMPP remains available over HTTP. Do not trust forwarded headers.
-  RewriteCond %{HTTP_HOST} ^sdohealth\.page\.gd(?::80)?$ [NC]
-  RewriteCond %{HTTPS} !=on
-  RewriteRule ^ https://sdohealth.page.gd%{REQUEST_URI} [R=308,L,NE]
 </IfModule>
-<FilesMatch "^(config.*\.php|web-push-key\.php|README\.md|.*\.sql|.*\.log|.*\.pem)$">
-  Require all denied
-</FilesMatch>
-<Files "push-worker.js">
-  <IfModule mod_headers.c>
-    Header always set Cache-Control "no-store"
-  </IfModule>
-</Files>
-<FilesMatch "(?i)(\.(?:bak|old|orig|save|swp|sql|sqlite|db|log|pem|key|zip|tar|gz|7z)|~)$">
+<FilesMatch "^(config.*\.php|README\.md|.*\.sql|.*\.log)$">
   Require all denied
 </FilesMatch>
 <IfModule mod_headers.c>

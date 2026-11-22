@@ -12,7 +12,7 @@ final class Service {
     }
     public function choice(array $d,string $key,array $values): string { $v=$this->text($d,$key); if(!in_array($v,$values,true)) throw new DomainException('Invalid '.str_replace('_',' ',$key).'.',422); return $v; }
     public function positive(array $d,string $key,int $min=1,int $max=10000): int {
-        $v=filter_var($d[$key]??null,FILTER_VALIDATE_INT); if($v===false || $v<$min || $v>$max) throw new DomainException("Invalid $key (allowed $min–$max).",422); return $v;
+        $v=filter_var($d[$key]??null,FILTER_VALIDATE_INT); if($v===false || $v<$min || $v>$max) throw new DomainException("Invalid $key (allowed $minÃ¢â‚¬â€œ$max).",422); return $v;
     }
     public function reference(string $table,mixed $id): int { $id=(int)$id; $r=$this->record($table,$id); if(isset($r['active']) && !$r['active']) throw new DomainException('The selected record is inactive.',422); return $id; }
     public function nurse(mixed $id): int { $id=$this->reference('users',$id); if($this->record('users',$id)['role']!=='nurse') throw new DomainException('Select an active nurse.',422); return $id; }
@@ -34,11 +34,6 @@ final class Service {
     }
     public function notify(int $id,string $title,string $message,string $link='?page=notifications'): void {
         $this->db->insert('notifications',['user_id'=>$id,'title'=>$title,'message'=>$message,'link'=>$link,'created_at'=>now()]);
-    }
-    public function notifyActiveUsers(string $title,string $message,string $link='?page=notifications'): void {
-        $this->db->transaction(function() use ($title,$message,$link): void {
-            foreach($this->db->all('SELECT id FROM users WHERE active=1') as $user) $this->notify((int)$user['id'],$title,$message,$link);
-        });
     }
     public function notifyHeads(string $title,string $message,string $link): void { foreach($this->db->all("SELECT id FROM users WHERE active=1 AND role IN ('head','admin')") as $u) $this->notify((int)$u['id'],$title,$message,$link); }
     public function conflicts(int $id,string $start,string $end,string $excludeTable='',int $excludeId=0): array {
@@ -63,7 +58,7 @@ final class Service {
             $data=['nurse_id'=>$nurse,'location_id'=>$this->reference('locations',$d['location_id']??0),'duty_type_id'=>$this->reference('duty_types',$d['duty_type_id']??0),'starts_at'=>$start,'ends_at'=>$end,'remarks'=>$this->text($d,'remarks',3000,false),'updated_at'=>now()];
             if($id) $this->db->update('schedules',$id,$data); else $id=$this->db->insert('schedules',$data+['created_by'=>$this->actor['id'],'created_at'=>now(),'status'=>'Scheduled']);
             $this->audit($old?'Schedule updated':'Schedule created','schedules',$id,$old,$data);
-            $this->notify($nurse,'Duty schedule '.($old?'updated':'created'),$start.' · '.$this->record('locations',$data['location_id'])['name'],'?page=schedule'); return $id;
+            $this->notify($nurse,'Duty schedule '.($old?'updated':'created'),$start.' Ã‚Â· '.$this->record('locations',$data['location_id'])['name'],'?page=schedule'); return $id;
         });
     }
     public function cancel(array $d): void {
@@ -73,7 +68,7 @@ final class Service {
             if(in_array($table,['deployments','activities'])) $this->requireRole(['admin','head']); else $this->own((int)$r['nurse_id']);
             if(($r['status']??'')==='Cancelled') throw new DomainException('This record is already cancelled.',422);
             if($table==='leave_records' && $r['status']==='Approved') $this->requireRole(['admin','head']);
-            if($table==='activities' && $this->db->one("SELECT id FROM deployments WHERE activity_id=? AND status<>'Cancelled'",[$r['id']])) throw new DomainException("Cancel the activity's deployments first.",409);
+            if($table==='activities' && $this->db->one("SELECT id FROM deployments WHERE activity_id=? AND status<>'Cancelled'",[$r['id']])) throw new DomainException('Cancel the activityÃ¢â‚¬â„¢s deployments first.',409);
             $change=['status'=>'Cancelled']; if($table==='deployments') $change+=['cancelled_at'=>now(),'cancellation_reason'=>$reason];
             $this->db->update($table,(int)$r['id'],$change); $this->audit('Cancelled',$table,(int)$r['id'],$r,$change,$reason);
             if(isset($r['nurse_id'])) $this->notify((int)$r['nurse_id'],'Assignment / availability record cancelled',$reason);
@@ -85,22 +80,9 @@ final class Service {
             if($old && $old['status']==='Cancelled') throw new DomainException('Create a new requirement for a cancelled activity.',422);
             if($id && $this->db->one('SELECT id FROM deployments WHERE activity_id=?',[$id])) throw new DomainException('This requirement has deployment history. Create a replacement requirement to preserve the original details.',409);
             [$start,$end]=$this->window($d);
-            $selectedLocation=null;
-            if(!empty($d['location_id'])) {
-                $selectedLocationId=$this->reference('locations',$d['location_id']);
-                $selectedLocation=$this->record('locations',$selectedLocationId);
-            }
-            $destination=$this->text($d,'destination_name',190,false);
-            $address=$this->text($d,'destination_address',1000,false);
-            if($destination==='' && $selectedLocation) $destination=$selectedLocation['name'];
-            if($address==='' && $selectedLocation) $address=(string)$selectedLocation['address'];
-            if($destination==='') $destination=$this->text($d,'destination_name',190);
-            $locationId=null;
-            if($selectedLocation && $destination===$selectedLocation['name'] && $address===(string)$selectedLocation['address']) $locationId=(int)$selectedLocation['id'];
-            elseif($old && !empty($old['location_id'])) { $saved=$this->record('locations',(int)$old['location_id']); if($destination===$saved['name'] && $address===(string)$saved['address']) $locationId=(int)$saved['id']; }
-            $requiredSkill=$this->text($d,'required_skill',190,false);
-            if(in_array(mb_strtolower($requiredSkill),['nurse','nurses'],true)) $requiredSkill='';
-            $data=['title'=>$this->text($d,'title'),'location_id'=>$locationId,'destination_name'=>$destination,'destination_address'=>$address?:null,'starts_at'=>$start,'ends_at'=>$end,'organizer'=>$this->text($d,'organizer',190,false),'required_nurses'=>$this->positive($d,'required_nurses',1,1000),'required_skill'=>$requiredSkill,'reason_id'=>$this->reference('deployment_reasons',$d['reason_id']??0),'instructions'=>$this->text($d,'instructions',5000,false)];
+            $destination=$this->text($d,'destination_name',190); $address=$this->text($d,'destination_address',1000,false); $locationId=null;
+            if($old && !empty($old['location_id'])) { $saved=$this->record('locations',(int)$old['location_id']); if($destination===$saved['name'] && $address===(string)$saved['address']) $locationId=(int)$saved['id']; }
+            $data=['title'=>$this->text($d,'title'),'location_id'=>$locationId,'destination_name'=>$destination,'destination_address'=>$address?:null,'starts_at'=>$start,'ends_at'=>$end,'organizer'=>$this->text($d,'organizer',190,false),'required_nurses'=>$this->positive($d,'required_nurses',1,1000),'required_skill'=>$this->text($d,'required_skill',190,false),'reason_id'=>$this->reference('deployment_reasons',$d['reason_id']??0),'instructions'=>$this->text($d,'instructions',5000,false)];
             if($id) $this->db->update('activities',$id,$data); else $id=$this->db->insert('activities',$data+['created_by'=>$this->actor['id'],'created_at'=>now(),'status'=>'Open']);
             $this->audit($old?'Requirement updated':'Requirement created','activities',$id,$old,$data);
             $this->notifyHeads('Personnel required',$data['title'].' needs '.$data['required_nurses'].' nurse(s).','?page=deployment&activity='.$id); return $id;
@@ -108,21 +90,15 @@ final class Service {
     }
     public function candidates(int $activityId): array {
         $this->requireRole(['admin','head']); $a=$this->record('activities',$activityId); $list=[];
-        foreach($this->db->all("SELECT u.id,u.name,u.active,u.specialization,u.skills,d.name district_name,l.name location_name FROM users u LEFT JOIN districts d ON d.id=u.district_id LEFT JOIN locations l ON l.id=u.location_id WHERE u.role='nurse' ORDER BY u.name") as $u) {
+        foreach($this->db->all("SELECT u.*,d.name district_name,l.name location_name FROM users u LEFT JOIN districts d ON d.id=u.district_id LEFT JOIN locations l ON l.id=u.location_id WHERE u.role='nurse' ORDER BY u.name") as $u) {
             $reasons=[]; if(!$u['active']) $reasons[]='Inactive account';
             if($a['status']==='Cancelled') $reasons[]='Requirement cancelled';
             if(!empty($a['location_id']) && !$this->record('locations',(int)$a['location_id'])['active']) $reasons[]='Destination is inactive';
             if($a['ends_at']<=now()) $reasons[]='Requirement has ended';
-            if($a['required_skill']!=='' && !$this->hasCompetency($u,$a['required_skill'])) $reasons[]='Missing required competency: '.$a['required_skill'];
             $conflicts=$this->conflicts((int)$u['id'],$a['starts_at'],$a['ends_at']);
-            foreach($conflicts as $c) $reasons[]=$c['label'].' ('.$c['starts_at'].' – '.$c['ends_at'].')';
-            $list[]=$u+['eligible'=>!$reasons,'unavailable'=>(bool)$conflicts,'reasons'=>$reasons];
+            foreach($conflicts as $c) $reasons[]=$c['label'].' ('.$c['starts_at'].' â€“ '.$c['ends_at'].')';
+            unset($u['password_hash']); $list[]=$u+['eligible'=>!$reasons,'unavailable'=>(bool)$conflicts,'reasons'=>$reasons];
         } return $list;
-    }
-    private function hasCompetency(array $nurse,string $required): bool {
-        $required=trim($required);
-        if(in_array(mb_strtolower($required),['nurse','nurses'],true)) return true;
-        return mb_stripos((string)$nurse['specialization']."\n".(string)$nurse['skills'],$required,0,'UTF-8')!==false;
     }
     public function deploy(array $d): int {
         $this->requireRole(['admin','head']); return $this->db->transaction(function() use($d) {
@@ -132,12 +108,11 @@ final class Service {
             $count=$this->db->one("SELECT COUNT(*) n FROM deployments WHERE activity_id=? AND status<>'Cancelled'",[$a['id']]);
             if($count['n'] >= $a['required_nurses']) throw new DomainException('This requirement is already fully staffed.',409);
             $u=$this->record('users',$nurse);
-            if($a['required_skill']!=='' && !$this->hasCompetency($u,$a['required_skill'])) throw new DomainException('The nurse does not have the required competency recorded for this requirement.',422);
             $this->assertFree($nurse,$a['starts_at'],$a['ends_at']);
             $home=$u['location_id']?$this->record('locations',(int)$u['location_id'])['name']:'No home location recorded';
             $data=['activity_id'=>$a['id'],'nurse_id'=>$nurse,'location_id'=>$a['location_id'],'starts_at'=>$a['starts_at'],'ends_at'=>$a['ends_at'],'reason'=>$this->record('deployment_reasons',(int)$a['reason_id'])['name'],'instructions'=>$a['instructions'],'original_assignment'=>$home,'authorized_by'=>$this->actor['id'],'created_at'=>now(),'status'=>'Assigned'];
             $id=$this->db->insert('deployments',$data); $this->audit('Deployment assigned','deployments',$id,null,$data);
-            $this->notify($nurse,'New official duty assignment',$a['title'].' · '.$a['starts_at'].'. Please review and acknowledge.','?page=deployment'); return $id;
+            $this->notify($nurse,'New official duty assignment',$a['title'].' Ã‚Â· '.$a['starts_at'].'. Please review and acknowledge.','?page=deployment'); return $id;
         });
     }
     public function acknowledge(array $d): void {
@@ -156,7 +131,7 @@ final class Service {
             $type=$this->choice($d,'type',['Vacation Leave','Sick Leave','Official Leave','Other Leave','Unavailability']);
             $data=['nurse_id'=>$nurse,'type'=>$type,'starts_at'=>$start,'ends_at'=>$end,'reason'=>$this->text($d,'reason',3000),'attachment'=>$attachment,'created_at'=>now(),'status'=>'Submitted'];
             $id=$this->db->insert('leave_records',$data); $this->audit('Leave submitted','leave_records',$id,null,$data);
-            $this->notifyHeads('Leave request for review',$this->record('users',$nurse)['name'].' · '.$start,'?page=leave'); return $id;
+            $this->notifyHeads('Leave request for review',$this->record('users',$nurse)['name'].' Ã‚Â· '.$start,'?page=leave'); return $id;
         });
     }
     public function reviewLeave(array $d): void {
@@ -167,7 +142,7 @@ final class Service {
             if($status==='Approved') $this->assertFree((int)$r['nurse_id'],$r['starts_at'],$r['ends_at'],'leave_records',(int)$r['id']);
             $change=['status'=>$status,'reviewed_by'=>$this->actor['id'],'reviewed_at'=>now(),'review_note'=>$this->text($d,'review_note',2000,false)];
             $this->db->update('leave_records',(int)$r['id'],$change); $this->audit('Leave '.$status,'leave_records',(int)$r['id'],$r,$change);
-            $this->notify((int)$r['nurse_id'],'Leave request '.$status,$r['starts_at'].' · '.$change['review_note'],'?page=leave');
+            $this->notify((int)$r['nurse_id'],'Leave request '.$status,$r['starts_at'].' Ã‚Â· '.$change['review_note'],'?page=leave');
         });
     }
     public function availability(array $d): int {
@@ -220,33 +195,6 @@ final class Service {
             $this->audit($old?'Account updated':'Account created','users',$id,$old,$data); return $id;
         });
     }
-    public function deleteUser(array $d): void {
-        $this->requireRole(['admin']);
-        $this->db->transaction(function() use($d) {
-            $id=$this->positive($d,'id',1,PHP_INT_MAX);
-            if($id===(int)$this->actor['id']) throw new DomainException('You cannot delete your own account.',422);
-            $old=$this->record('users',$id);
-            if($old['role']==='admin' && $old['active'] && (int)$this->db->one("SELECT COUNT(*) AS count FROM users WHERE role='admin' AND active=1")['count']<=1) {
-                throw new DomainException('You cannot delete the last active administrator account.',422);
-            }
-            foreach([
-                'schedules'=>['nurse_id','created_by'],
-                'activities'=>['created_by'],
-                'deployments'=>['nurse_id','authorized_by'],
-                'leave_records'=>['nurse_id','reviewed_by'],
-                'availability_records'=>['nurse_id'],
-            ] as $table=>$columns) {
-                foreach($columns as $column) if($this->db->one("SELECT id FROM $table WHERE $column=? LIMIT 1",[$id])) {
-                    throw new DomainException('This account is linked to operational history. Deactivate it instead of deleting it.',409);
-                }
-            }
-            $this->audit('Account deleted','users',$id,$old,null);
-            $this->db->run('UPDATE registration_requests SET reviewed_by=NULL WHERE reviewed_by=?',[$id]);
-            $this->db->run('DELETE FROM notifications WHERE user_id=?',[$id]);
-            $this->db->run('DELETE FROM nurse_locations WHERE nurse_id=?',[$id]);
-            $this->db->run('DELETE FROM users WHERE id=?',[$id]);
-        });
-    }
     public function monthlyNurseSchedules(string $month): array {
         $this->requireRole(['admin','head']);
         $first=DateTimeImmutable::createFromFormat('!Y-m',$month);
@@ -256,10 +204,7 @@ final class Service {
     public function assignedLocations(int $nurseId): array {
         return $this->db->all('SELECT l.* FROM locations l WHERE l.id=(SELECT location_id FROM users WHERE id=?) OR EXISTS (SELECT 1 FROM nurse_locations nl WHERE nl.nurse_id=? AND nl.location_id=l.id) ORDER BY l.name,l.id',[$nurseId,$nurseId]);
     }
-    public function password(mixed $raw): string {
-        if(!is_string($raw) || strlen($raw)<12 || strlen($raw)>72 || str_contains($raw,"\0")) throw new DomainException('Use a password between 12 and 72 bytes.',422);
-        return $raw;
-    }
+    public function password(mixed $raw): string { $p=(string)$raw; if(strlen($p)<12 || strlen($p)>72) throw new DomainException('Use a password between 12 and 72 bytes.',422); return $p; }
     public function profile(array $d,?string $photo=null): void {
         $this->db->transaction(function() use($d,$photo) {
             $old=$this->record('users',(int)$this->actor['id']); $data=[]; if(trim((string)($d['phone']??''))!=='') $data['phone']=$this->text($d,'phone',40,false);
@@ -288,18 +233,7 @@ final class Service {
     }
     public function settings(array $d): void {
         $this->requireRole(['admin']); $this->db->transaction(function() use($d) {
-            $organization=$this->text($d,'organization',190,true);
-            $old=$this->db->one("SELECT * FROM system_settings WHERE setting_key='organization'");
-            $this->db->run("UPDATE system_settings SET setting_value=? WHERE setting_key='organization'",[$organization]);
-            $this->audit('Settings updated','system_settings',null,$old,['setting_key'=>'organization','setting_value'=>$organization]);
-        });
-    }
-    public function publishMemo(array $data,?string $attachment=null): void {
-        $this->requireRole(['admin']);
-        $memo=['title'=>$this->text($data,'title',190,true),'body'=>$this->text($data,'body',2000,true),'attachment'=>$attachment,'published_at'=>now()];
-        $this->db->transaction(function() use($memo) {
-            $id=$this->db->insert('workspace_memos',$memo);
-            $this->audit('Memo published','workspace_memos',$id,null,$memo);
+            foreach(['organization','system_notice'] as $key) { $v=$this->text($d,$key,$key==='organization'?190:2000,$key==='organization'); $old=$this->db->one('SELECT * FROM system_settings WHERE setting_key=?',[$key]); $this->db->run('UPDATE system_settings SET setting_value=? WHERE setting_key=?',[$v,$key]); $this->audit('Settings updated','system_settings',null,$old,['setting_key'=>$key,'setting_value'=>$v]); }
         });
     }
     public function workforce(string $start,string $end): array {

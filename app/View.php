@@ -9,18 +9,18 @@ function badge(string $text): string { return '<span class="badge '.e(strtolower
 function initials(string $name): string { $parts=explode(' ',preg_replace('/^Demo /','',$name)); return mb_substr($parts[0],0,1).mb_substr(end($parts),0,1); }
 function avatar(string $name): string { return '<span class="avatar">'.e(initials($name)).'</span>'; }
 function dt(string $date): string { return date('M j, Y · g:i A',strtotime($date)); }
-function range_label(array $r): string { return e(date('M j, Y',strtotime($r['starts_at']))).'<small>'.e(date('g:i A',strtotime($r['starts_at'])).' – '.(substr($r['starts_at'],0,10)!==substr($r['ends_at'],0,10)?date('M j, Y, ',strtotime($r['ends_at'])):'').date('g:i A',strtotime($r['ends_at']))).'</small>'; }
+function range_label(array $r): string { return e(date('M j, Y',strtotime($r['starts_at']))).'<small>'.e(date('g:i A',strtotime($r['starts_at'])).' – '.(substr($r['starts_at'],0,10)!==substr($r['ends_at'],0,10)?date('M j, ',strtotime($r['ends_at'])):'').date('g:i A',strtotime($r['ends_at']))).'</small>'; }
 function options(string $table,string $where='active=1'): array { global $db; return array_column($db->all("SELECT id,name FROM $table WHERE $where ORDER BY name"),'name','id'); }
 function input(string $name,string $label,mixed $value='',string $type='text',bool $required=true,string $extra=''): void { ?><label><?=e($label)?><input type="<?=e($type)?>" name="<?=e($name)?>" value="<?=e($value)?>" <?=$required?'required':''?> <?=$extra?>></label><?php }
 function select_field(string $name,string $label,array $options,mixed $value='',bool $required=true): void { ?><label><?=e($label)?><select name="<?=e($name)?>" <?=$required?'required':''?>><option value=""><?=$required?'Select an option':'All / none'?></option><?php foreach($options as $k=>$v): ?><option value="<?=e($k)?>" <?=(string)$value===(string)$k?'selected':''?>><?=e($v)?></option><?php endforeach ?></select></label><?php }
-function school_assignments_field(array $record,bool $enabled=true): void {
+function school_assignments_field(array $record): void {
     global $db;
     $selected=$record['school_ids']??(isset($record['id'])?array_column($db->all('SELECT location_id FROM nurse_locations WHERE nurse_id=?',[$record['id']]),'location_id'):[]);
     if(!is_array($selected)) $selected=[];
     $snapshot=json_decode(file_get_contents(ROOT.'/database/aurora-schools.json'),true,512,JSON_THROW_ON_ERROR);
     $names=array_column(array_filter($snapshot['schools'],fn($s)=>!empty($s['levels']) && !empty($s['public_inventory'])),'name');
     $schools=$db->all("SELECT l.*,m.name municipality_name FROM locations l LEFT JOIN municipalities m ON m.id=l.municipality_id WHERE l.type='School' ORDER BY l.name,l.id");
-    ?><fieldset id="nurse-school-assignments" class="span-2 school-assignments" data-nurse-school-assignments <?=$enabled?'':'hidden disabled'?>>
+    ?><fieldset class="span-2 school-assignments">
         <legend class="sr-only">Additional assigned schools</legend>
         <input type="hidden" name="schools_present" value="1">
         <div class="school-picker-heading"><span class="school-picker-icon" aria-hidden="true"><?=icon('locations')?></span><div><h3>Additional schools</h3><p>Expand this nurse’s coverage beyond their home school.</p></div><span class="school-selection-badge" aria-live="polite"><?=count(array_unique($selected))?> selected</span></div>
@@ -59,11 +59,7 @@ function prepare_page_views(string $html): string {
             foreach($table->getElementsByTagName('th') as $th) { $headers[]=trim($th->textContent); $th->setAttribute('scope','col'); }
             foreach($table->getElementsByTagName('tbody') as $body) foreach($body->getElementsByTagName('tr') as $row) {
                 $row->setAttribute('role','row');
-                foreach($row->getElementsByTagName('td') as $i=>$cell) {
-                    $label=$headers[$i]??'';
-                    $cell->setAttribute('data-label',$label); $cell->setAttribute('role','cell');
-                    if(preg_match('/\b(?:actions?|details?)\b/i',$label)) $cell->setAttribute('class',trim($cell->getAttribute('class').' record-action-cell'));
-                }
+                foreach($row->getElementsByTagName('td') as $i=>$cell) { $cell->setAttribute('data-label',$headers[$i]??''); $cell->setAttribute('role','cell'); }
             }
         }
         foreach($dom->getElementsByTagName('form') as $form) if(strtolower($form->getAttribute('method'))==='get') {

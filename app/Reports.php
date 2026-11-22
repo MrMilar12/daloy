@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 final class Reports {
-    public const TYPES=['daily'=>'Daily duty roster','weekly'=>'Weekly nurse schedule','monthly'=>'Monthly nurse schedule','individual'=>'Individual duty history','school'=>'School assignment report','district'=>'District / area assignments','deployment'=>'Deployment report','assignment_history'=>'Assignment history','activity'=>'Activity personnel report','availability'=>'Availability report','leave'=>'Leave / unavailability report','conflicts'=>'Schedule conflict report','audit'=>'Audit trail report'];
+    public const TYPES=['daily'=>'Daily duty roster','weekly'=>'Weekly nurse schedule','monthly'=>'Monthly nurse schedule','individual'=>'Individual duty history','school'=>'School assignment report','district'=>'District / area assignments','deployment'=>'Deployment report','activity'=>'Activity personnel report','availability'=>'Availability report','leave'=>'Leave / unavailability report','conflicts'=>'Schedule conflict report','audit'=>'Audit trail report'];
     public static function build(Service $s,string $type,array $f): array {
         $s->requireRole(['admin','head']); if(!isset(self::TYPES[$type])) throw new DomainException('Unknown report.',422);
         [$start,$end]=$s->window($f); $db=$s->db;
@@ -27,14 +27,6 @@ final class Reports {
             if(!empty($f['municipality_id'])) { $where.=' AND (l.municipality_id=? OR EXISTS (SELECT 1 FROM nurse_locations nl JOIN locations al ON al.id=nl.location_id WHERE nl.nurse_id=u.id AND al.municipality_id=?))'; array_push($params,(int)$f['municipality_id'],(int)$f['municipality_id']); }
             $rows=$db->all("SELECT u.name,r.type,r.starts_at,r.ends_at,r.status,r.reason,h.name reviewer,r.reviewed_at,r.review_note FROM leave_records r JOIN users u ON u.id=r.nurse_id LEFT JOIN locations l ON l.id=u.location_id LEFT JOIN users h ON h.id=r.reviewed_by WHERE $where ORDER BY r.starts_at LIMIT 5000",$params);
             return ['columns'=>['Nurse','Type','Start','End','Status','Reason','Reviewer','Reviewed at','Review note'],'rows'=>array_map('array_values',$rows)];
-        }
-        if($type==='assignment_history') {
-            $where='d.starts_at<? AND d.ends_at>?'; $params=[$end,$start];
-            foreach(['nurse_id'=>'d.nurse_id','district_id'=>'u.district_id','location_id'=>'d.location_id','municipality_id'=>'l.municipality_id','activity_id'=>'d.activity_id'] as $key=>$column) {
-                if(!empty($f[$key])) { $where.=" AND $column=?"; $params[]=(int)$f[$key]; }
-            }
-            $rows=$db->all("SELECT d.id,u.name nurse_name,a.title,COALESCE(l.name,a.destination_name) destination,d.starts_at,d.ends_at,d.status,d.created_at assigned_at,h.name authorized_by,d.acknowledged_at,d.original_assignment,d.cancellation_reason FROM deployments d JOIN users u ON u.id=d.nurse_id JOIN users h ON h.id=d.authorized_by JOIN activities a ON a.id=d.activity_id LEFT JOIN locations l ON l.id=d.location_id WHERE $where ORDER BY d.created_at DESC,d.id DESC LIMIT 5000",$params);
-            return ['columns'=>['ID','Nurse','Activity','Destination','Start','End','Status','Assigned at','Authorized by','Acknowledged at','Original home assignment','Cancellation reason'],'rows'=>array_map('array_values',$rows)];
         }
         $roster=$s->roster($f);
         if($type==='conflicts') {

@@ -2,82 +2,10 @@
 if($page==='settings') {
     page_heading('SYSTEM ADMINISTRATION','Workspace settings','Manage the information shown across the workspace.');
     $settings=array_column($db->all('SELECT * FROM system_settings'),'setting_value','setting_key');
-    ?>
-    <section class="settings-page-intro">
-        <span class="settings-page-intro-mark" aria-hidden="true"><?=icon('settings')?></span>
-        <div class="settings-page-intro-copy">
-            <span class="eyebrow">ADMIN CONTROL CENTER</span>
-            <h2>Keep your workspace in good order.</h2>
-            <p>Update organization details, manage system updates, and review your server settings.</p>
-        </div>
-        <div class="settings-page-intro-tag"><span><?=icon('profile')?></span><div><strong>Administrator tools</strong><small>Workspace controls</small></div></div>
-    </section>
-    <div class="settings-panels">
-        <section class="card editor settings-workspace-panel">
-            <div class="settings-panel-heading">
-                <span class="settings-panel-mark" aria-hidden="true"><?=icon('settings')?></span>
-                <div><span class="eyebrow">WORKSPACE PROFILE</span><h2>Organization details</h2><p>These details appear throughout the DALOY workspace.</p></div>
-            </div>
-            <?php form_start('settings','?page=settings'); ?>
-                <?php input('organization','Organization name',$settings['organization']); ?>
-                <?php form_end('?page=settings','Save settings'); ?>
-                <div class="memo-publisher" id="publish-memo">
-                    <h2>Publish a workspace memo</h2>
-                    <p>All users will see the memo before entering the workspace and must mark it as read.</p>
-                    <?php $memoFormReturn='?page=settings'; require __DIR__.'/../memo-publish-form.php'; ?>
-                    <a href="?page=memo-acknowledgments">View memo acknowledgments</a>
-                </div>
-        </section>
-        <?php if($user['role']==='admin'): ?>
-            <section class="card settings-updater-panel github-updater" data-github-updater>
-                <div class="settings-panel-heading">
-                    <span class="settings-panel-mark settings-update-mark" aria-hidden="true"><?=icon('deployment')?></span>
-                    <div><span class="eyebrow">SYSTEM UPDATES</span><h2>Keep DALOY current</h2><p>Check for approved updates from the official repository.</p></div>
-                </div>
-                <div class="settings-updater-repository">
-                    <span class="settings-repository-mark" aria-hidden="true"><?=icon('settings')?></span>
-                    <div><strong>MrMilar12/daloy</strong><small>Official repository · main branch</small></div>
-                    <span class="github-updater-status" data-github-status>Ready</span>
-                </div>
-                <div class="github-updater-actions settings-updater-actions">
-                    <button type="button" class="primary" data-github-check>Check for updates</button>
-                    <a href="https://github.com/MrMilar12/daloy" target="_blank" rel="noopener">Open repository <span aria-hidden="true">↗</span></a>
-                </div>
-                <div class="update-progress" data-update-progress hidden><div class="progress-track"><span data-update-progress-bar></span></div><div class="progress-meta"><strong data-update-progress-label>Preparing update…</strong><span data-update-progress-percent>0%</span></div></div>
-                <div class="github-updater-result" data-github-result hidden></div>
-                <dialog class="github-update-dialog" data-github-update-dialog aria-labelledby="github-update-title">
-                    <section class="github-update-dialog-card">
-                        <button type="button" class="github-update-dialog-close" data-github-update-close aria-label="Close update notice">×</button>
-                        <div class="github-update-dialog-heading">
-                            <span class="github-update-dialog-mark" aria-hidden="true">↻</span>
-                            <div><span class="eyebrow">VERIFIED SYSTEM UPDATE</span><h2 id="github-update-title">New system update found</h2><p>A verified DALOY update is ready to install.</p></div>
-                        </div>
-                        <div class="github-update-dialog-commit">
-                            <div class="github-update-dialog-meta"><span>Latest commit</span><code data-github-update-commit></code></div>
-                            <div class="github-update-dialog-message" data-github-update-message></div>
-                        </div>
-                        <div class="github-update-dialog-actions">
-                            <button type="button" data-github-update-close>Not now</button>
-                            <button type="button" class="primary" data-github-install>Install update</button>
-                        </div>
-                    </section>
-                </dialog>
-            </section>
-        <?php endif ?>
-    </div>
-    <section class="card settings-server-panel">
-        <div class="settings-panel-heading">
-            <span class="settings-panel-mark settings-server-mark" aria-hidden="true"><?=icon('calendar')?></span>
-            <div><span class="eyebrow">SYSTEM INFORMATION</span><h2>Server configuration &amp; backups</h2><p>Review the environment details needed to maintain this installation.</p></div>
-        </div>
-        <div class="settings-server-grid">
-            <div><span>TIME ZONE</span><strong>Asia/Manila</strong><small>Philippine Standard Time · UTC+8</small></div>
-            <div><span>SESSION TIMEOUT</span><strong><?=round($config['session_timeout']/60)?> minutes</strong><small>Inactive sessions require sign-in again.</small></div>
-            <div><span>CONFIGURATION FILE</span><strong><code>config.local.php</code></strong><small>Credentials and security settings are stored here.</small></div>
-        </div>
-        <p class="settings-backup-note"><span aria-hidden="true"><?=icon('availability')?></span><span>Back up the database and protected uploads together. Follow the recovery procedure in <code>README.md</code>.</span></p>
-    </section>
-    <?php return;
+    if($user['role']==='admin') {
+        ?><section class="card settings-combined github-updater" data-github-updater><div class="settings-hero"><div><span class="eyebrow">DEVELOPER CENTER</span><h2>Keep DALOY current</h2><p>Review and install approved updates from the official DALOY repository.</p></div><div class="settings-hero-mark">↻</div></div><div class="updater-head"><div class="updater-title"><span class="updater-icon">↻</span><div><span class="eyebrow">SYSTEM UPDATER</span><h2>DALOY GitHub updates</h2></div></div><span class="github-updater-status" data-github-status>Ready</span></div><div class="updater-repo"><span class="repo-dot"></span><div><strong>MrMilar12/daloy</strong><small>Official repository · main branch</small></div></div><div class="github-updater-actions"><button type="button" class="primary" data-github-check>Check for updates</button><a href="https://github.com/MrMilar12/daloy" target="_blank" rel="noopener">Open repository <span>↗</span></a></div><div class="update-progress" data-update-progress hidden><div class="progress-track"><span data-update-progress-bar></span></div><div class="progress-meta"><strong data-update-progress-label>Preparing update…</strong><span data-update-progress-percent>0%</span></div></div><div class="github-updater-result" data-github-result hidden></div></section><?php
+    }
+    ?><section class="card editor"><?php form_start('settings','?page=settings'); input('organization','Organization name',$settings['organization']); textarea('system_notice','Workspace notice',$settings['system_notice']); form_end('?page=settings'); ?></section><section class="card inset"><h2>Server configuration & backups</h2><p>Database credentials, secure cookies, and session timeout are configured in <code>config.local.php</code>. Back up the database and protected uploads together using the procedure in README.md.</p><p class="muted">Timezone: Asia/Manila · Session timeout: <?=round($config['session_timeout']/60)?> minutes</p></section><?php return;
 }
 $tables=['districts'=>'Districts / areas','municipalities'=>'Municipalities','duty_types'=>'Duty types','deployment_reasons'=>'Deployment reasons','shifts'=>'Duty shifts'];
 $table=$page==='locations'?'locations':(string)($_GET['tab']??'districts');

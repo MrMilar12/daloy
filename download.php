@@ -6,18 +6,9 @@ try {
     $service=new Service($db,$user); $type=$_GET['type']??'';
     if($type==='leave') { $r=$service->record('leave_records',(int)($_GET['id']??0)); $service->own((int)$r['nurse_id']); $name=$r['attachment']; }
     elseif($type==='photo') { $r=$service->record('users',(int)($_GET['id']??0)); $service->own((int)$r['id']); $name=$r['photo']; }
-    elseif($type==='memo') {
-        $r=$db->one('SELECT * FROM workspace_memos WHERE id=?',[(int)($_GET['id']??0)]);
-        $name=$r['attachment']??null;
-    }
     else throw new DomainException('Unknown file type.',404);
     if(!$name || !preg_match('/^[a-f0-9]{48}\.(jpg|png|pdf)$/D',$name) || !is_file(ROOT.'/storage/uploads/'.$name)) throw new DomainException('File not found.',404);
     $path=ROOT.'/storage/uploads/'.$name; $mime=(new finfo(FILEINFO_MIME_TYPE))->file($path);
-    $allowed=$type==='photo'?['image/jpeg','image/png']:['application/pdf','image/jpeg','image/png'];
-    if(!in_array($mime,$allowed,true)) throw new DomainException('File format is unavailable.',404);
-    $inline=$type==='photo' || ($type==='memo' && ($_GET['preview']??'')==='1' && in_array($mime,['application/pdf','image/jpeg','image/png'],true));
-    // Uploaded documents must not run scripts with the application's origin.
-    header("Content-Security-Policy: sandbox; default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
-    header('Content-Type: '.$mime); header('Content-Length: '.filesize($path)); header('Content-Disposition: '.($inline?'inline':'attachment').'; filename="daloy-'.$type.'-'.(int)$r['id'].'.'.pathinfo($name,PATHINFO_EXTENSION).'"'); readfile($path);
+    header('Content-Type: '.$mime); header('Content-Length: '.filesize($path)); header('Content-Disposition: '.($type==='photo'?'inline':'attachment').'; filename="daloy-'.$type.'-'.(int)$r['id'].'.'.pathinfo($name,PATHINFO_EXTENSION).'"'); readfile($path);
 } catch(DomainException $e) { http_response_code($e->getCode()?:403); echo e($e->getMessage()); }
 catch(Throwable $e) { error_log((string)$e); http_response_code(500); echo 'Unable to retrieve file.'; }

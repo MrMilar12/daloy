@@ -20,22 +20,4 @@ final class Auth {
         (new Service($this->db,$u))->audit('Login','users',(int)$u['id'],null,null);
     }
     public function logout(): void { $_SESSION=[]; session_regenerate_id(true); }
-    public function limitRegistration(string $ip): void {
-        if(!$this->db->all("SHOW TABLES LIKE 'registration_attempts'")) $this->db->pdo->exec('CREATE TABLE IF NOT EXISTS registration_attempts (
-            ip_hash CHAR(64) PRIMARY KEY, expires_at DATETIME NOT NULL, attempts INTEGER NOT NULL,
-            INDEX registration_attempt_expiry (expires_at)
-        )');
-        $hash=hash('sha256',$ip);
-        $this->db->transaction(function() use($hash) {
-            $this->db->run('DELETE FROM registration_attempts WHERE expires_at<=? ORDER BY expires_at LIMIT 100',[now()]);
-            $attempt=$this->db->one('SELECT attempts,expires_at FROM registration_attempts WHERE ip_hash=? FOR UPDATE',[$hash]);
-            if(!$attempt || $attempt['expires_at']<=now()) {
-                $this->db->run('INSERT INTO registration_attempts (ip_hash,expires_at,attempts) VALUES (?,?,1)
-                    ON DUPLICATE KEY UPDATE expires_at=VALUES(expires_at),attempts=1',[$hash,date('Y-m-d H:i:s',time()+900)]);
-                return;
-            }
-            if((int)$attempt['attempts']>=10) throw new DomainException('Too many registration attempts. Please try again in 15 minutes.',429);
-            $this->db->run('UPDATE registration_attempts SET attempts=attempts+1 WHERE ip_hash=?',[$hash]);
-        });
-    }
 }
