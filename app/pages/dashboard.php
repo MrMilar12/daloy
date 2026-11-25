@@ -7,6 +7,27 @@ $districtOverview=[]; $unassignedDistrictNurses=0;
 if($service->manager()) {
     $districtOverview=$db->all("SELECT d.id,d.name,COALESCE(n.nurse_count,0) nurse_count,COALESCE(s.school_count,0) school_count FROM districts d LEFT JOIN (SELECT district_id,COUNT(*) nurse_count FROM users WHERE role='nurse' AND active=1 GROUP BY district_id) n ON n.district_id=d.id LEFT JOIN (SELECT district_id,COUNT(*) school_count FROM locations WHERE active=1 AND type='School' GROUP BY district_id) s ON s.district_id=d.id WHERE d.active=1 ORDER BY nurse_count DESC,d.name");
     $unassignedDistrictNurses=(int)$db->one("SELECT COUNT(*) n FROM users u LEFT JOIN districts d ON d.id=u.district_id WHERE u.role='nurse' AND u.active=1 AND (u.district_id IS NULL OR d.id IS NULL OR d.active<>1)")['n'];
+    $schoolsByCoverage=['with'=>[], 'without'=>[]];
+    $schools=$db->all("
+        SELECT l.name, d.name AS district_name, COALESCE(coverage.nurse_count,0) AS nurse_count
+        FROM locations l
+        LEFT JOIN districts d ON d.id=l.district_id
+        LEFT JOIN (
+            SELECT location_id, COUNT(*) AS nurse_count
+            FROM (
+                SELECT location_id, id AS nurse_id FROM users WHERE role='nurse' AND active=1 AND location_id IS NOT NULL
+                UNION
+                SELECT nl.location_id, nl.nurse_id FROM nurse_locations nl
+                JOIN users u ON u.id=nl.nurse_id AND u.role='nurse' AND u.active=1
+            ) assignments
+            GROUP BY location_id
+        ) coverage ON coverage.location_id=l.id
+        WHERE l.type='School' AND l.active=1
+        ORDER BY l.name, d.name, l.id
+    ");
+    foreach ($schools as $school) {
+        $schoolsByCoverage[(int)$school['nurse_count'] > 0 ? 'with' : 'without'][]=$school;
+    }
 }
 $activities=$db->all("SELECT a.*,COALESCE(l.name,a.destination_name) location_name,(SELECT COUNT(*) FROM deployments d WHERE d.activity_id=a.id AND d.status<>'Cancelled') assigned FROM activities a LEFT JOIN locations l ON l.id=a.location_id WHERE a.status='Open' AND a.ends_at>? ORDER BY a.starts_at LIMIT 4",[now()]);
 page_heading('WORKFORCE AT A GLANCE',($service->manager()?'Your workforce, in flow.':'Hello, '.preg_replace('/^Demo /','',explode(' ',$user['name'])[0]).'.'),$service->manager()?'A clearer picture of your people, their duty, and where they’re needed.':'Your duty schedule, upcoming assignments, and updates in one place.',add_link('?page=schedule&new=1','Add schedule'));
@@ -121,6 +142,37 @@ page_heading('WORKFORCE AT A GLANCE',($service->manager()?'Your workforce, in fl
         <?php endforeach ?>
       </div>
     </div><?php endif ?>
+</section>
+<section class="card school-coverage" aria-labelledby="school-coverage-title">
+    <div class="section-heading">
+        <div><h2 id="school-coverage-title">School nurse coverage</h2><p>Active schools grouped by their registered nurse assignments.</p></div>
+    </div>
+    <div class="school-coverage-grid">
+        <?php foreach (['with'=>'Schools with nurses','without'=>'Schools without nurses'] as $group=>$title):
+            $schoolList=$schoolsByCoverage[$group];
+        ?>
+            <section class="school-coverage-group school-coverage-<?=$group?>" aria-labelledby="school-coverage-<?=$group?>">
+                <header>
+                    <h3 id="school-coverage-<?=$group?>"><?=e($title)?></h3>
+                    <span><?=number_format(count($schoolList))?> <?=count($schoolList)===1?'school':'schools'?></span>
+                </header>
+                <?php if ($schoolList): ?>
+                    <ul>
+                        <?php foreach ($schoolList as $school): ?>
+                            <li>
+                                <div><strong><?=e($school['name'])?></strong><small><?=e($school['district_name'] ?? 'Unassigned district')?></small></div>
+                                <?php if ($group==='with'): ?>
+                                    <span><?=number_format((int)$school['nurse_count'])?> <?=((int)$school['nurse_count']===1?'nurse':'nurses')?></span>
+                                <?php endif ?>
+                            </li>
+                        <?php endforeach ?>
+                    </ul>
+                <?php else: ?>
+                    <p><?=$group==='with'?'No active schools have an assigned nurse.':'No active schools are missing a nurse assignment.'?></p>
+                <?php endif ?>
+            </section>
+        <?php endforeach ?>
+    </div>
 </section>
 <?php endif ?>
 <?php

@@ -171,6 +171,20 @@ body[data-display=list] .school-assignment-options{grid-template-columns:1fr}bod
 .login-brand>.brand{display:none}.login-brand:before{display:block;width:min(100%,300px);height:120px;margin:0 auto 20px;background:url('daloy-logo.png') center/contain no-repeat;filter:drop-shadow(0 8px 16px #0004)}
 .login-shell{max-width:1240px;padding:48px 42px;gap:86px;grid-template-columns:minmax(0,1.2fr) minmax(380px,.8fr)}.login-brand:before{width:min(100%,520px);height:220px;margin-bottom:30px}.login-brand h1{font-size:52px;line-height:1.05;letter-spacing:-2.3px;margin:22px 0}.login-brand p{font-size:15px;line-height:1.85}
 .login-brand:before{width:min(100%,500px);height:210px;padding:16px;border-radius:22px;background-color:#07111c;background-image:url('daloy-logo.png');background-size:contain;background-repeat:no-repeat;background-position:center;box-shadow:0 20px 50px #10223535;border:1px solid #ffffff20}.login-form{border-radius:20px}.login-form .theme-toggle{top:18px;right:18px}.login-body{background:radial-gradient(circle at 10% 10%,#dcefeb 0,transparent 30%),radial-gradient(circle at 90% 90%,#dfe9f7 0,transparent 35%),#f6f9fb}
+.school-coverage-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;padding:0 clamp(14px,2vw,22px) 20px}
+.school-coverage-group{min-width:0;border:1px solid var(--border);border-radius:13px;overflow:hidden}
+.school-coverage-group header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:5px 10px;padding:12px 14px;background:var(--soft)}
+.school-coverage-with header{border-inline-start:3px solid var(--teal)}
+.school-coverage-without header{border-inline-start:3px solid #c58b46}
+.school-coverage-group h3{margin:0;font-size:1rem}
+.school-coverage-group header span,.school-coverage-group li>span{color:var(--primary);font-size:.875rem;font-weight:650;white-space:nowrap}
+.school-coverage-group ul{margin:0;padding:0 14px;list-style:none}
+.school-coverage-group li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0}
+.school-coverage-group li+li{border-top:1px solid var(--border)}
+.school-coverage-group li strong,.school-coverage-group li small{display:block;overflow-wrap:anywhere}
+.school-coverage-group li small,.school-coverage-group p{font-size:.875rem;color:var(--muted)}
+.school-coverage-group p{margin:0;padding:12px 14px}
+@media(max-width:760px){.school-coverage-grid{grid-template-columns:minmax(0,1fr)}}
 .district-card-grid {
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));
