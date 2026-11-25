@@ -8,18 +8,19 @@ if($service->manager()) {
     $districtOverview=$db->all("SELECT d.id,d.name,COALESCE(n.nurse_count,0) nurse_count,COALESCE(s.school_count,0) school_count FROM districts d LEFT JOIN (SELECT district_id,COUNT(*) nurse_count FROM users WHERE role='nurse' AND active=1 GROUP BY district_id) n ON n.district_id=d.id LEFT JOIN (SELECT district_id,COUNT(*) school_count FROM locations WHERE active=1 AND type='School' GROUP BY district_id) s ON s.district_id=d.id WHERE d.active=1 ORDER BY nurse_count DESC,d.name");
     $unassignedDistrictNurses=(int)$db->one("SELECT COUNT(*) n FROM users u LEFT JOIN districts d ON d.id=u.district_id WHERE u.role='nurse' AND u.active=1 AND (u.district_id IS NULL OR d.id IS NULL OR d.active<>1)")['n'];
     $schoolsByCoverage=['with'=>[], 'without'=>[]];
+    $schoolAssignmentsSql="
+        SELECT location_id, id AS nurse_id FROM users WHERE role='nurse' AND active=1 AND location_id IS NOT NULL
+        UNION
+        SELECT nl.location_id, nl.nurse_id FROM nurse_locations nl
+        JOIN users u ON u.id=nl.nurse_id AND u.role='nurse' AND u.active=1
+    ";
     $schools=$db->all("
-        SELECT l.name, d.name AS district_name, COALESCE(coverage.nurse_count,0) AS nurse_count
+        SELECT l.id, l.name, d.name AS district_name, COALESCE(coverage.nurse_count,0) AS nurse_count
         FROM locations l
         LEFT JOIN districts d ON d.id=l.district_id
         LEFT JOIN (
             SELECT location_id, COUNT(*) AS nurse_count
-            FROM (
-                SELECT location_id, id AS nurse_id FROM users WHERE role='nurse' AND active=1 AND location_id IS NOT NULL
-                UNION
-                SELECT nl.location_id, nl.nurse_id FROM nurse_locations nl
-                JOIN users u ON u.id=nl.nurse_id AND u.role='nurse' AND u.active=1
-            ) assignments
+            FROM ($schoolAssignmentsSql) assignments
             GROUP BY location_id
         ) coverage ON coverage.location_id=l.id
         WHERE l.type='School' AND l.active=1
@@ -161,6 +162,22 @@ $schoolMatchCount=count($schoolMatches);
 $schoolLastPage=max(1, (int)ceil($schoolMatchCount / $schoolsPerPage));
 $schoolPage=max(1, min($schoolLastPage, filter_var($_GET['school_page'] ?? 1, FILTER_VALIDATE_INT) ?: 1));
 $schoolOffset=($schoolPage - 1) * $schoolsPerPage;
+$visibleSchools=array_slice($schoolMatches, $schoolOffset, $schoolsPerPage);
+$schoolNurses=[];
+if ($coverageTab==='with' && $visibleSchools) {
+    $schoolIds=array_column($visibleSchools, 'id');
+    $placeholders=implode(',', array_fill(0, count($schoolIds), '?'));
+    $assignments=$db->all("
+        SELECT assignments.location_id, u.name
+        FROM ($schoolAssignmentsSql) assignments
+        JOIN users u ON u.id=assignments.nurse_id
+        WHERE assignments.location_id IN ($placeholders)
+        ORDER BY u.name, u.id
+    ", $schoolIds);
+    foreach ($assignments as $assignment) {
+        $schoolNurses[$assignment['location_id']][]=$assignment['name'];
+    }
+}
 $dashboardQuery=['page'=>'dashboard', 'date'=>$date];
 if (isset($_GET['month']) && is_string($_GET['month'])) $dashboardQuery['month']=$_GET['month'];
 $coverageUrl=static function (string $tab, string $search='', int $page=1) use ($dashboardQuery): string {
@@ -195,15 +212,33 @@ $coverageUrl=static function (string $tab, string $search='', int $page=1) use (
         </div>
         <?php if ($schoolMatches): ?>
             <div class="school-coverage-grid">
-                <?php foreach (array_slice($schoolMatches, $schoolOffset, $schoolsPerPage) as $school):
-                    $nurseCount=(int)$school['nurse_count'];
+                <?php foreach ($visibleSchools as $school):
+                    $assignedNurses=$schoolNurses[$school['id']] ?? [];
+                    $nurseCount=count($assignedNurses);
                 ?>
                     <article class="school-coverage-card">
                         <h3><?=e($school['name'])?></h3>
                         <p><?=e($school['district_name'] ?? 'Unassigned district')?></p>
-                        <span class="school-coverage-count<?=$nurseCount===0?' school-coverage-count-empty':''?>">
-                            <?=$nurseCount>0 ? number_format($nurseCount).($nurseCount===1?' nurse':' nurses') : 'No nurse assigned'?>
-                        </span>
+                        <?php if ($nurseCount): ?>
+                            <?php $dialogId='school-nurses-'.(int)$school['id']; ?>
+                            <button type="button" class="school-coverage-count school-coverage-nurse-button" data-school-nurse-dialog aria-haspopup="dialog" aria-controls="<?=$dialogId?>">
+                                <?=icon('nurses')?> <?=number_format($nurseCount)?> <?=$nurseCount===1?'nurse':'nurses'?>
+                            </button>
+                            <dialog class="record-modal school-nurse-modal" id="<?=$dialogId?>" aria-labelledby="<?=$dialogId?>-title">
+                                <section class="card record-modal-card">
+                                    <form method="dialog"><button type="submit" class="record-modal-close" aria-label="Close assigned nurses" autofocus>&times;</button></form>
+                                    <header class="record-modal-heading">
+                                        <span class="record-modal-mark"><?=icon('nurses')?></span>
+                                        <div><h2 id="<?=$dialogId?>-title"><?=e($school['name'])?></h2><p>Assigned nurses</p></div>
+                                    </header>
+                                    <ul class="school-nurse-list">
+                                        <?php foreach ($assignedNurses as $nurseName): ?><li><?=e($nurseName)?></li><?php endforeach ?>
+                                    </ul>
+                                </section>
+                            </dialog>
+                        <?php else: ?>
+                            <span class="school-coverage-count school-coverage-count-empty">No nurse assigned</span>
+                        <?php endif ?>
                     </article>
                 <?php endforeach ?>
             </div>

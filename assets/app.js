@@ -1,5 +1,10 @@
 (() => {
   'use strict';
+  document.querySelectorAll('[data-school-nurse-dialog]').forEach(button => {
+    button.addEventListener('click', () => {
+      document.getElementById(button.getAttribute('aria-controls'))?.showModal();
+    });
+  });
   const accountPhoto = document.querySelector('.top-account-photo');
   if (accountPhoto) {
     const showLoadedPhoto = () => { accountPhoto.hidden = accountPhoto.naturalWidth === 0; };
