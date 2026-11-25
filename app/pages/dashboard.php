@@ -143,35 +143,90 @@ page_heading('WORKFORCE AT A GLANCE',($service->manager()?'Your workforce, in fl
       </div>
     </div><?php endif ?>
 </section>
-<section class="card school-coverage" aria-labelledby="school-coverage-title">
-    <div class="section-heading">
-        <div><h2 id="school-coverage-title">School nurse coverage</h2><p>Active schools grouped by their registered nurse assignments.</p></div>
-    </div>
-    <div class="school-coverage-grid">
-        <?php foreach (['with'=>'Schools with nurses','without'=>'Schools without nurses'] as $group=>$title):
-            $schoolList=$schoolsByCoverage[$group];
-        ?>
-            <section class="school-coverage-group school-coverage-<?=$group?>" aria-labelledby="school-coverage-<?=$group?>">
-                <header>
-                    <h3 id="school-coverage-<?=$group?>"><?=e($title)?></h3>
-                    <span><?=number_format(count($schoolList))?> <?=count($schoolList)===1?'school':'schools'?></span>
-                </header>
-                <?php if ($schoolList): ?>
-                    <ul>
-                        <?php foreach ($schoolList as $school): ?>
-                            <li>
-                                <div><strong><?=e($school['name'])?></strong><small><?=e($school['district_name'] ?? 'Unassigned district')?></small></div>
-                                <?php if ($group==='with'): ?>
-                                    <span><?=number_format((int)$school['nurse_count'])?> <?=((int)$school['nurse_count']===1?'nurse':'nurses')?></span>
-                                <?php endif ?>
-                            </li>
-                        <?php endforeach ?>
-                    </ul>
-                <?php else: ?>
-                    <p><?=$group==='with'?'No active schools have an assigned nurse.':'No active schools are missing a nurse assignment.'?></p>
+<?php
+$coverageTabs=['with'=>'With nurses','without'=>'Without nurses'];
+$requestedTab=$_GET['school_coverage'] ?? '';
+$coverageTab=is_string($requestedTab) && isset($coverageTabs[$requestedTab]) ? $requestedTab : 'with';
+$searchText=$_GET['school_search'] ?? '';
+$schoolSearch=is_string($searchText) ? mb_substr(trim($searchText), 0, 120) : '';
+$schoolMatches=$schoolsByCoverage[$coverageTab];
+if ($schoolSearch !== '') {
+    $schoolMatches=array_values(array_filter($schoolMatches, static fn($school) =>
+        mb_stripos($school['name'], $schoolSearch) !== false
+        || mb_stripos($school['district_name'] ?? 'Unassigned district', $schoolSearch) !== false
+    ));
+}
+$schoolsPerPage=12;
+$schoolMatchCount=count($schoolMatches);
+$schoolLastPage=max(1, (int)ceil($schoolMatchCount / $schoolsPerPage));
+$schoolPage=max(1, min($schoolLastPage, filter_var($_GET['school_page'] ?? 1, FILTER_VALIDATE_INT) ?: 1));
+$schoolOffset=($schoolPage - 1) * $schoolsPerPage;
+$dashboardQuery=['page'=>'dashboard', 'date'=>$date];
+if (isset($_GET['month']) && is_string($_GET['month'])) $dashboardQuery['month']=$_GET['month'];
+$coverageUrl=static function (string $tab, string $search='', int $page=1) use ($dashboardQuery): string {
+    $query=$dashboardQuery + ['school_coverage'=>$tab];
+    if ($search !== '') $query['school_search']=$search;
+    if ($page > 1) $query['school_page']=$page;
+    return '?'.http_build_query($query).'#school-coverage';
+};
+?>
+<section class="card school-coverage" id="school-coverage" aria-labelledby="school-coverage-title">
+    <header class="school-coverage-heading">
+        <span class="school-coverage-icon"><?=icon('locations')?></span>
+        <div><h2 id="school-coverage-title">School nurse coverage</h2><p>Browse active schools by registered nurse assignment.</p></div>
+    </header>
+    <div class="school-coverage-body">
+        <div class="school-coverage-toolbar">
+            <nav class="school-coverage-tabs" aria-label="School coverage filters">
+                <?php foreach ($coverageTabs as $tab=>$title): ?>
+                    <a href="<?=e($coverageUrl($tab, $schoolSearch))?>" <?=$tab===$coverageTab?'aria-current="page"':''?>>
+                        <?=e($title)?> <span><?=number_format(count($schoolsByCoverage[$tab]))?></span>
+                    </a>
+                <?php endforeach ?>
+            </nav>
+            <form class="school-coverage-search" method="get" action="./#school-coverage">
+                <?php foreach ($dashboardQuery + ['school_coverage'=>$coverageTab] as $name=>$value): ?>
+                    <input type="hidden" name="<?=e($name)?>" value="<?=e($value)?>">
+                <?php endforeach ?>
+                <label class="sr-only" for="school-coverage-search">Search schools or districts</label>
+                <input id="school-coverage-search" type="search" name="school_search" value="<?=e($schoolSearch)?>" placeholder="Search schools or districts" maxlength="120">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+        <?php if ($schoolMatches): ?>
+            <div class="school-coverage-grid">
+                <?php foreach (array_slice($schoolMatches, $schoolOffset, $schoolsPerPage) as $school):
+                    $nurseCount=(int)$school['nurse_count'];
+                ?>
+                    <article class="school-coverage-card">
+                        <h3><?=e($school['name'])?></h3>
+                        <p><?=e($school['district_name'] ?? 'Unassigned district')?></p>
+                        <span class="school-coverage-count<?=$nurseCount===0?' school-coverage-count-empty':''?>">
+                            <?=$nurseCount>0 ? number_format($nurseCount).($nurseCount===1?' nurse':' nurses') : 'No nurse assigned'?>
+                        </span>
+                    </article>
+                <?php endforeach ?>
+            </div>
+        <?php else: ?>
+            <div class="school-coverage-empty">
+                <strong><?=$schoolSearch!==''?'No matching schools':'No schools in this group'?></strong>
+                <?php if ($schoolSearch!==''): ?><p>Try a different school or district name.</p><?php endif ?>
+            </div>
+        <?php endif ?>
+        <?php if ($schoolMatches || $schoolSearch!==''): ?>
+            <div class="school-coverage-footer">
+                <?php if ($schoolMatches): ?>
+                    <span><?=number_format($schoolOffset+1)?>–<?=number_format(min($schoolOffset+$schoolsPerPage, $schoolMatchCount))?> of <?=number_format($schoolMatchCount)?> schools</span>
                 <?php endif ?>
-            </section>
-        <?php endforeach ?>
+                <?php if ($schoolSearch!==''): ?><a href="<?=e($coverageUrl($coverageTab))?>">Clear search</a><?php endif ?>
+                <?php if ($schoolLastPage>1): ?>
+                    <nav aria-label="School results pages">
+                        <?php if ($schoolPage>1): ?><a class="button" href="<?=e($coverageUrl($coverageTab, $schoolSearch, $schoolPage-1))?>">Previous</a><?php endif ?>
+                        <?php if ($schoolPage<$schoolLastPage): ?><a class="button" href="<?=e($coverageUrl($coverageTab, $schoolSearch, $schoolPage+1))?>">Next</a><?php endif ?>
+                    </nav>
+                <?php endif ?>
+            </div>
+        <?php endif ?>
     </div>
 </section>
 <?php endif ?>
