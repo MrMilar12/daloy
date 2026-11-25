@@ -194,9 +194,11 @@ body[data-display=list] .school-assignment-options{grid-template-columns:1fr}bod
 .school-coverage-count-empty{background:color-mix(in srgb,#c58b46 18%,var(--surface))}
 .school-coverage-nurse-button{gap:5px;min-height:34px;color:var(--primary)}
 .school-coverage-nurse-button svg{width:14px;height:14px}
-dialog.record-modal.school-nurse-modal{width:min(460px,calc(100% - 24px))}
+dialog.record-modal.nurse-assignment-modal{width:min(500px,calc(100% - 24px))}
 .school-nurse-list{display:grid;gap:7px;margin:0;padding:0;list-style:none}
 .school-nurse-list li{padding:8px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg);overflow-wrap:anywhere}
+.school-nurse-list strong,.school-nurse-list span{display:block}
+.school-nurse-list span{margin-top:2px;color:var(--muted);font-size:.875rem}
 .school-coverage-empty{padding:26px 14px;border:1px dashed var(--border);border-radius:12px;text-align:center;color:var(--muted)}
 .school-coverage-empty p{margin:4px 0 0}
 .school-coverage-footer,.school-coverage-footer nav{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px}

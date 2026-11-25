@@ -7,6 +7,25 @@ $districtOverview=[]; $unassignedDistrictNurses=0;
 if($service->manager()) {
     $districtOverview=$db->all("SELECT d.id,d.name,COALESCE(n.nurse_count,0) nurse_count,COALESCE(s.school_count,0) school_count FROM districts d LEFT JOIN (SELECT district_id,COUNT(*) nurse_count FROM users WHERE role='nurse' AND active=1 GROUP BY district_id) n ON n.district_id=d.id LEFT JOIN (SELECT district_id,COUNT(*) school_count FROM locations WHERE active=1 AND type='School' GROUP BY district_id) s ON s.district_id=d.id WHERE d.active=1 ORDER BY nurse_count DESC,d.name");
     $unassignedDistrictNurses=(int)$db->one("SELECT COUNT(*) n FROM users u LEFT JOIN districts d ON d.id=u.district_id WHERE u.role='nurse' AND u.active=1 AND (u.district_id IS NULL OR d.id IS NULL OR d.active<>1)")['n'];
+    $nursesByDistrict=[];
+    $districtAssignments=$db->all("
+        SELECT d.id AS district_id, u.id AS nurse_id, u.name, home.name AS home_location, extra.name AS assigned_school
+        FROM users u
+        LEFT JOIN districts d ON d.id=u.district_id AND d.active=1
+        LEFT JOIN locations home ON home.id=u.location_id
+        LEFT JOIN nurse_locations nl ON nl.nurse_id=u.id AND (u.location_id IS NULL OR nl.location_id<>u.location_id)
+        LEFT JOIN locations extra ON extra.id=nl.location_id AND extra.type='School'
+        WHERE u.role='nurse' AND u.active=1
+        ORDER BY u.name, u.id, extra.name
+    ");
+    foreach ($districtAssignments as $assignment) {
+        $districtKey=(int)$assignment['district_id'];
+        $nurseId=(int)$assignment['nurse_id'];
+        $nursesByDistrict[$districtKey][$nurseId] ??= ['name'=>$assignment['name'], 'home_location'=>$assignment['home_location'], 'schools'=>[]];
+        if ($assignment['assigned_school']!==null) {
+            $nursesByDistrict[$districtKey][$nurseId]['schools'][]=$assignment['assigned_school'];
+        }
+    }
     $schoolsByCoverage=['with'=>[], 'without'=>[]];
     $schoolAssignmentsSql="
         SELECT location_id, id AS nurse_id FROM users WHERE role='nurse' AND active=1 AND location_id IS NOT NULL
@@ -138,7 +157,33 @@ page_heading('WORKFORCE AT A GLANCE',($service->manager()?'Your workforce, in fl
                 <div class="district-card-track" role="meter" aria-label="Active nurses compared with the largest group" aria-valuemin="0" aria-valuemax="<?=$districtMax?>" aria-valuenow="<?=$nurses?>">
                     <svg aria-hidden="true"><rect width="<?=$barWidth?>%" height="100%" rx="4"></rect></svg>
                 </div>
-                <a class="button district-card-action" href="?page=nurses<?=$districtId===null?'':'&amp;district_id='.(int)$districtId?>" aria-label="<?=e($districtId===null?'View all nursing personnel':'View nurses in '.$district['name'])?>"><?=$districtId===null?'View personnel':'View nurses'?></a>
+                <?php $districtDialogId='district-nurses-'.(int)$districtId; ?>
+                <button type="button" class="district-card-action" data-nurse-dialog aria-haspopup="dialog" aria-controls="<?=$districtDialogId?>">
+                    View nurses <span class="sr-only">in <?=e($district['name'])?></span>
+                </button>
+                <dialog class="record-modal nurse-assignment-modal" id="<?=$districtDialogId?>" aria-labelledby="<?=$districtDialogId?>-title">
+                    <section class="card record-modal-card">
+                        <form method="dialog"><button type="submit" class="record-modal-close" aria-label="Close district nurses" autofocus>&times;</button></form>
+                        <header class="record-modal-heading">
+                            <span class="record-modal-mark"><?=icon('nurses')?></span>
+                            <div><h2 id="<?=$districtDialogId?>-title"><?=e($district['name'])?></h2><p>Assigned nurses and schools</p></div>
+                        </header>
+                        <?php $districtNurses=$nursesByDistrict[(int)$districtId] ?? []; ?>
+                        <?php if ($districtNurses): ?>
+                            <ul class="school-nurse-list">
+                                <?php foreach ($districtNurses as $nurse): ?>
+                                    <li>
+                                        <strong><?=e($nurse['name'])?></strong>
+                                        <span><?=$nurse['home_location']===null?'No home school or office assigned':'Home school / office: '.e($nurse['home_location'])?></span>
+                                        <?php if ($nurse['schools']): ?><span>Additional schools: <?=e(implode(', ', $nurse['schools']))?></span><?php endif ?>
+                                    </li>
+                                <?php endforeach ?>
+                            </ul>
+                        <?php else: ?>
+                            <p class="muted">No active nurses assigned to this district.</p>
+                        <?php endif ?>
+                    </section>
+                </dialog>
             </article>
         <?php endforeach ?>
       </div>
@@ -168,14 +213,15 @@ if ($coverageTab==='with' && $visibleSchools) {
     $schoolIds=array_column($visibleSchools, 'id');
     $placeholders=implode(',', array_fill(0, count($schoolIds), '?'));
     $assignments=$db->all("
-        SELECT assignments.location_id, u.name
+        SELECT assignments.location_id, u.name, home.name AS home_location
         FROM ($schoolAssignmentsSql) assignments
         JOIN users u ON u.id=assignments.nurse_id
+        LEFT JOIN locations home ON home.id=u.location_id
         WHERE assignments.location_id IN ($placeholders)
         ORDER BY u.name, u.id
     ", $schoolIds);
     foreach ($assignments as $assignment) {
-        $schoolNurses[$assignment['location_id']][]=$assignment['name'];
+        $schoolNurses[$assignment['location_id']][]=$assignment;
     }
 }
 $dashboardQuery=['page'=>'dashboard', 'date'=>$date];
@@ -221,10 +267,10 @@ $coverageUrl=static function (string $tab, string $search='', int $page=1) use (
                         <p><?=e($school['district_name'] ?? 'Unassigned district')?></p>
                         <?php if ($nurseCount): ?>
                             <?php $dialogId='school-nurses-'.(int)$school['id']; ?>
-                            <button type="button" class="school-coverage-count school-coverage-nurse-button" data-school-nurse-dialog aria-haspopup="dialog" aria-controls="<?=$dialogId?>">
+                            <button type="button" class="school-coverage-count school-coverage-nurse-button" data-nurse-dialog aria-haspopup="dialog" aria-controls="<?=$dialogId?>">
                                 <?=icon('nurses')?> <?=number_format($nurseCount)?> <?=$nurseCount===1?'nurse':'nurses'?>
                             </button>
-                            <dialog class="record-modal school-nurse-modal" id="<?=$dialogId?>" aria-labelledby="<?=$dialogId?>-title">
+                            <dialog class="record-modal nurse-assignment-modal" id="<?=$dialogId?>" aria-labelledby="<?=$dialogId?>-title">
                                 <section class="card record-modal-card">
                                     <form method="dialog"><button type="submit" class="record-modal-close" aria-label="Close assigned nurses" autofocus>&times;</button></form>
                                     <header class="record-modal-heading">
@@ -232,7 +278,12 @@ $coverageUrl=static function (string $tab, string $search='', int $page=1) use (
                                         <div><h2 id="<?=$dialogId?>-title"><?=e($school['name'])?></h2><p>Assigned nurses</p></div>
                                     </header>
                                     <ul class="school-nurse-list">
-                                        <?php foreach ($assignedNurses as $nurseName): ?><li><?=e($nurseName)?></li><?php endforeach ?>
+                                        <?php foreach ($assignedNurses as $nurse): ?>
+                                            <li>
+                                                <strong><?=e($nurse['name'])?></strong>
+                                                <span><?= $nurse['home_location']===null ? 'No home school or office assigned' : 'Home school / office: '.e($nurse['home_location']) ?></span>
+                                            </li>
+                                        <?php endforeach ?>
                                     </ul>
                                 </section>
                             </dialog>

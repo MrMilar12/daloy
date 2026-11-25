@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  document.querySelectorAll('[data-school-nurse-dialog]').forEach(button => {
+  document.querySelectorAll('[data-nurse-dialog]').forEach(button => {
     button.addEventListener('click', () => {
       document.getElementById(button.getAttribute('aria-controls'))?.showModal();
     });
