@@ -9,7 +9,7 @@
 </head>
 <body class="activation-body" data-page="activate">
     <header class="activation-header">
-        <div class="brand"><span class="brand-mark">D</span><span>DALOY<small>SDO AURORA</small></span></div>
+        <div class="brand"><span class="brand-mark">D+</span><span>DALOY<small>NURSING WORKFORCE</small></span></div>
         <div class="top-actions">
             <button class="theme-toggle icon-button" type="button" aria-label="Toggle color theme">◐</button>
             <form method="post" action="?page=activate">

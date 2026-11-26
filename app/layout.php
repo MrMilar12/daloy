@@ -11,7 +11,7 @@ $navigationGroups = [
 $labels['memo-acknowledgments'] = 'Memo acknowledgments';
 ?>
 <aside class="sidebar" id="sidebar">
-    <a class="brand" href="./"><span class="brand-mark">D</span><span>DALOY<small>SDO AURORA</small></span></a>
+    <a class="brand" href="./"><span class="brand-mark">D+</span><span>DALOY<small>NURSING WORKFORCE</small></span></a>
     <nav class="sidebar-tree" aria-label="Main navigation">
         <a class="sidebar-leaf<?=$page==='dashboard'?' active':''?>" href="?page=dashboard" <?=$page==='dashboard'?'aria-current="page"':''?>>
             <span class="sidebar-branch-icon"><?=icon('dashboard')?></span><span><?=e($labels['dashboard'])?></span>
@@ -110,5 +110,5 @@ $labels['memo-acknowledgments'] = 'Memo acknowledgments';
         </form>
     </div>
 </header>
-<main id="main-content"><?php $notice=$db->one("SELECT setting_value FROM system_settings WHERE setting_key='system_notice'")['setting_value']??''; if($notice): ?><div class="alert notice"><?=e($notice)?></div><?php endif ?><?php if($error): ?><div class="alert danger" role="alert"><?=e($error)?></div><?php endif ?><?php if(isset($_SESSION['flash'])): ?><div class="alert success" role="status"><?=e($_SESSION['flash'])?></div><?php unset($_SESSION['flash']); endif ?><?=$content?></main><footer class="app-footer"><span>DALOY · <?=e($installed['setting_value'])?></span><span>All times are Asia/Manila (UTC+8)</span></footer></div>
+<main id="main-content"><?php $notice=$db->one("SELECT setting_value FROM system_settings WHERE setting_key='system_notice'")['setting_value']??''; if($notice): ?><div class="alert notice"><?=e($notice)?></div><?php endif ?><?php if($error): ?><div class="alert danger" role="alert"><?=e($error)?></div><?php endif ?><?php if(isset($_SESSION['flash'])): ?><div class="alert success" role="status"><?=e($_SESSION['flash'])?></div><?php unset($_SESSION['flash']); endif ?><?=$content?></main><footer class="app-footer"><span>DALOY+ · Nursing Workforce Management</span><span>All times are Asia/Manila (UTC+8)</span></footer></div>
 <nav class="mobile-bottom" aria-label="Quick navigation"><?php foreach(['dashboard','calendar','deployment','profile'] as $item): ?><a href="?page=<?=$item?>" class="<?=$page===$item?'active':''?>"><?=icon($item)?><span><?=e($item==='dashboard'?'Home':ucfirst($item))?></span></a><?php endforeach ?></nav></body></html>

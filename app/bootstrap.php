@@ -23,7 +23,15 @@ function redirect(string $url): never { header('Location: ' . $url, true, 303); 
 function start_session(): void {
     global $config;
     $sessionPath=$config['session_path']??ROOT.'/storage/sessions';
-    if(!is_dir($sessionPath)) mkdir($sessionPath,0700,true);
+    if(!is_dir($sessionPath) && !@mkdir($sessionPath,0700,true)) {
+        // Some local Apache setups cannot write into the checked-out project tree.
+        // Keep sessions outside the public document root in that case.
+        $sessionPath=rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'daloy-sessions';
+        if(!is_dir($sessionPath) && !@mkdir($sessionPath,0700,true) && !is_dir($sessionPath)) {
+            throw new RuntimeException('Session storage could not be created.');
+        }
+    }
+    if(!is_writable($sessionPath)) throw new RuntimeException('Session storage is not writable.');
     session_save_path($sessionPath);
     ini_set('session.use_strict_mode', '1'); ini_set('session.use_only_cookies', '1');
     session_name('daloy_session');

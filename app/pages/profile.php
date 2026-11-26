@@ -10,16 +10,16 @@ page_heading('YOUR ACCOUNT','My profile','Your personnel record, school coverage
     <aside class="profile-id-sidebar">
         <section class="employee-id" aria-label="Your employee profile card">
             <div class="employee-id-red">
-                <img class="employee-id-seal employee-id-deped-seal" src="<?=e(asset_url('deped-seal.png'))?>" alt="Department of Education (DepEd) seal" width="102" height="102">
+                <div class="employee-id-seal" aria-hidden="true">D+</div>
                 <h2><?=e($person['name'])?></h2>
-                <p class="employee-id-department"><?=e($person['district_name']?:'Schools Division Office of Aurora')?></p>
+                <p class="employee-id-department"><?=e($person['district_name']?:'Nursing workforce')?></p>
                 <p class="employee-id-number"><span>ID NO.</span> <?=e($person['employee_number']?:'Not recorded')?></p>
                 <div class="employee-id-designation"><?=e($person['designation']?:$roleLabel)?></div>
             </div>
             <div class="employee-id-bottom">
                 <div class="employee-id-employment"><strong><?=e($roleLabel)?></strong><span><?=e($person['employment_status'])?> employee</span><?=badge($person['active']?'Active':'Inactive')?></div>
                 <a class="employee-id-photo" href="#profile-photo-editor" aria-label="Change your profile photo"><?php if($person['photo']): ?><img src="download.php?type=photo&id=<?=$user['id']?>" alt="Your profile photo"><?php else: ?><?=avatar($person['name'])?><?php endif ?><span class="employee-id-camera" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 5l2-2h4l2 2h4v15H4V5z"/><circle cx="12" cy="12" r="4"/></svg></span></a>
-                <div class="employee-id-brand"><strong>DALOY<span>+</span></strong><small>NURSING WORKFORCE<br>SDO AURORA</small></div>
+                <div class="employee-id-brand"><strong>DALOY<span>+</span></strong><small>NURSING WORKFORCE<br>MANAGEMENT</small></div>
                 <a class="employee-id-photo-link" href="#profile-photo-editor">Change photo <span aria-hidden="true">↗</span></a>
             </div>
         </section>

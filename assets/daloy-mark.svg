@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">DALOY+</title>
+  <rect width="512" height="512" fill="none"/>
+  <path fill="#0739b8" d="M110 64h145c76 0 132 39 132 103 0 37-21 65-55 81v-47c0-14-11-25-25-25h-48c-14 0-25 11-25 25v33c-48 6-88 30-124 66V64Zm0 109c56-48 115-69 179-77-72 4-126 21-179 53v24Z"/>
+  <circle cx="308" cy="113" r="20" fill="#f5b400"/>
+  <path fill="#e50020" d="M110 347c31-69 77-101 145-101h44c46 0 76-24 92-66 8 17 12 35 12 56 0 70-53 112-136 112H110Z"/>
+  <path fill="#fff" d="M196 176h48c14 0 25 11 25 25v20h20c14 0 25 11 25 25v48c0 14-11 25-25 25h-20v20c0 14-11 25-25 25h-48c-14 0-25-11-25-25v-20h-20c-14 0-25-11-25-25v-48c0-14 11-25 25-25h20v-20c0-14 11-25 25-25Z"/>
+  <text x="27" y="454" fill="#fff" font-family="Arial,Helvetica,sans-serif" font-size="111" font-weight="800" letter-spacing="-8">DALOY</text>
+  <path fill="#e50020" d="M452 372h29v28h28v31h-28v29h-29v-29h-28v-31h28z"/>
+</svg>

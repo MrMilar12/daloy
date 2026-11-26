@@ -178,20 +178,20 @@ button { cursor: pointer; }
 }
 /* Keep the DALOY identity prominent while giving the hero a clean hierarchy. */
 .auth-logo-frame {
-    width: min(100%, 360px);
-    margin: 22px auto 0;
-    padding: 0;
-    overflow: visible;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
+    width: min(100%, 430px);
+    margin: 12px auto 0;
+    padding: 12px;
+    overflow: hidden;
+    border: 1px solid #355477;
+    border-radius: 22px;
+    background: linear-gradient(145deg, #102c52, #07172d);
+    box-shadow: 0 20px 48px #07172d45, inset 0 1px #ffffff18;
 }
 .auth-logo {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 1;
     object-fit: contain;
     margin: 0;
     border: 0;
@@ -200,19 +200,18 @@ button { cursor: pointer; }
 }
 .auth-story-copy { padding-top: 34px; }
 @media (max-width: 820px) {
-    .auth-logo-frame { width: min(100%, 280px); margin: 14px auto 0; padding: 0; border-radius: 0; }
-    .auth-logo { border-radius: 0; box-shadow: none; }
+    .auth-logo-frame { width: min(100%, 320px); margin: 12px auto 0; padding: 10px; border-radius: 18px; }
     .auth-story-copy { padding: 17px 0 14px; text-align: center; }
     .auth-story-label { margin-bottom: 7px; }
     .auth-story-copy h1 { font-size: 30px; }
     .auth-story-copy p { margin-inline: auto; }
 }
 @media (max-width: 380px) {
-    .auth-logo-frame { width: min(100%, 240px); margin-top: 12px; }
+    .auth-logo-frame { width: min(100%, 280px); margin-top: 10px; padding: 8px; }
     .auth-story-copy { padding: 14px 0 12px; }
     .auth-story-copy h1 { font-size: 27px; }
 }
-/* DepEd-inspired blue, red, and gold waves behind the login story. */
+/* Brand-color waves behind the login story. */
 .auth-story { isolation: isolate; }
 .auth-story-waves {
     position: absolute;

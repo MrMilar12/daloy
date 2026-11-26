@@ -5,8 +5,8 @@ require __DIR__.'/app/Auth.php';
 require __DIR__.'/app/Schema.php';
 start_session();
 if(is_file(ROOT.'/storage/update-maintenance.json') && ($_GET['page']??'')!=='health') { http_response_code(503); ?><!doctype html><meta charset="utf-8"><title>System maintenance</title><style>body{font:16px system-ui;background:#f5f8fc;color:#17344a;display:grid;place-items:center;min-height:100vh}main{background:white;padding:40px;border-radius:18px;text-align:center;box-shadow:0 10px 30px #17344a18}h1{margin-top:0;color:#b91f36}</style><main><h1>System maintenance</h1><p>DALOY is applying an update. Please try again shortly.</p></main><?php exit; }
-try { $db=new Database($config); ensure_custom_destination_schema($db); $db->run("CREATE TABLE IF NOT EXISTS registration_requests (id INTEGER PRIMARY KEY AUTO_INCREMENT,name VARCHAR(120) NOT NULL,email VARCHAR(190) NOT NULL UNIQUE,password_hash VARCHAR(255) NOT NULL,status VARCHAR(20) NOT NULL DEFAULT 'pending',reviewed_by INTEGER NULL,reviewed_at DATETIME NULL,created_at DATETIME NOT NULL)"); $installed=$db->one("SELECT setting_value FROM system_settings WHERE setting_key='organization'"); if(!$installed) throw new RuntimeException('Not installed'); }
-catch(Throwable $e) { http_response_code(503); require __DIR__.'/app/setup.php'; exit; }
+try { $db=new Database($config); ensure_custom_destination_schema($db); $installed=$db->one("SELECT setting_value FROM system_settings WHERE setting_key='organization'"); if(!$installed) throw new RuntimeException('Workspace is not configured'); }
+catch(Throwable $e) { error_log((string)$e); http_response_code(503); ?><!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DALOY+ unavailable</title><main><h1>DALOY+ is temporarily unavailable</h1><p>Please contact your system administrator.</p></main></html><?php exit; }
 $auth=new Auth($db); $user=$auth->user(); $page=(string)($_GET['page']??'dashboard'); $error=null;
 if($_SERVER['REQUEST_METHOD']==='POST') {
     try {
@@ -15,25 +15,8 @@ if($_SERVER['REQUEST_METHOD']==='POST') {
             $auth->login((string)($_POST['email']??''),(string)($_POST['password']??''),$_SERVER['REMOTE_ADDR']??'unknown');
             redirect($auth->user()['must_change_password']?'?page=activate':'?page=dashboard');
         }
-        if($action==='register') {
-            if($user) redirect('?page=dashboard');
-            $name=trim((string)($_POST['name']??'')); $email=strtolower(trim((string)($_POST['email']??''))); $password=(string)($_POST['password']??'');
-            if(mb_strlen($name)<3 || mb_strlen($name)>120) throw new DomainException('Enter your full name.',422);
-            if(!filter_var($email,FILTER_VALIDATE_EMAIL)) throw new DomainException('Enter a valid email address.',422);
-            if(strlen($password)<12 || !preg_match('/[A-Z]/',$password) || !preg_match('/[a-z]/',$password) || !preg_match('/\d/',$password)) throw new DomainException('Password must be at least 12 characters and include uppercase, lowercase, and a number.',422);
-            if($db->one('SELECT id FROM users WHERE email=?',[$email])) throw new DomainException('An account with this email already exists.',409);
-            $requestId=$db->insert('registration_requests',['name'=>$name,'email'=>$email,'password_hash'=>password_hash($password,PASSWORD_DEFAULT),'status'=>'pending','created_at'=>now()]);
-            foreach($db->all("SELECT id FROM users WHERE role='admin' AND active=1") as $admin) $db->insert('notifications',['user_id'=>$admin['id'],'title'=>'New registration request','message'=>$name.' requested access to DALOY. Review the pending request before creating an account.','link'=>'?page=users','created_at'=>now()]);
-            $_SESSION['flash']='Registration submitted. An administrator must activate your account before you can sign in.'; redirect('./');
-        }
         if(!$user) throw new DomainException('Please sign in again.',401);
         $service=new Service($db,$user);
-        if($action==='register_review') {
-            $service->requireRole(['admin']); $request=$db->one("SELECT * FROM registration_requests WHERE id=? AND status='pending'",[(int)($_POST['request_id']??0)]); if(!$request) throw new DomainException('Registration request is no longer pending.',404);
-            if(($_POST['decision']??'')==='approve') { $db->insert('users',['name'=>$request['name'],'email'=>$request['email'],'password_hash'=>$request['password_hash'],'role'=>'nurse','active'=>1,'must_change_password'=>1,'designation'=>'Nurse','employment_status'=>'Permanent','created_at'=>now()]); $db->run('DELETE FROM registration_requests WHERE id=?',[(int)$request['id']]); }
-            else { $db->update('registration_requests',(int)$request['id'],['status'=>'rejected','reviewed_by'=>$user['id'],'reviewed_at'=>now()]); }
-            $_SESSION['flash']=($_POST['decision']??'')==='approve'?'Registration approved. The requester may now sign in with the temporary password.':'Registration request rejected.'; redirect('?page=users');
-        }
         if($action==='logout') { $service->audit('Logout','users',(int)$user['id'],null,null); $auth->logout(); redirect('./'); }
         if($user['must_change_password'] && !in_array($action,['activate','profile'],true)) throw new DomainException('Set your new password to finish account setup. Your workspace will then open.',403);
         require __DIR__.'/app/Upload.php'; $file=null;

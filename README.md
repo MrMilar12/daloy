@@ -1,35 +1,12 @@
 # DALOY
 
-Duty Allocation & Logistics Operations for Your Workforce — a native PHP nursing workforce management system for the Schools Division Office of Aurora.
+Duty Allocation & Logistics Operations for Your Workforce — a native PHP nursing workforce management system. DALOY+ is an independent application and does not represent a government agency.
 
 ## Run locally
 
 Requirements: Apache 2.4, PHP 8.1+ with `pdo_mysql`, `mbstring`, `fileinfo`, `gd`, `zip`, and MariaDB 10.4+ / MySQL 8+. The supplied XAMPP environment meets these requirements. No Composer, npm, external fonts, CDN, or third-party runtime packages are required.
 
-1. Start **Apache** and **MySQL** in XAMPP.
-2. Place this project in `C:\xampp\htdocs\daloy`.
-3. Copy `config.example.php` to `config.local.php`. Set the database connection. The local default is the `daloy` database on `127.0.0.1`, with XAMPP's root account.
-4. From the project directory, run:
-
-   ```powershell
-   C:\xampp\php\php.exe bin\install.php
-   ```
-
-5. Open **http://localhost/daloy/**. Use the administrator email and randomly generated temporary password printed by the installer. The first sign-in requires a password change.
-
-First sign-in opens a dedicated **Finish account setup** screen. Enter the temporary password you just used, choose a different new password, confirm it, and click **Save password & open dashboard**. The workspace navigation appears after that step; links no longer silently display the Profile page. Your dashboard then provides direct links for adding districts, locations, and personnel.
-
-The installer creates the database and tables, eight Aurora municipalities, configurable duty types and deployment reasons, and a standard day shift. It does not invent official school, district, or employee records. Running it again does not overwrite an existing installation.
-
-To customize the initial administrator:
-
-```powershell
-C:\xampp\php\php.exe bin\install.php --email=administrator@example.gov.ph --name="DALOY Administrator"
-```
-
-An optional `DALOY_ADMIN_PASSWORD` environment variable supplies the temporary password (12–72 bytes). Otherwise the installer generates one. Passwords are not written to source code or logs by the application.
-
-For a **separate demonstration installation**, point the configuration at a new database and add `--demo`. This creates eight fictional nurses, a supervisor, demonstration locations and duty records. Every sample person/location is marked “Demo”; the workspace displays a demonstration notice. The installer prints the demo credentials. Do not mix this optional dataset with official records.
+Start Apache and MySQL in XAMPP, configure `config.local.php` for an already provisioned DALOY database, then open the local application URL. Account creation is managed by the system administrator; there is no public registration form or browser-based installation page.
 
 ## First-use workflow
 
@@ -150,7 +127,7 @@ Restore refuses to overwrite any existing tables and validates attachment checks
 - `app/Reports.php`, `app/Backup.php`: native exports and recovery.
 - `assets/`: native JavaScript and responsive CSS.
 - `database/schema.sql`: indexed relational schema.
-- `bin/`: CLI installation, backup, and recovery.
+- `bin/`: backup and recovery utilities.
 - `tests/`: isolated integration and optional real-browser checks.
 
 The implementation intentionally consolidates some recommended entities: roles are validated values on users; nurse profiles are stored on nurse accounts; schools are typed duty locations; activity requirements and deployment requests are activity records; acknowledgments are retained with their deployment. These preserve the specified relationships and workflows without duplicate records.
